@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^README\.Rmd$
+^CODE_OF_CONDUCT\.md$
+^data-raw$
+^doc$
+^Meta$
+^codecov\.yml$
+^app\.R$
+^rsconnect$
+^\.rscignore$
