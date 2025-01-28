@@ -46,7 +46,8 @@ renv::status() #check renv status
 ## Install the required dev dependencies ----
 golem::install_dev_deps()
 
-
+## run app
+golem::run_dev()
 # add a documentation
 devtools::document()
 
@@ -86,3 +87,4 @@ usethis::use_git_remote(
 
 # go to dev/02_dev.R
 rstudioapi::navigateToFile("dev/02_dev.R")
+
