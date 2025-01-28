@@ -1,0 +1,151 @@
+/* General Body display*/
+
+body{
+
+  background-color: #f4f4f9;
+  background-size: 100vw 100vh;
+  background-position: center;
+  padding: 0;
+  font-family: Times New Roman;
+
+}
+/*Display for headers*/
+
+header{
+  background-color: rgb(79, 121, 66, );
+  text-align: center;
+  padding: 5px;
+  color: white;
+
+}
+header h1{
+  font-size: 3em;
+  margin: 0;
+}
+header p{
+  font-size: 1.5em;
+  margin-top: 5px;
+}
+/* Display for containers */
+
+flex-container {
+  display: flex;
+
+}
+
+/*sidenav {
+    background-color: #333333;
+    color: white;
+    width: 200px;
+    padding-top: 20px;
+    position: fixed;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+*/
+/*sidenav ul {
+    list-style-type: none;
+    padding: 0;
+}
+sidenav ul li {
+    padding: 10px 15px;
+    text-align: left;
+}
+sidenav ul li a {
+  color: #B0B0B0;
+    text-decoration: none;
+    font-size: 1.1em;
+}
+sidenav ul li a:hover {
+  color: black ;
+}*/
+/*Main content list-style*/
+
+/*backgroundimg {
+  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRLtZNUd3macbfno8gEEcJRSlLlNJq6cFzBA&s");
+  background-size: 150px;
+  width: 300px;
+  height: 300px;
+}*/
+
+header-image{
+  width:100px;
+  height:200px;
+  object-fit: cover;
+}
+
+main-content{
+   background-image: "wheat_pic.png";
+   background-color: white;
+   padding: 25px;
+   margin-top: 50px;
+  margin-bottom: 50px;
+  margin-left: 150px;
+  margin-right: 100px;
+}
+main-content h2{
+  font-size: 3em;
+  font-family: Arial;
+  color: black;
+}
+
+main-content p{
+  font-size: 1.1em;
+    color: black;
+    line-height: 1.6;
+    padding-left: 80px;
+    padding-right: 80px;
+    margin-top: 100px;
+  margin-bottom: ;: 100px;
+  margin-left: ;: 150px;
+  margin-right: ;: 80px;
+}
+icon{
+ font-size: 10vh;
+ width: 10vw;
+ height: 5vh;
+}
+rightbar{
+  width: 25px;
+  padding: 20px;
+  background-color: #f4f4f9;
+  border: 1px solid #ddd;
+
+}
+p{
+ color: black;
+ line-height: 1.5;
+
+}
+ul{
+  list-style-type: none;
+  padding: 0;
+}
+ul li{
+  margin: 20px;
+}
+a{
+ text-decoration: none;
+ color:black;
+}
+a.hover{
+  text-decoration: underline;
+}
+/* Responsive Layout*/
+@media screen and (max-width: 768px) {
+     sidenav {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    container {
+        flex-direction: column;
+    }
+
+    main-content {
+        margin-left: 0;
+    }
+}
+
