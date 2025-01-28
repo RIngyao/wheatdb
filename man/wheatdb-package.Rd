@@ -4,12 +4,12 @@
 \name{wheatdb-package}
 \alias{wheatdb}
 \alias{wheatdb-package}
-\title{wheatdb: An Amazing Shiny App}
+\title{wheatdb: PKG_TITLE}
 \description{
-What the package does (one paragraph).
+PKG_DESC.
 }
 \author{
-\strong{Maintainer}: firstname lastname \email{your@email.com}
+\strong{Maintainer}: AUTHOR_FIRST AUTHOR_LAST \email{AUTHOR@MAIL.COM}
 
 }
 \keyword{internal}
