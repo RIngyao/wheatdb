@@ -37,6 +37,7 @@ golem::add_sass_file("custom")
 golem::add_any_file("file.json")
 golem::add_html_template("index")
 golem::add_html_template("picture")
+golem::add_css_file("flexbox")
 
 ## Add internal datasets ----
 ## If you have data in your package

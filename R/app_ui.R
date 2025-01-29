@@ -27,7 +27,8 @@ app_ui <- function(request) {
       ),
       dashboardBody(
         tags$head(
-          tags$link(rel="stylesheet", text="text/css", href="custom.css")),
+          tags$link(rel="stylesheet", text="text/css", href="custom.css"),
+          ),
 
         tabItems(
           tabItem(tabName = "home",
