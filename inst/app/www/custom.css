@@ -25,12 +25,13 @@ header h1{
 header p{
   font-size: 1.5em;
   margin-top: 5px;
+  font: center;
 }
 /* Display for containers */
 
 .container {
 
-  margin: 0;
+  margin: 5px;
 
 }
  h2{
@@ -40,7 +41,7 @@ header p{
     padding: 10px;
   margin: 10px;
 
-  ;
+
 }
 .container p{
 
@@ -50,74 +51,65 @@ header p{
   margin-right: 20px;
   margin-left: 10px;
 }
+.container img {
+  display: block;
+  margin: auto;
+  width: 70%;
+}
 
-/*sidenav {
-    background-color: #333333;
-    color: white;
-    width: 200px;
-    padding-top: 20px;
-    position: fixed;
-    height: 100%;
-    top: 0;
-    left: 0;
-}
-*/
-/*sidenav ul {
-    list-style-type: none;
-    padding: 0;
-}
-sidenav ul li {
-    padding: 10px 15px;
-    text-align: left;
-}
-sidenav ul li a {
-  color: #B0B0B0;
-    text-decoration: none;
-    font-size: 1.1em;
-}
-sidenav ul li a:hover {
-  color: black ;
-}*/
-/*Main content list-style*/
-
-/*backgroundimg {
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRLtZNUd3macbfno8gEEcJRSlLlNJq6cFzBA&s");
-  background-size: 150px;
-  width: 300px;
-  height: 300px;
-}*/
-/*
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}*/
-#parent {
+.parent {
   text-decoration: underline;
    color: black;
     line-height: 1.6;
-    padding: 10px;
+  text-align: center;
+  margin: 16px;
+  padding: 32px 32px;
+  border: 1px solid black;
+
+}
+
+.child {
+  width: 30%;
+  padding: 32px 32px;
+  border: 1px solid black;
+  float: left;
   margin: 10px;
-  display: bold;
 }
-
-/*ox1{
-  width: 10px;
-  height: 10px;
- background-color: white;
- margin: 10px;
- display: flex;
-
+.link {
+  width: 30%;
+  padding: 32px 32px;
+  border: 1px solid black;
+  float: right;
+  margin-right: 10px;
 }
-.box2{
-  width: 10px;
-  height: 10px;
-  background-color: white;
-  margin: 30px;
-  display: flex;
-
-
-}*/
-h4{
+.child img {
+  display: inline-block;
+    width: 100px;
+    height: 100px;
+}
+.link img{
+  display: inline-block;
+    width: 150px;
+    height: 100px;
+}
+/*.float-parent {
+    width: 50%;
+}
+.float-child {
+    float: left;
+    width: 50%;
+}
+.red {
+    background-color: red;
+    margin-left: 50%;
+    height: 100px;
+}
+.blue {
+    margin-left: 50%;
+    height: 100px;
+    background-color: blue;
+}
+/*h4{
   display: inline;
 }
 
@@ -127,19 +119,14 @@ h4{
   grid-template-columns: 180px 180px;
 
 }*/
-.item {
+/*.item {
 
   border: 1px solid #ccc;
 
 
 }
-/*header-image {
-  width:100px;
-  height:200px;
-  object-fit: cover;
-}*/
 
-.main-content img {
+/*.main-content img {
 
    background-color: white;
 
@@ -164,7 +151,7 @@ h4{
 
 }
 
-icon{
+.icon{
  font-size: 5vh;
  width: 5px;
  height: 5px;
@@ -193,10 +180,16 @@ a{
  text-decoration: none;
  color:black;
 }
-a:link {
+.child a:link {
   color: green;
 }
-a:hover {
+.child a:hover {
+  text-decoration: underline;
+}
+.link a:link {
+  color: green;
+}
+.link a:hover {
   text-decoration: underline;
 }
 /* Responsive Layout*/
