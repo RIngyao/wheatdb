@@ -38,7 +38,8 @@ renv::init() # initiate the env
 #renv::install("shinydashboard") # install package or
 # install package and update DESCRIPTION
 usethis::use_package_doc() # create a doc file for updating the NAMESPACE
-usethis::use_package("shinydashboard") # this will auto add to the DESCRIPTION
+usethis::use_package("tidyverse", type = "depends") # this will auto add to the DESCRIPTION
+usethis::use_package("shinyFeedback", type = "depends")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
 renv::snapshot() # take a snapshot of the packages
 renv::status() #check renv status
@@ -50,6 +51,8 @@ golem::install_dev_deps()
 golem::run_dev()
 # add a documentation
 devtools::document()
+
+
 
 ## Create Common Files ----
 ## See ?usethis for more information
