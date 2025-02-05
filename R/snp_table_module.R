@@ -46,15 +46,6 @@ snp_table_server <- function(id){
     observe({
       req(gene_coord())
 
-
-      if (!is.numeric(gene_coord())){
-        output$alert <- renderText({"Input is not numeric" })
-      }
-      else {
-        output$alert <- renderText(NULL)
-      }
-
-      print(gene_coord())
       if(gene_coord() == "Gene")
         {
           output$panel <- renderUI(
@@ -63,8 +54,10 @@ snp_table_server <- function(id){
           }
       else if (gene_coord() == "Coordinates"){
             output$panel <- renderUI(
-              tagList(textInput(inputId = NS(id, "coordinates"), label = "start", placeholder = c("start value")),
-                      textInput(inputId = NS(id, "coordinates"), label = "end", placeholder = c("end value"))
+              fluidRow(
+                column(6, textInput(inputId = NS(id, "start_coord"), label = "start", placeholder = c("start value")))
+                ,
+                column(6,textInput(inputId = NS(id, "end_coord"), label = "end", placeholder = c("end value")))
                       )
 
 
@@ -72,6 +65,33 @@ snp_table_server <- function(id){
       else{
               output$panel <- renderUI(NULL)
             }
+
+    })
+
+    
+    # get the input  info  for coordinat and  return TRUE for numeric,  else FALSE for  non-numeric
+    start_coord <- reactive({ 
+      req(input$start_coord)
+      yesNo <- sapply(input$start_coord, function(x) stringr::str_detect(x, "^[0-9]+$"))
+      return(yesNo)
+    })
+
+    end_coord <- reactive({
+      req(input$end_coord)
+      yesNo <- sapply(input$end_coord, function(x) stringr::str_detect(x, "^[0-9]+$"))
+      return(yesNo)
+    })
+    
+    #  check validity of the input coordinates
+    #observeE({
+    observe({
+
+      if (!isTruthy(start_coord()) || !isTruthy(end_coord())){
+        output$alert <- renderText("Provide numeric value for coordinates")
+      }
+      else {
+        output$alert <- renderText(NULL)
+      }
     })
     # observeEvent(req(gene_coord()),{
     #   # browser()
