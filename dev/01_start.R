@@ -74,6 +74,7 @@ golem::use_favicon() # path = "path/to/ico". Can be an online file.
 ## Add helper functions ----
 golem::use_utils_ui(with_test = TRUE)
 golem::use_utils_server(with_test = TRUE)
+golem::run_dev()
 
 ## Use git ----
 usethis::use_git()
