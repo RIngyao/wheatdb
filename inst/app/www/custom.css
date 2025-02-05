@@ -25,111 +25,171 @@ header h1{
 header p{
   font-size: 1.5em;
   margin-top: 5px;
+  font: center;
 }
 /* Display for containers */
 
-flex-container {
-  display: flex;
+.container {
+
+  margin: 5px;
+
+}
+ h2{
+   text-decoration: underline;
+   color: black;
+    line-height: 1.6;
+    padding: 10px;
+  margin: 10px;
+
+
+}
+.container p{
+
+    color: black;
+    line-height: 1.6;
+    padding: 10px;
+  margin-right: 20px;
+  margin-left: 10px;
+}
+.container img {
+  display: block;
+  margin: auto;
+  width: 70%;
+}
+
+.parent {
+  text-decoration: underline;
+   color: black;
+    line-height: 1.6;
+  text-align: center;
+  margin: 16px;
+  padding: 32px 32px;
+  border: 1px solid black;
 
 }
 
-/*sidenav {
-    background-color: #333333;
-    color: white;
-    width: 200px;
-    padding-top: 20px;
-    position: fixed;
-    height: 100%;
-    top: 0;
-    left: 0;
+.child {
+  width: 30%;
+  padding: 32px 32px;
+  border: 1px solid black;
+  float: left;
+  margin: 10px;
 }
-*/
-/*sidenav ul {
-    list-style-type: none;
-    padding: 0;
+.link {
+  width: 30%;
+  padding: 32px 32px;
+  border: 1px solid black;
+  float: right;
+  margin-right: 10px;
 }
-sidenav ul li {
-    padding: 10px 15px;
-    text-align: left;
+.child img {
+  display: inline-block;
+    width: 100px;
+    height: 100px;
 }
-sidenav ul li a {
-  color: #B0B0B0;
-    text-decoration: none;
-    font-size: 1.1em;
+.link img{
+  display: inline-block;
+    width: 150px;
+    height: 100px;
 }
-sidenav ul li a:hover {
-  color: black ;
+/*.float-parent {
+    width: 50%;
+}
+.float-child {
+    float: left;
+    width: 50%;
+}
+.red {
+    background-color: red;
+    margin-left: 50%;
+    height: 100px;
+}
+.blue {
+    margin-left: 50%;
+    height: 100px;
+    background-color: blue;
+}
+/*h4{
+  display: inline;
+}
+
+/*container{
+  display: grid;
+  grid-template-rows: 100px 100px ;
+  grid-template-columns: 180px 180px;
+
 }*/
-/*Main content list-style*/
+/*.item {
 
-/*backgroundimg {
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRLtZNUd3macbfno8gEEcJRSlLlNJq6cFzBA&s");
-  background-size: 150px;
-  width: 300px;
-  height: 300px;
-}*/
+  border: 1px solid #ccc;
 
-header-image{
-  width:100px;
-  height:200px;
-  object-fit: cover;
+
 }
 
-main-content{
-   background-image: "wheat_pic.png";
+/*.main-content img {
+
    background-color: white;
-   padding: 25px;
-   margin-top: 50px;
-  margin-bottom: 50px;
-  margin-left: 150px;
-  margin-right: 100px;
+
+   height: 50%;
+   width: 50%;
+   margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
+
 }
-main-content h2{
+.main-content h2{
   font-size: 3em;
   font-family: Arial;
   color: black;
 }
 
-main-content p{
+.main-content p{
   font-size: 1.1em;
     color: black;
     line-height: 1.6;
-    padding-left: 80px;
-    padding-right: 80px;
-    margin-top: 100px;
-  margin-bottom: ;: 100px;
-  margin-left: ;: 150px;
-  margin-right: ;: 80px;
+
 }
-icon{
- font-size: 10vh;
- width: 10vw;
- height: 5vh;
+
+.icon{
+ font-size: 5vh;
+ width: 5px;
+ height: 5px;
 }
-rightbar{
+/*rightbar{
   width: 25px;
   padding: 20px;
   background-color: #f4f4f9;
   border: 1px solid #ddd;
+   display: flex;
+}*/
 
-}
 p{
  color: black;
  line-height: 1.5;
 
 }
-ul{
+/*ul{
   list-style-type: none;
   padding: 0;
 }
 ul li{
   margin: 20px;
-}
+}*/
 a{
  text-decoration: none;
  color:black;
 }
-a.hover{
+.child a:link {
+  color: green;
+}
+.child a:hover {
+  text-decoration: underline;
+}
+.link a:link {
+  color: green;
+}
+.link a:hover {
   text-decoration: underline;
 }
 /* Responsive Layout*/
