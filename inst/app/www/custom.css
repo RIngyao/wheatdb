@@ -92,6 +92,16 @@ header p{
     width: 150px;
     height: 100px;
 }
+
+#alert {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+/*#downloadbutton {
+  display: inline-block;
+  float: right;
+}*/
 /*.float-parent {
     width: 50%;
 }

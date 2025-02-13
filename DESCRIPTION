@@ -25,4 +25,6 @@ RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Depends: 
     shinyFeedback,
-    tidyverse
+    shinyjs,
+    tidyverse,
+    vroom
