@@ -47,7 +47,7 @@ wet climate
                </div>
                <div class="link"
                <a href="https://www.ncbi.nlm.nih.gov/" target="_blank>
-                   <span></span><link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon">
+                   <span><link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon"></span>
 
                   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfIHPYlZzIl63NHd2gfVIPrhwx6f_IYpMODQ&s" style="width=50px;height=50px">
                   <h4>National Center for biological Information</h4>
@@ -59,6 +59,12 @@ wet climate
 
        ')
   )
+      snp_page <- div(
+        HTML('
+             <div id="alert>alert</div>
+
+             ')
+      )
 
   tagList(
     # Leave this function for adding external resources
@@ -92,7 +98,7 @@ wet climate
                  ),# end of Home
 
           tabItem(tabName = "snps",
-
+                    snp_page,
                     snp_table_ui("table")
 
                     #end fliudRow
