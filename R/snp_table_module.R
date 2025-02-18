@@ -22,19 +22,33 @@ snp_table_ui <- function(id) {
                                                                                    "Chr6A", "Chr6B", "Chr6D",
                                                                                    "Chr7A", "Chr7B", "Chr7D"), selected = "NULL")),
       column(2, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
-      column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value"))),
-      column(2, downloadLink(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
-      ),
-
+      column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
+    ),
     actionButton(inputId = ns("click"), label = "Search"), # apply when this button is clicked
     uiOutput(outputId = ns("panel")),
-    #numericInput(inputId = ns("InputWarning"), "Warn if error happens", value=""),
     uiOutput(outputId = ns("alert")), #for displaying alert messages #shinyjs
-    #helpText(outputId = ns("message"), style = "color:red"),
     uiOutput(outputId = ns("coordinates_panel")), #for coordinates column
-    DTOutput(outputId = ns("table_output")), #for table output
-    #downloadLink(outputId = ns("Download"))
-)
+    hr(),
+     fluidRow(
+      box(title = "SNP Table", height = "620", solidHeader = T,
+          # fluidRow(
+          #   column(1, align = "right", offset = 9,
+          #          downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
+          #   column(2, align = "left", offset = 10,
+          #          selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))),
+          # ),
+           column(1, align = "right", offset = 9,
+                  downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
+           column(2, align = "left", offset = 10,
+                  selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))),
+           DTOutput(outputId = ns("table_output"))
+         ),#for table output
+      br(),
+      box(title = "SNP Analysis Plot", height = "450", solidHeader = T, plotOutput(outputId = ns("plot1"), height = "250")
+         )#for plot output
+      )
+    )
+
 }
 
 #' name_of_module1 Server Functions
@@ -72,7 +86,7 @@ snp_table_server <- function(id, snps_df) {
       return(yesNo)
     })
 
-    # to show the gene samples in table
+    # get the sample name of snps table
     sample_name <- reactive(req(input$sample_name))
     chr_sample <- reactive(req(input$chr))
 
@@ -85,8 +99,9 @@ snp_table_server <- function(id, snps_df) {
     error_msg <- reactiveValues(msg=NULL)
     #not to show the table when coordinates are empty
     null_table <- reactiveValues(show=NULL)
+    #table_download <- reactiveValues(download=NULL) # for displaying table download option
 
-    # checking validity of the coordinates
+    # checking validity of the coordinates--------------------------
     observe({
 
        # tryCatch({  # rework
@@ -149,6 +164,8 @@ snp_table_server <- function(id, snps_df) {
       })
 
 
+    # feedback ----------------------------------------------------------------
+
     observe({
       req(track_error_df$status, error_msg$msg)
       if(!isTRUE(track_error_df$status)){
@@ -168,7 +185,7 @@ snp_table_server <- function(id, snps_df) {
 
 
 
-   # generating btable--------------------------
+   # processing the final table--------------------------
     final_table <- eventReactive(input$click,{
       req(sample_name(), chr_sample(), start_coord$coord,
           end_coord$coord(), track_error_df$status)
@@ -185,19 +202,75 @@ snp_table_server <- function(id, snps_df) {
         }
 
         final_df <- df_sample()[df_sample()$POS >= start_coord$coord() & df_sample()$POS <= end_coord$coord() & df_sample()$`#CHROM` == chr_sample(), col_list]
+
       }else if(!isTRUE(track_error_df$status) || !isTruthy(start_coord$coord()) || !isTruthy(end_coord$coord())){
         final_df <- as.data.frame(NULL)
       }
     })
 
-    # display table
+   # values <- reactiveValues(download=NULL)
+
+
+    # download params ---------------------------------------------------------
+
+    observe({
+    # browser()
+      req(is.data.frame(final_table()))
+      output$Download <- downloadHandler(
+
+        filename = function() {
+         # data <- final_table()
+          # readxl::read_xlsx("wheatdb_snps.xlsx")
+          # readxl::read_xls("wheatdb_snps.xls")
+          paste(switch(input$filetype,
+                               "csv" = "wheatdb_snps.csv",
+                               "tsv" = "wheatdb_snps.tsv",
+
+                               "xlsx" = "wheatdb_snps.xlsx",
+                               "xls" = "wheatdb_snps.xls",
+              ))
+          },
+        # tsv, csv, xlsx, xlx
+
+        content = function(file) {
+
+          if(input$filetype == "csv") {
+            write.csv(final_table(), file, sep = ",")
+          }
+          else if(input$filetype == "tsv") {
+            write.table(final_table(), file, sep = "\t")
+          }
+          else if(input$filetype == "xlsx" || input$filetype == "xls") {
+            write.xlsx(final_table(), file)
+          }
+        }
+      )
+
+    })
+
+    # display table--------------------------------
     observe({
       req(is.data.frame(final_table()))
 
       if(nrow(final_table()) > 1){
-        output$table_output <- renderDT(datatable(final_table()))
+        output$table_output <- renderDT({
+          datatable(
+            cbind(final_table()),
+            options = list(
+              scrollX = TRUE,
+              scrollY = "250px"
+            ))
+
+      })
       }
     })
+
+
+    # observe({
+    #   #values$download <- reactive(FALSE)
+    #   #shinyjs::show("Download")
+    #
+    # })
     # observeEvent(input$click,  {
     #     # check the sample name provided by the user
     #     req(sample_name(), chr_sample(), !is.null(start_coord$coord),
@@ -237,7 +310,9 @@ snp_table_server <- function(id, snps_df) {
 
  }#module server
 )
-  }#snp table server
+
+
+}#snp table server
 
 
 ## To be copied in the UI

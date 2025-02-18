@@ -24,6 +24,9 @@ LazyData: true
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Depends: 
+    bs4Dash,
+    openxlsx,
+    shinydashboardPlus,
     shinyFeedback,
     shinyjs,
     tidyverse,

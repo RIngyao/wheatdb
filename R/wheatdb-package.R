@@ -8,6 +8,8 @@
 #'@import shinyFeedback
 #'@import vroom
 #'@import shinyjs
-
+#'@import openxlsx
+#'@import bs4Dash
+#'@import shinydashboardPlus
 ## usethis namespace: end
 NULL
