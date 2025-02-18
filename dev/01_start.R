@@ -39,8 +39,9 @@ renv::init() # initiate the env
 # install package and update DESCRIPTION
 usethis::use_package_doc() # create a doc file for updating the NAMESPACE
 usethis::use_package("tidyverse", type = "depends") # this will auto add to the DESCRIPTION
-usethis::use_package("vroom", type = "depends")
-1
+usethis::use_package("openxlsx", type = "depends")
+usethis::use_package("bs4Dash", type = "depends")
+usethis::use_package("shinydashboardPlus", type = "depends")
 usethis::use_package("shinyFeedback", type = "depends")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
 renv::snapshot() # take a snapshot of the packages

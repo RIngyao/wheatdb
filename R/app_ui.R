@@ -73,13 +73,30 @@ wet climate
     shinydashboard::dashboardPage(
       dashboardHeader( title ="Wheat Portal"),
       dashboardSidebar(
+        width = 150,
         shinydashboard::sidebarMenu(
+
            menuItem("Home", tabName="home", icon=icon("home")),
            menuItem("SNPs", tabName="snps") # icon=icon("caret-down"))
 
 
         )
       ),
+
+       # dashboardFooter(
+       #   div {
+       #   left = "Copyright All Rights Reserved",
+       #   right = "2025",
+       #
+       #               position:absolute;
+       #               height:50px;
+       #               color: white;
+       #               padding: 10px;
+       #               background-color: black;
+       #   }
+       #
+       #
+       # ),
       dashboardBody(
         tags$head(
           tags$link(rel="stylesheet", text="text/css", href="custom.css"),
@@ -98,10 +115,11 @@ wet climate
                  ),# end of Home
 
           tabItem(tabName = "snps",
-                    snp_page,
-                    snp_table_ui("table")
+                  fluidRow(
 
-                    #end fliudRow
+                    snp_table_ui("table"),
+
+                   ) #end fliudRow
                   ) #end snps
 
 
@@ -111,7 +129,16 @@ wet climate
 
 
 
-    ) #end dashboardPage
+    ), #end dashboardPage
+
+    #footer
+      footer <- div(
+        HTML('
+             <div class="footermsg">
+             <h3>Copyright All Rights Reserved 2025</h3>
+              ')
+      )
+
   ) #end taglist
 
 
