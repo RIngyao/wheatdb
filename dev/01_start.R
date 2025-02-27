@@ -42,6 +42,10 @@ usethis::use_package("tidyverse", type = "depends") # this will auto add to the 
 usethis::use_package("openxlsx", type = "depends")
 usethis::use_package("bs4Dash", type = "depends")
 usethis::use_package("shinydashboardPlus", type = "depends")
+usethis::use_package("ggplot2", type = "depends")
+usethis::use_package("shinythemes", type = "depends")
+usethis::use_package("bslib", type = "depends")
+usethis::use_package("plotly", type = "depends")
 usethis::use_package("shinyFeedback", type = "depends")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
 renv::snapshot() # take a snapshot of the packages
@@ -54,6 +58,7 @@ golem::install_dev_deps()
 golem::run_dev()
 # add a documentation
 devtools::document()
+
 
 
 

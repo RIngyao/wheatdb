@@ -11,5 +11,10 @@
 #'@import openxlsx
 #'@import bs4Dash
 #'@import shinydashboardPlus
-## usethis namespace: end
+#'@import ggplot2
+#'@import shinythemes
+#'@import bslib
+#'@import plotly
+## usethis names
+
 NULL
