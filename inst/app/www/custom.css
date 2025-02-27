@@ -1,18 +1,12 @@
 /* General Body display*/
 
-body{
-
-  background-color: #f4f4f9;
-  background-size: 100vw 100vh;
-  background-position: center;
-  padding: 0;
-  font-family: Times New Roman;
-
+body, .content-wrapper {
+background-color: white;
 }
 /*Display for headers*/
 
 header{
-  background-color: rgb(79, 121, 66, );
+  background-color: black;
   text-align: center;
   padding: 5px;
   color: white;
@@ -39,22 +33,30 @@ header p{
    color: black;
     line-height: 1.6;
     padding: 10px;
-  margin: 10px;
 
 
+
+}
+
+.box-header {
+  font-size: 40px;
+  font-weight: bold;
+  color: darkblue;
+  text-transform: uppercase;
+  font-family: Times New Roman, serif;
 }
 .container p{
 
     color: black;
     line-height: 1.6;
     padding: 10px;
-  margin-right: 20px;
-  margin-left: 10px;
+
 }
 .container img {
   display: block;
   margin: auto;
   width: 70%;
+
 }
 
 .parent {
@@ -65,7 +67,7 @@ header p{
   margin: 16px;
   padding: 32px 32px;
   border: 1px solid black;
-
+  background-color: white;
 }
 
 .child {
@@ -74,6 +76,7 @@ header p{
   border: 1px solid black;
   float: left;
   margin: 10px;
+   background-color: white;
 }
 .link {
   width: 30%;
@@ -110,94 +113,13 @@ header p{
  margin-left: 20px;
  padding-bottom: 10px;
  }
-/*#downloadbutton {
-  display: inline-block;
-  float: right;
-}*/
-/*.float-parent {
-    width: 50%;
-}
-.float-child {
-    float: left;
-    width: 50%;
-}
-.red {
-    background-color: red;
-    margin-left: 50%;
-    height: 100px;
-}
-.blue {
-    margin-left: 50%;
-    height: 100px;
-    background-color: blue;
-}
-/*h4{
-  display: inline;
-}
-
-/*container{
-  display: grid;
-  grid-template-rows: 100px 100px ;
-  grid-template-columns: 180px 180px;
-
-}*/
-/*.item {
-
-  border: 1px solid #ccc;
-
-
-}
-
-/*.main-content img {
-
-   background-color: white;
-
-   height: 50%;
-   width: 50%;
-   margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: 20px;
-  margin-right: 20px;
-
-}
-.main-content h2{
-  font-size: 3em;
-  font-family: Arial;
-  color: black;
-}
-
-.main-content p{
-  font-size: 1.1em;
-    color: black;
-    line-height: 1.6;
-
-}
-
-.icon{
- font-size: 5vh;
- width: 5px;
- height: 5px;
-}
-/*rightbar{
-  width: 25px;
-  padding: 20px;
-  background-color: #f4f4f9;
-  border: 1px solid #ddd;
-   display: flex;
-}*/
 
 p{
  color: black;
  line-height: 1.5;
 
 }
-/*ul{
-  list-style-type: none;
-  padding: 0;
-}
-ul li{
-  margin: 20px;
-}*/
+
 a{
  text-decoration: none;
  color:black;
@@ -216,6 +138,10 @@ a{
 }
 /* Responsive Layout*/
 @media screen and (max-width: 768px) {
+     body {
+       background-color: white;
+     }
+
      sidenav {
         width: 100%;
         height: auto;

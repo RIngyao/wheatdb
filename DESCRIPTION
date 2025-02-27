@@ -25,9 +25,13 @@ RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Depends: 
     bs4Dash,
+    bslib,
+    ggplot2,
     openxlsx,
+    plotly,
     shinydashboardPlus,
     shinyFeedback,
     shinyjs,
+    shinythemes,
     tidyverse,
     vroom

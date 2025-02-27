@@ -59,25 +59,39 @@ wet climate
 
        ')
   )
-      snp_page <- div(
-        HTML('
-             <div id="alert>alert</div>
+      # snp_page <- div(
+      #   HTML('
+      #        <div id="alert>alert</div>
+      #
+      #        ')
+      # )
 
-             ')
-      )
+ # bs_theme(
+ #    version = 5,
+ #    bg = "#FFFFFF",
+ #    fg = "#000000",
+ #    primary = "#0199F8",
+ #    secondary = "#FF374B",
+ #    base_font = "Maven Pro"
+ #  )
 
+#  bs_theme_preview(theme = custom_theme, with_themer = FALSE)
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
     shinydashboard::dashboardPage(
       dashboardHeader( title ="Wheat Portal"),
+      # bs_theme(
+      #   bg = "#FFFFFF",
+      #   fg = "#FFF",
+      # ),
       dashboardSidebar(
         width = 150,
         shinydashboard::sidebarMenu(
 
            menuItem("Home", tabName="home", icon=icon("home")),
-           menuItem("SNPs", tabName="snps") # icon=icon("caret-down"))
+           menuItem("Markers", tabName="markers") # icon=icon("caret-down"))
 
 
         )
@@ -108,19 +122,20 @@ wet climate
 
                      # h2("Hello"),
 
-                      frontPage
+                      column(12, frontPage),
                        #includeHTML("inst/app/www/index.html")
 
                           )# end fluidrow
                  ),# end of Home
 
-          tabItem(tabName = "snps",
+          tabItem(tabName = "markers",
                   fluidRow(
 
-                    snp_table_ui("table"),
+                    column(12, snp_table_ui("table")
+                           ),
 
                    ) #end fliudRow
-                  ) #end snps
+                  ) #end markers
 
 
         ) #end tabItems

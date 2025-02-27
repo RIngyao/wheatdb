@@ -10,7 +10,6 @@
 snp_table_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    shinyjs::useShinyjs(),
     shinyFeedback::useShinyFeedback(),
     fluidRow(
       column(3,selectInput(inputId = ns("sample_name"), label = "Choose query type", choices = c("None"), selected = "None")),
@@ -25,18 +24,12 @@ snp_table_ui <- function(id) {
       column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
     ),
     actionButton(inputId = ns("click"), label = "Search"), # apply when this button is clicked
-    uiOutput(outputId = ns("panel")),
+    #uiOutput(outputId = ns("panel")),
     uiOutput(outputId = ns("alert")), #for displaying alert messages #shinyjs
-    uiOutput(outputId = ns("coordinates_panel")), #for coordinates column
-    hr(),
-     fluidRow(
-      box(title = "SNP Table", height = "620", solidHeader = T,
-          # fluidRow(
-          #   column(1, align = "right", offset = 9,
-          #          downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
-          #   column(2, align = "left", offset = 10,
-          #          selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))),
-          # ),
+    #uiOutput(outputId = ns("coordinates_panel")), #for coordinates column
+
+    fluidRow(
+      box(title = "SNP Table", height = "600", solidHeader = T,
            column(1, align = "right", offset = 9,
                   downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
            column(2, align = "left", offset = 10,
@@ -44,9 +37,18 @@ snp_table_ui <- function(id) {
            DTOutput(outputId = ns("table_output"))
          ),#for table output
       br(),
-      box(title = "SNP Analysis Plot", height = "450", solidHeader = T, plotOutput(outputId = ns("plot1"), height = "250")
-         )#for plot output
-      )
+      box(title = "SNP Plot analysis", height = "650", solidHeader = T,
+          column(1, align = "right", offset = 8,
+                 downloadButton(outputId = ns("download_bar"), label = "Download image", icon = shiny::icon("download"))),
+          column(2, align = "left", offset = 10,
+                 selectInput(inputId = ns("imgtype"), label = "Type:", choices = c("png", "pdf", "jpeg"))),
+          column(12,
+              div(height=500, width = 500,
+                    plotOutput(outputId = ns("plot"), click = "plot_click", hover= "plot_hover")))
+          )#for plot output
+      ),
+    #textInput(inputId = ns("text"), label ="type"),
+    uiOutput(outputId = ns("text_plot"))
     )
 
 }
@@ -54,7 +56,7 @@ snp_table_ui <- function(id) {
 #' name_of_module1 Server Functions
 #'
 #' @noRd
-snp_table_server <- function(id, snps_df) {
+snp_table_server <- function(id, snps_df, snps_plot, df_combined) {
   moduleServer(id, function(input, output, session){
 
     ns <- session$ns
@@ -100,66 +102,46 @@ snp_table_server <- function(id, snps_df) {
     #not to show the table when coordinates are empty
     null_table <- reactiveValues(show=NULL)
     #table_download <- reactiveValues(download=NULL) # for displaying table download option
+    null_plot <- reactiveValues(imgplot=NULL) #true for NULL and false for displaying the plot
 
     # checking validity of the coordinates--------------------------
     observe({
-
-       # tryCatch({  # rework
-      # browser()
-      # if (is.null(start_coord$coord) & is.null(end_coord$coord)) {
-      #  # output$table_output <- renderDT(NULL)
-      #   #null_table$show <- TRUE
-      # }
+          # browser()
 
         if (!isTruthy(start_coordTF()) || !isTruthy(end_coordTF())){
            # checking for numeric
-           #showFeedbackWarning(inputId = InputWarning)
-
-
-
-           #output$alert <- renderText("Provide numeric value for coordinates" )
            track_error_df$status <- reactive(FALSE)
            error_msg$msg <- "Provide numeric value for coordinates"
            output$table_output <- renderDT((NULL))
-           #stop("Provide numeric value for coordinate")
+           output$plot <- renderPlot(NULL)
          }
          else {
            # browser()
            # only numeric values were provided
-          #hideFeedback(inputId="start_coord",  )
-           #output$alert <- renderText(NULL)
-           #shinyjs::alert("click")
-          # hideFeedback("InputWarning")
-           # convert to numeric: textinput is character
            start_coord$coord <- reactive(as.numeric(input$start_coord))
            end_coord$coord <- reactive(as.numeric(input$end_coord))
 
            if (!isTruthy(start_coord$coord() < end_coord$coord())) {
-
-
              track_error_df$status <- reactive(FALSE)
              error_msg$msg <- "End coordinate should be greater than start coordinate"
-             #output$alert <- renderText("End value should be greater than start value")
-             #shinyjs::alert("End value should be greater than start value")
              output$table_output <- renderDT((NULL))
+             output$plot <- renderPlot((NULL))
            }  else {
-             #shinyjs::enable("click")
              output$alert <- renderText(NULL)
              track_error_df$status <- TRUE
-
-           }
+             #null_plot$imgplot <- FALSE
+             }
           if (is.null(start_coord$coord()) & is.null(end_coord$coord())) {
             null_table$show <- TRUE
+            null_plot$imgplot <- TRUE
             output$table_output <- renderDT((NULL))
+            output$plot <- renderPlot((NULL))
 
           } else {
            null_table$show <- FALSE
+           null_plot$imgplot <- FALSE
          }
          }
-
-        #  }, error = function(e) {
-        #  paste("An error occured", e, "\n")
-        # }
 
       })
 
@@ -179,6 +161,8 @@ snp_table_server <- function(id, snps_df) {
       }
       output$table_output <- renderDT((NULL))
       null_table$show <- TRUE
+      output$plot <- renderPlot(NULL)
+      null_plot$imgplot <- TRUE
     })
 
 
@@ -189,6 +173,7 @@ snp_table_server <- function(id, snps_df) {
     final_table <- eventReactive(input$click,{
       req(sample_name(), chr_sample(), start_coord$coord,
           end_coord$coord(), track_error_df$status)
+     # plot_rct <- reactive(colnames(snps_plot))
       # check for error and extract the data
       if(isTRUE(track_error_df$status) && isTruthy(start_coord$coord()) && isTruthy(end_coord$coord())){
 
@@ -203,49 +188,11 @@ snp_table_server <- function(id, snps_df) {
 
         final_df <- df_sample()[df_sample()$POS >= start_coord$coord() & df_sample()$POS <= end_coord$coord() & df_sample()$`#CHROM` == chr_sample(), col_list]
 
-      }else if(!isTRUE(track_error_df$status) || !isTruthy(start_coord$coord()) || !isTruthy(end_coord$coord())){
+
+
+     }  else if(!isTRUE(track_error_df$status) || !isTruthy(start_coord$coord()) || !isTruthy(end_coord$coord())){
         final_df <- as.data.frame(NULL)
       }
-    })
-
-   # values <- reactiveValues(download=NULL)
-
-
-    # download params ---------------------------------------------------------
-
-    observe({
-    # browser()
-      req(is.data.frame(final_table()))
-      output$Download <- downloadHandler(
-
-        filename = function() {
-         # data <- final_table()
-          # readxl::read_xlsx("wheatdb_snps.xlsx")
-          # readxl::read_xls("wheatdb_snps.xls")
-          paste(switch(input$filetype,
-                               "csv" = "wheatdb_snps.csv",
-                               "tsv" = "wheatdb_snps.tsv",
-
-                               "xlsx" = "wheatdb_snps.xlsx",
-                               "xls" = "wheatdb_snps.xls",
-              ))
-          },
-        # tsv, csv, xlsx, xlx
-
-        content = function(file) {
-
-          if(input$filetype == "csv") {
-            write.csv(final_table(), file, sep = ",")
-          }
-          else if(input$filetype == "tsv") {
-            write.table(final_table(), file, sep = "\t")
-          }
-          else if(input$filetype == "xlsx" || input$filetype == "xls") {
-            write.xlsx(final_table(), file)
-          }
-        }
-      )
-
     })
 
     # display table--------------------------------
@@ -261,58 +208,188 @@ snp_table_server <- function(id, snps_df) {
               scrollY = "250px"
             ))
 
-      })
+
+        })
       }
-    })
+})
 
 
-    # observe({
-    #   #values$download <- reactive(FALSE)
-    #   #shinyjs::show("Download")
-    #
-    # })
-    # observeEvent(input$click,  {
-    #     # check the sample name provided by the user
-    #     req(sample_name(), chr_sample(), !is.null(start_coord$coord),
-    #         !is.null(end_coord$coord), isTRUE(track_error_df$status))
-    #     browser()
-    #     if(sample_name() == "All"){
-    #       col_list <- colnames(snps_df)
-    #       df_sample <- reactive(snps_df)
-    #     }else{
-    #       col_list <- c("#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT", sample_name())
-    #       df_sample <- reactive(snps_df[,col_list])
-    #     }
-    #
-    #     # browser()
-    #     # check the start and end coordinates: start must always be smaller than end
-    #     tryCatch({
-    #       if(start_coord$coord < end_coord$coord) {
-    #
-    #       final_df <- df_sample()[df_sample()$POS >= start_coord$coord & df_sample()$POS <= end_coord$coord & df_sample()$`#CHROM` == chr_sample(), col_list]
-    #       # print(start_coord$coord)
-    #       # print(end_coord$coord)
-    #
-    #        output$table_output <- renderDT(datatable(final_df))
-    #       }else if (start_coord$coord > end_coord$coord){
-    #
-    #         stop("End value should be greater than start value")
-    #       #output$alert <- renderText("End values should be greater than start value")
-    #       }
-    #     #show the table based on column
-    #     }, error = function(e) {
-    #       paste("An error occured", e, "\n")
-    #     }
-    #     )
-    #
-    #   })
+
+    # process the graph
+      final_plot <- eventReactive(input$click, {
+        req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample())
+        # browser()
 
 
- }#module server
+        # check for error and then proceed
+        if(isTRUE(track_error_df$status) && isTruthy(start_coord$coord()) && isTruthy(end_coord$coord())) {
+
+          # if no error, extract the data for plotting
+          df_plot <- reactive({
+            if(nrow(final_table()) > 1){
+              df <- snps_plot %>% filter(chr == chr_sample() & (pos >= start_coord$coord() & pos <= end_coord$coord()))
+            }else{
+              df <- NULL
+            }
+            return(df)
+          })
+
+          if(nrow(df_plot()) > 1){
+            data_plot <-  ggplot(data = df_plot(), aes(x = int_region ))+
+              geom_bar(stat = "count")+
+              theme_classic() +
+              theme(
+                axis.text.x = element_text(size = 10, face = "bold", angle = 90, hjust = 1),
+                axis.text.y = element_text(size = 10, face = "bold"),
+                axis.title = element_text(size=10, face="bold"),
+                axis.ticks = element_line(linewidth = 2)
+              ) +
+              labs(title="Analysis of snp data",
+                   x = "Position",
+                   y = "count")
+               return(data_plot)
+          }else{
+            data_plot <- NULL
+          }
+
+        }
+         else {
+           data_plot <- NULL
+         }
+      })
+
+        #display the graph
+        observe({
+          req(!is.null(final_plot()))
+          # browser()
+          output$plot <- renderPlot(final_plot())
+
+            })
+
+        observe({
+          req(final_table(), input$plot_click)
+
+           output$plot_text <- renderPrint({
+             #browser()
+             #if(is.null(input$plot_click$x)) return()
+              y <- nearPoints(df = final_table(), coordinfo = input$plot_click, threshold = 10, maxpoints = 1, addRows = TRUE)
+              if(nrow(y) != 0)
+                return(y)
+
+          })
+        })
+
+       # observe({
+       #     req(!is.null(final_plot()))
+       #   output$text_plot <- renderUI({
+       #     click <- input$plot_click
+       #     y <- nearPoints(final_table(), input$plot_click)
+       #     req(nrow(y) != 0)
+       #     DT::datatable(final_table(), colnames = (y), options = list(dom = '', searching = F, bSort = FALSE))
+       #
+       #   } )
+       # })
+
+
+        # Download action---------------------------------
+        # Action for table
+        observe({
+          # browser()
+          req(is.data.frame(final_table()))
+          output$Download <- downloadHandler(
+
+            filename = function() {
+
+              paste(switch(input$filetype,
+                           "csv" = "wheatdb_snps.csv",
+                           "tsv" = "wheatdb_snps.tsv",
+                           "xlsx" = "wheatdb_snps.xlsx",
+                           "xls" = "wheatdb_snps.xls",
+              ))
+            },
+
+            content = function(file) {
+
+              if(input$filetype == "csv") {
+                write.csv(final_table(), file, sep = ",")
+              }
+              else if(input$filetype == "tsv") {
+                write.table(final_table(), file, sep = "\t")
+              }
+              else if(input$filetype == "xlsx" || input$filetype == "xls") {
+                write.xlsx(final_table(), file)
+              }
+            }
+          )
+
+        })
+
+        # action for graph
+        observe({
+          req(!is.null(final_plot()))
+          imgtype <- reactive(NULL)
+          # browser()
+          output$download_bar <- downloadHandler(
+
+            filename = function() {
+
+              switch(input$imgtype,
+                           "png" = paste0("snps_",format(Sys.time(), "%d_%X"),'.png'),
+                           "pdf" = paste0("snps_",format(Sys.time(), "%d_%X"),'.pdf'),
+                           "jpeg" = paste0("snps_",format(Sys.time(), "%d_%X"),'.jpeg'),
+
+              )
+            },
+
+            content = function(file) {
+
+              if(input$imgtype == "png") {
+                png(file,  width = 12, height = 8, units = "in", res = 400)
+                print(final_plot())
+                dev.off()
+                contentType = 'image/png'
+
+              }
+              else if(input$imgtype == "pdf") {
+                pdf(file, width = 12, height = 8, onefile = T)
+                print(final_plot())
+                dev.off()
+                contentType = 'image/pdf'
+
+              }
+              else if(input$imgtype == "jpeg") {
+                jpeg(file,  width = 12, height = 8, units = "in", res = 400)
+                print(final_plot())
+                dev.off()
+                contentType = 'image/jpeg'
+
+              }
+            }
+
+          )
+
+
+
+
+  } # end of inner module server
 )
+        } # end of module function
 
 
-}#snp table server
+)}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## To be copied in the UI
