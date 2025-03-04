@@ -50,6 +50,7 @@ usethis::use_package("shinyFeedback", type = "depends")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
 renv::snapshot() # take a snapshot of the packages
 renv::status() #check renv status
+renv::restore()
 
 ## Install the required dev dependencies ----
 golem::install_dev_deps()
