@@ -11,25 +11,65 @@ snp_table_ui <- function(id) {
   ns <- NS(id)
   tagList(
     shinyFeedback::useShinyFeedback(),
-    selectInput(inputId = ns("sample_name"), label = "SAMPLE NAME", choices = c("None"), selected = "None"),
-    selectInput(inputId = ns("query_menu"), label = "Dropdown Menu", choices = c("None", "geneID", "type", "impact", "coordinates")),
-    uiOutput(outputId = ns("filterInput")), #dynamic output for text display when user's choice is selected
-    actionButton(inputId = ns("click"), label = "Submit"), # apply when this button is clicked
+    div(
+      style= "margin-top:2px;
+      background-image:radial-gradient(white,white, #dbf1f9);
+      box-shadow:0px 2px 20px -15px inset;
+      padding:5px;
+      text-align:center;
+      align:center;
+      font-weight:bold;
+      ",
+      h2("Query Parameters", style = "margin-top:1px; text-align:center; font-weight:bold; color:#025b05"),
+      div(
+        style ="display:flex;
+        justify-content:center;
+        padding: 5px;",
 
+        fluidRow(
+          column(6, selectInput(inputId = ns("query_menu"), label = "Query type", choices = c("None", "geneID", "type", "impact", "coordinates"))),
+          column(6,selectInput(inputId = ns("sample_name"), label = "Cultivar name", choices = c("None"), selected = "None"))
+        )
+      ),
+
+      div(
+        style = "display:flex; justify-content:center; padding: 5px",
+        #dynamic output for text display when user's choice is selected
+        uiOutput(outputId = ns("filterInput")),
+      ),
+
+      # button for submitting the query
+      conditionalPanel(condition = sprintf("input['%s'] != 'None'", ns("query_menu")),
+                       actionButton(inputId = ns("click"), label = "SUBMIT",
+                                    width = "70%",
+                                    # class = "btn-primary btn-lg",
+                                    class = "btn-info btn-sm",
+                                    style = "font-weight:bold;")
+                       )
+
+    ),
+
+
+    # display the download button only when the data is ready (table and figure)
      fluidRow(
-      box(title = "SNP Table", height = "600", solidHeader = T,
+      box( height = "600", solidHeader = T, #title = "SNP Table",
            column(1, align = "right", offset = 9,
-                  downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
+                  uiOutput("uiDownload")
+                  ),
+                  # downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
            column(2, align = "left", offset = 10,
-                  selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))),
+                  uiOutput("uiFiletype")
+                  ),
            DTOutput(outputId = ns("table_output"))
          ),#for table output
       br(),
-      box(title = "SNP Plot analysis", height = "650", solidHeader = T,
+      box( height = "650", solidHeader = T, #title = "SNP Plot analysis",
           column(1, align = "right", offset = 8,
-                 downloadButton(outputId = ns("download_bar"), label = "Download image", icon = shiny::icon("download"))),
+                 uiOutput("UiDowloadBar")
+                 ),
           column(2, align = "left", offset = 10,
-                 selectInput(inputId = ns("imgtype"), label = "Type:", choices = c("png", "pdf", "jpeg"))),
+                 uiOutput("uiImageType")
+                 ),
           column(12,
               div(height=500, width = 500,
                     plotOutput(outputId = ns("plot"), click = "plot_click", hover= "plot_hover")))
@@ -57,7 +97,7 @@ snp_table_server <- function(id, snps_df) {
       # browser()
 
       llst <- sample_list()[8:length(sample_list())]
-      updateSelectInput(inputId = "sample_name", label = "Sample",
+      updateSelectInput(inputId = "sample_name", label = "Cultivar name",
                         choices = c("All",llst))
 
     })
@@ -143,7 +183,7 @@ snp_table_server <- function(id, snps_df) {
       if(!isTRUE(track_error_df$status)){
         showFeedbackWarning(inputId="start_coord", text = error_msg$msg, color = "#ff0000",
                             icon = shiny::icon("warning-sign", lib = "glyphicon"))
-        showFeedbackWarning(inputId = "gene_name", text = gene_error$message, color = #ff0000",
+        showFeedbackWarning(inputId = "gene_name", text = gene_error$message, color = "#ff0000",
                               icon = shiny::icon("warning-sign", lib = "glyphicon"))
          track_error_df$status <- FALSE
         # error_msg$msg <- TRUE
@@ -219,8 +259,8 @@ snp_table_server <- function(id, snps_df) {
                                                                                      "Chr5A", "Chr5B", "Chr5D",
                                                                                      "Chr6A", "Chr6B", "Chr6D",
                                                                                      "Chr7A", "Chr7B", "Chr7D"), selected = "NULL")),
-        column(2, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
-        column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
+        column(4, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
+        column(4, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
       ))
     }
       else {
@@ -304,6 +344,14 @@ snp_table_server <- function(id, snps_df) {
     observe({
       req(is.data.frame(final_table()))
 
+      # show download button for table
+      output$uiDownload <- renderUI(
+        downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))
+      )
+      # show the file type
+      output$uiFiletype <- renderUI(
+        selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))
+      )
       if(nrow(final_table()) > 1){
         output$table_output <- renderDT({
           datatable(
@@ -366,6 +414,13 @@ snp_table_server <- function(id, snps_df) {
     #     #display the graph
     #     observe({
     #       req(!is.null(final_plot()))
+            # show download button and type here
+            # output$uiDownloadBar <- renderUI(
+            #   downloadButton(outputId = ns("download_bar"), label = "Download image", icon = shiny::icon("download"))
+            # )
+            # output$uiImageType <- renderUI(
+            #   selectInput(inputId = ns("imgtype"), label = "Type:", choices = c("png", "pdf", "jpeg"))
+            # )
     #       # browser()
     #       output$plot <- renderPlot(final_plot())
     #
