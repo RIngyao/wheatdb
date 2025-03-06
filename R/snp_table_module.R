@@ -9,8 +9,31 @@
 #' @importFrom shiny NS tagList
 snp_table_ui <- function(id) {
   ns <- NS(id)
+  # important variables------------------------------
+  # type for SNPs
+  type <- c("intergenic_region", "upstream_gene_variant",
+            "intron_variant", "conservative_inframe_deletion",
+            "3_prime_UTR_variant", "5_prime_UTR_variant",
+            "downstream_gene_variant", "splice_region_variant&intron_variant",
+            "frameshift_variant", "conservative_inframe_insertion",
+            "disruptive_inframe_insertion", "frameshift_variant&stop_gained",
+            "frameshift_variant&splice_region_variant", "stop_gained&conservative_inframe_insertion",
+            "disruptive_inframe_deletion", "non_coding_transcript_exon_variant",
+            "missense_variant", "frameshift_variant&start_lost",
+            "conservative_inframe_insertion&splice_region_variant", "splice_acceptor_variant&splice_region_variant&intron_variant",
+            "splice_acceptor_variant&intron_variant", "splice_region_variant",
+            "splice_donor_variant&intron_variant", "start_lost&conservative_inframe_insertion")
+  chrom <- c("Chr1A", "Chr1B", "Chr1D",
+             "Chr2A", "Chr2B", "Chr2D",
+             "Chr3A", "Chr3B", "Chr3D",
+             "Chr4A", "Chr4B", "Chr4D",
+             "Chr5A", "Chr5B", "Chr5D",
+             "Chr6A", "Chr6B", "Chr6D",
+             "Chr7A", "Chr7B", "Chr7D")
+  # start ui-------------------------
   tagList(
     shinyFeedback::useShinyFeedback(),
+    # box for query parameters------------------------
     div(
       style= "margin-top:2px;
       background-image:radial-gradient(white,white, #dbf1f9);
@@ -34,8 +57,64 @@ snp_table_ui <- function(id) {
 
       div(
         style = "display:flex; justify-content:center; padding: 5px",
-        #dynamic output for text display when user's choice is selected
-        uiOutput(outputId = ns("filterInput")),
+
+        conditionalPanel(condition = sprintf("input['%s'] == 'geneID'", ns("query_menu")),
+
+                         # change the button type: use raditobutton
+                         fluidRow(
+                           column(4,selectInput(inputId = ns("gene_name"), label = "Choose", choices = c("Enter", "Upload"))),
+
+
+                          conditionalPanel(condition = sprintf("input['%s'] == 'Enter'", ns("gene_name")),
+                                           column(8,textInput(inputId = ns("enter_gene"), label = "Enter GENE ID", placeholder = c("Must be comma or space separated!")))
+                                           ),
+
+                          conditionalPanel(condition = sprintf("input['%s'] == 'Upload'", ns("gene_name")),
+                                             column(8,fileInput(inputId = ns("upload_gene"), label = "Upload GENE ID", placeholder = "No files selected" ))
+                                             )
+
+                         )
+
+                         ), # end of conditiopanel geneID
+
+        # ui for type-----------------------
+        conditionalPanel(condition = sprintf("input['%s'] == 'type' ", ns("query_menu")),
+                           tagList(
+                             fluidRow(
+                               column(4, selectInput(inputId = ns("type_name"), label = "TYPE", choices = type)),
+                               column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = chrom, selected = "Chr1A")),
+                               column(2, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
+                               column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
+                             )
+                           )
+
+                         ), # end of type
+
+        # ui for coorindates -----------------------
+        conditionalPanel(condition = sprintf("input['%s'] == 'impact' ", ns("query_menu")),
+                         tagList(
+                           fluidRow(
+                             column(4, selectInput(inputId = ns("impact_name"), label = "IMPACT", choices = c("MODIFIER", "MODERATE", "LOW", "HIGH"))),
+                             column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = chrom, selected = "Chr1A")),
+                             column(2, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
+                             column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
+                           )
+                         )
+
+        ), # end of impact
+
+        conditionalPanel(condition = sprintf("input['%s'] == 'coordinates' ", ns("query_menu")),
+                         tagList(
+                           fluidRow(
+                             column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = chrom, selected = "Chr1A")),
+                             column(4, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
+                             column(4, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
+                           )
+                         )
+
+        ) # end of coordinates
+        # uiOutput(outputId = ns("filterInput")),
+        #uiOutput(outputId = ns("filtergeneInput"))
       ),
 
       # button for submitting the query
@@ -53,22 +132,23 @@ snp_table_ui <- function(id) {
     # display the download button only when the data is ready (table and figure)
      fluidRow(
       box( height = "600", solidHeader = T, #title = "SNP Table",
+
            column(1, align = "right", offset = 9,
-                  uiOutput("uiDownload")
+                  uiOutput(ns("uiDownload"))
                   ),
                   # downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
            column(2, align = "left", offset = 10,
-                  uiOutput("uiFiletype")
+                  uiOutput(ns("uiFiletype"))
                   ),
            DTOutput(outputId = ns("table_output"))
          ),#for table output
       br(),
       box( height = "650", solidHeader = T, #title = "SNP Plot analysis",
           column(1, align = "right", offset = 8,
-                 uiOutput("UiDowloadBar")
+                 uiOutput(ns("UiDowloadBar"))
                  ),
           column(2, align = "left", offset = 10,
-                 uiOutput("uiImageType")
+                 uiOutput(ns("uiImageType"))
                  ),
           column(12,
               div(height=500, width = 500,
@@ -116,7 +196,7 @@ snp_table_server <- function(id, snps_df) {
     })
 
     # get the sample name of snps table
-    gene_sample <- reactive(req(input$gene_name))
+    gene_sample <- reactive(req(input$enter_gene))
     sample_name <- reactive(req(input$sample_name))
     type_sample <- reactive(req(input$type_name))
     impact_sample <- reactive(req(input$impact_name))
@@ -127,8 +207,12 @@ snp_table_server <- function(id, snps_df) {
     end_coord <- reactiveValues(coord=NULL)
     # track the error: False for error msg and TRUE for no error
     track_error_df <- reactiveValues(status=NULL) # to get the error message in red and bold
+    # display the error for geneId : False for error and true for no error
+    # display_error <- reactiveValues(gene=NULL)
     # error msg for coordinates
     error_msg <- reactiveValues(msg=NULL)
+    # error msg for geneID
+    gene_error <- reactiveVal(TRUE) # NUll value doesn't react, so given TRUE - string value if error
     #not to show the table when coordinates are empty
     null_table <- reactiveValues(show=NULL)
     #table_download <- reactiveValues(download=NULL) # for displaying table download option
@@ -159,7 +243,7 @@ snp_table_server <- function(id, snps_df) {
            }  else {
              output$alert <- renderText(NULL)
              track_error_df$status <- TRUE
-             #null_plot$imgplot <- FALSE
+
              }
           if (is.null(start_coord$coord()) & is.null(end_coord$coord())) {
             null_table$show <- TRUE
@@ -176,98 +260,91 @@ snp_table_server <- function(id, snps_df) {
       })
 
 
+    #checking for validity of geneId
+    observe({
+      req(gene_sample())
+
+      gene <- reactive(unlist(strsplit(gene_sample(), "[, ]+")))  #splitting the gene on the basis of comma or space
+      gene_no <- reactive(lengths(strsplit(gene_sample(), "[, ]+")))
+      # browser()
+      if(!isTRUE(stringr::str_detect(gene(), "TraesCS"))){
+        gene_error("Invalid gene ID. Eg. TraesCS1A03G0011000")
+        output$table_output <- renderDT((NULL))
+        output$plot <- renderPlot(NULL)
+
+
+      }else if (nchar(gene()) != 19){
+        gene_error("Invalid gene ID. It must have 19 characters")
+        output$table_output <- renderDT((NULL))
+        output$plot <- renderPlot(NULL)
+
+      }else{
+        gene_error(TRUE) # Null value doesn't react. So, TRUE is used
+      }
+    })
+
+
+
+
+
+
     # feedback ----------------------------------------------------------------
 
+    #for coordinates feedback
     observe({
-      req(track_error_df$status, error_msg$msg, gene_error$message)
+     # browser()
+      req(track_error_df$status, error_msg$msg)
       if(!isTRUE(track_error_df$status)){
         showFeedbackWarning(inputId="start_coord", text = error_msg$msg, color = "#ff0000",
                             icon = shiny::icon("warning-sign", lib = "glyphicon"))
-        showFeedbackWarning(inputId = "gene_name", text = gene_error$message, color = "#ff0000",
-                              icon = shiny::icon("warning-sign", lib = "glyphicon"))
+         output$uiDownload <- renderUI(NULL)
          track_error_df$status <- FALSE
         # error_msg$msg <- TRUE
       } else{
         hideFeedback(inputId = "start_coord")
-        hideFeedback(inputId = "gene_name")
+
       }
       output$table_output <- renderDT((NULL))
+      #output$UiDownload <- renderUI((NULL))
+      output$uiFiletype <- renderUI((NULL))
       null_table$show <- TRUE
       output$plot <- renderPlot(NULL)
       null_plot$imgplot <- TRUE
     })
 
+    # for checking geneId
 
-  #checking the query input menu--------------------------------------------
-
-    output$filterInput <- renderUI({
-    if(input$query_menu == "geneID") {
-      textInput(inputId = ns("gene_name"), label = "GENE ID", placeholder = c("Should be comma or space separated only"))
-    }
-    else if (input$query_menu == "type")  {
-      tagList(
-        fluidRow(
-          column(4, selectInput(inputId = ns("type_name"), label = "TYPE", choices = c("intergenic_region", "upstream_gene_variant",
-                                                                             "intron_variant", "conservative_inframe_deletion",
-                                                                             "3_prime_UTR_variant", "5_prime_UTR_variant",
-                                                                             "downstream_gene_variant", "splice_region_variant&intron_variant",
-                                                                             "frameshift_variant", "conservative_inframe_insertion",
-                                                                             "disruptive_inframe_insertion", "frameshift_variant&stop_gained",
-                                                                             "frameshift_variant&splice_region_variant", "stop_gained&conservative_inframe_insertion",
-                                                                             "disruptive_inframe_deletion", "non_coding_transcript_exon_variant",
-                                                                             "missense_variant", "frameshift_variant&start_lost",
-                                                                             "conservative_inframe_insertion&splice_region_variant", "splice_acceptor_variant&splice_region_variant&intron_variant",
-                                                                             "splice_acceptor_variant&intron_variant", "splice_region_variant",
-                                                                             "splice_donor_variant&intron_variant", "start_lost&conservative_inframe_insertion"))),
-          column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = c("Chr1A", "Chr1B", "Chr1D",
-                                                                             "Chr2A", "Chr2B", "Chr2D",
-                                                                             "Chr3A", "Chr3B", "Chr3D",
-                                                                             "Chr4A", "Chr4B", "Chr4D",
-                                                                             "Chr5A", "Chr5B", "Chr5D",
-                                                                             "Chr6A", "Chr6B", "Chr6D",
-                                                                             "Chr7A", "Chr7B", "Chr7D"), selected = "NULL")),
-          column(2, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
-          column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
-        )
-      )
+    observe({
+      result <- lapply(gene(), check_gene)
 
 
-    } else if(input$query_menu == "impact") {
-      tagList(
-        fluidRow(
-        column(4, selectInput(inputId = ns("impact_name"), label = "IMPACT", choices = c("MODIFIER", "MODERATE", "LOW", "HIGH"))),
-        column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = c("Chr1A", "Chr1B", "Chr1D",
-                                                                                     "Chr2A", "Chr2B", "Chr2D",
-                                                                                     "Chr3A", "Chr3B", "Chr3D",
-                                                                                     "Chr4A", "Chr4B", "Chr4D",
-                                                                                     "Chr5A", "Chr5B", "Chr5D",
-                                                                                     "Chr6A", "Chr6B", "Chr6D",
-                                                                                     "Chr7A", "Chr7B", "Chr7D"), selected = "NULL")),
-        column(2, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
-        column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
-        )
-      )
+      req(gene_error(), gene_sample())
+      # browser()
+      if(!isTRUE(gene_error())){
+        showFeedbackWarning(inputId = "enter_gene", text = gene_error(), color = "#ff0000",
+                            icon = shiny::icon("warning-sign", lib = "glyphicon"))
 
-
-    } else if(input$query_menu == "coordinates") {
-      tagList(
-      fluidRow(
-        column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = c("Chr1A", "Chr1B", "Chr1D",
-                                                                                     "Chr2A", "Chr2B", "Chr2D",
-                                                                                     "Chr3A", "Chr3B", "Chr3D",
-                                                                                     "Chr4A", "Chr4B", "Chr4D",
-                                                                                     "Chr5A", "Chr5B", "Chr5D",
-                                                                                     "Chr6A", "Chr6B", "Chr6D",
-                                                                                     "Chr7A", "Chr7B", "Chr7D"), selected = "NULL")),
-        column(4, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
-        column(4, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
-      ))
-    }
-      else {
-        NULL
+        output$uiDownload <- renderUI(NULL)
+      } else{
+        hideFeedback(inputId = "enter_gene")
       }
-
+      output$table_output <- renderDT((NULL))
+      #output$UiDownload <- renderUI((NULL))
+      output$uiFiletype <- renderUI((NULL))
+      null_table$show <- TRUE
+      output$plot <- renderPlot(NULL)
+      null_plot$imgplot <- TRUE
+    #}
     })
+
+
+
+  # #checking the query input menu--------------------------------------------
+  #   query <- reactive(input$query_menu)
+  #
+  #
+  #
+  #   # })
 
 
 
@@ -275,8 +352,7 @@ snp_table_server <- function(id, snps_df) {
    # processing the final table--------------------------
 
      final_table <- eventReactive(input$click,{
-      req(sample_name()) #, type_sample(), impact_sample(), gene_sample(),
-          #start_coord$coord(), end_coord$coord(), track_error_df$status)
+      req(sample_name())
        # browser()
 
        # first arrange proper column name
@@ -289,22 +365,23 @@ snp_table_server <- function(id, snps_df) {
          df_sample <- reactive(snps_df[,col_list])
        }
 
-       query <- reactive(input$query_menu)
+
       # check for error and extract the data
+      #if(isTRUE(display_error$gene)) {
+       #browser()
        if(query() == "geneID") {
 
          # query with only gene ID
          req(gene_sample())
-         gene <- unlist(strsplit(gene_sample(), "[, ]+"))  #splitting the gene on the basis of comma or space
-         print(gene)
-         # validate
-         if(!is.integer(grep("TraeCS", gene))){
-           cap_err <- "Invalid gene ID. Eg. TraesCS1A03G0011000"
-         }else if (nchar(gene) != 19){
-           cap_err <- "Invalid gene ID. It must be 19 in length"
-         }else{
-           df_table <- df_sample()[df_sample()$GENE_ID %in% gene, col_list]
-         }
+         gene <- unlist(strsplit(gene_sample(), "[, ]+")) %>% unique() #splitting the gene on the basis of comma or space
+         # gene_no <- lengths(strsplit(gene_sample(), "[, ]+"))
+
+
+
+         df_table <- df_sample()[df_sample()$GENE_ID %in% gene, col_list]
+
+
+      # }
        }
        else{
 
@@ -344,26 +421,32 @@ snp_table_server <- function(id, snps_df) {
     observe({
       req(is.data.frame(final_table()))
 
-      # show download button for table
-      output$uiDownload <- renderUI(
-        downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))
-      )
-      # show the file type
-      output$uiFiletype <- renderUI(
-        selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))
-      )
-      if(nrow(final_table()) > 1){
-        output$table_output <- renderDT({
-          datatable(
-            cbind(final_table()),
-            options = list(
-              scrollX = TRUE,
-              scrollY = "250px"
-            ))
+      #if(isTRUE(gene_error()) || isTRUE(track_error_df$status)) {
+
+        if(nrow(final_table()) > 1){
+          # show download button for table
+          output$uiDownload <- renderUI(
+            downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))
+          )
+          # show the file type
+          output$uiFiletype <- renderUI(
+            selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))
+          )
+          output$table_output <- renderDT({
+            datatable(
+              cbind(final_table()),
+              options = list(
+                scrollX = TRUE,
+                scrollY = "250px"
+              ))
 
 
-        })
-      }
+          })
+        }
+
+ #}
+
+
 })
 
 
@@ -435,31 +518,40 @@ snp_table_server <- function(id, snps_df) {
         observe({
           # browser()
           req(is.data.frame(final_table()))
-          output$Download <- downloadHandler(
+               #if(isTRUE(gene_error()) || isTRUE(track_error_df$status)) {
+               output$Download <- downloadHandler(
 
-            filename = function() {
+                filename = function() {
 
-              paste(switch(input$filetype,
-                           "csv" = "wheatdb_snps.csv",
-                           "tsv" = "wheatdb_snps.tsv",
-                           "xlsx" = "wheatdb_snps.xlsx",
-                           "xls" = "wheatdb_snps.xls",
-              ))
-            },
+                  paste(switch(input$filetype,
+                               "csv" = "wheatdb_snps.csv",
+                               "tsv" = "wheatdb_snps.tsv",
+                               "xlsx" = "wheatdb_snps.xlsx",
+                               "xls" = "wheatdb_snps.xls",
+                  ))
+                },
 
-            content = function(file) {
+                content = function(file) {
 
-              if(input$filetype == "csv") {
-                write.csv(final_table(), file, sep = ",")
-              }
-              else if(input$filetype == "tsv") {
-                write.table(final_table(), file, sep = "\t")
-              }
-              else if(input$filetype == "xlsx" || input$filetype == "xls") {
-                write.xlsx(final_table(), file)
-              }
-            }
-          )
+                  if(input$filetype == "csv") {
+                    write.csv(final_table(), file, sep = ",")
+                  }
+                  else if(input$filetype == "tsv") {
+                    write.table(final_table(), file, sep = "\t")
+                  }
+                  else if(input$filetype == "xlsx" || input$filetype == "xls") {
+                    write.xlsx(final_table(), file)
+                  }
+                }
+              )
+#
+#                }
+#           else {
+#                  output$Download <- NULL
+#                  content = NULL
+#                }
+
+
 
         })
 
@@ -510,12 +602,12 @@ snp_table_server <- function(id, snps_df) {
 #
 #
 #
-#   } # end of inner module server
-# )
+  } # end of inner module server
+)
         } # end of module function
 
 
-)}
+
 
 
 
@@ -530,7 +622,11 @@ snp_table_server <- function(id, snps_df) {
 
 
 #"TraesCS1A03G0011000"
-# col_list
+# Tra12341A03G0011000
+# TraesCS1A03G0012500
+# TraesCS1A03G0011500
+# TraesCS1A03G0010400
+
 ## To be copied in the UI
 # mod_name_of_module1_ui("name_of_module1_1")
 
