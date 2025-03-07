@@ -62,20 +62,19 @@ snp_table_ui <- function(id) {
 
                          # change the button type: use raditobutton
                          fluidRow(
-                           column(4,selectInput(inputId = ns("gene_name"), label = "Choose", choices = c("Enter", "Upload"))),
-
+                           column(4, radioButtons(inputId = ns("gene_name"), label = "Choose", choices = c("Enter", "Upload"))),
 
                           conditionalPanel(condition = sprintf("input['%s'] == 'Enter'", ns("gene_name")),
                                            column(8,textInput(inputId = ns("enter_gene"), label = "Enter GENE ID", placeholder = c("Must be comma or space separated!")))
                                            ),
 
                           conditionalPanel(condition = sprintf("input['%s'] == 'Upload'", ns("gene_name")),
-                                             column(8,fileInput(inputId = ns("upload_gene"), label = "Upload GENE ID", placeholder = "No files selected" ))
+                                             column(8,fileInput(inputId = ns("upload"), label = "Upload GENE ID", placeholder = "No files selected" ))
                                              )
 
                          )
 
-                         ), # end of conditiopanel geneID
+                         ), # end of conditionpanel geneID
 
         # ui for type-----------------------
         conditionalPanel(condition = sprintf("input['%s'] == 'type' ", ns("query_menu")),
@@ -113,8 +112,7 @@ snp_table_ui <- function(id) {
                          )
 
         ) # end of coordinates
-        # uiOutput(outputId = ns("filterInput")),
-        #uiOutput(outputId = ns("filtergeneInput"))
+
       ),
 
       # button for submitting the query
@@ -265,8 +263,18 @@ snp_table_server <- function(id, snps_df) {
       req(gene_sample())
 
       gene <- reactive(unlist(strsplit(gene_sample(), "[, ]+")))  #splitting the gene on the basis of comma or space
-      gene_no <- reactive(lengths(strsplit(gene_sample(), "[, ]+")))
-      # browser()
+      #gene_no <- reactive(lengths(strsplit(gene_sample(), "[, ]+")))
+      #browser()
+      gene_result <- lapply(gene(), check_gene, "name")
+      return(gene_result)
+
+      gene_result1 <- lapply(gene(), check_gene, "size")
+      return(gene_result)
+      output_gene <- as.data.frame(do.call(gene_result, gene_result1))
+
+
+      #gene_result1 <- lapply(gene(), check_gene, "size")
+     #browser()
       if(!isTRUE(stringr::str_detect(gene(), "TraesCS"))){
         gene_error("Invalid gene ID. Eg. TraesCS1A03G0011000")
         output$table_output <- renderDT((NULL))
@@ -315,10 +323,8 @@ snp_table_server <- function(id, snps_df) {
     # for checking geneId
 
     observe({
-      result <- lapply(gene(), check_gene)
 
-
-      req(gene_error(), gene_sample())
+      req(gene_error())
       # browser()
       if(!isTRUE(gene_error())){
         showFeedbackWarning(inputId = "enter_gene", text = gene_error(), color = "#ff0000",
@@ -339,15 +345,38 @@ snp_table_server <- function(id, snps_df) {
 
 
 
-  # #checking the query input menu--------------------------------------------
-  #   query <- reactive(input$query_menu)
-  #
-  #
-  #
-  #   # })
 
+    # # processing the user uploaded data in geneId-------------------------
 
-
+    # observe({
+    #
+    # #gene_data <- reactive(input$upload)
+    #
+    # #browser()
+    # ext <- tools::file_ext(input$upload$datapath)
+    # ext2 <- tools::file_ext(input$upload$name)
+    #
+    # # print(ext)
+    # # print(ext2)
+    #
+    # validate(need(ext %in% c("csv", "tsv"), "Please upload a valid file type"))
+    #
+    # output$table_output <- renderDT({
+    #   read.csv(input$upload$datapath)
+    #
+    #   #file_content <- read.csv(input$upload$datapath)
+    # # splitfile <- strsplit(file_content, split = "[, ]+")[[1]]
+    # # for (i in 1:length(splitString)) {
+    # #      cat(splitString[i])
+    # #        if (splitString[i] == "[, ]+") {
+    # #             cat("\n")
+    # #         }
+    # #    }
+    #
+    #   #read.tsv(input$upload$datapath)
+    #  })
+    #
+    # })
 
    # processing the final table--------------------------
 
@@ -367,6 +396,7 @@ snp_table_server <- function(id, snps_df) {
 
 
       # check for error and extract the data
+       query <- reactive(input$query_menu)
       #if(isTRUE(display_error$gene)) {
        #browser()
        if(query() == "geneID") {
@@ -375,8 +405,22 @@ snp_table_server <- function(id, snps_df) {
          req(gene_sample())
          gene <- unlist(strsplit(gene_sample(), "[, ]+")) %>% unique() #splitting the gene on the basis of comma or space
          # gene_no <- lengths(strsplit(gene_sample(), "[, ]+"))
-
-
+         #browser()
+        # processing the user uploaded data in geneId
+         # ext <- tools::file_ext(input$upload$datapath)
+         # ext2 <- tools::file_ext(input$upload$name)
+         # print(ext)
+         # print(ext2)
+         # validate(need(ext %in% c("csv", "tsv"), "Please upload a valid file type"))
+         # read.csv(input$upload$datapath)
+         # file_content <- read.csv(input$upload$datapath)
+         # splitfile <- strsplit(file_content, split = "[, ]+")[[1]]
+         # for (i in 1:length(splitfile)) {
+         #      cat(splitfile[i])
+         #        if (splitfile[i] == "[, ]+") {
+         #             cat("\n")
+         #         }
+         #    }
 
          df_table <- df_sample()[df_sample()$GENE_ID %in% gene, col_list]
 
@@ -439,14 +483,31 @@ snp_table_server <- function(id, snps_df) {
                 scrollX = TRUE,
                 scrollY = "250px"
               ))
-
-
           })
         }
+})
+    observe({
+       req(input$upload)
+      output$table_output <- renderDT({
+       # browser()
+        file_content <- read_delim(input$upload$datapath, col_names = "gene", delim = ",")
+       # read <- readLines(input$upload$datapath)
 
- #}
+         #split_gene <- lapply(file_content, )
 
+        # splitfile <- strsplit(file_content$gene, split = "[, ]+")
+        for (i in 1:length(splitfile)) {
+          paste(splitfile[i])
+          #splitfile <- strsplit(file_content$gene[i], split = "[, ]+")
 
+          if (splitfile[i] == "[, ]+") {
+            cat("\n")
+          }
+        }
+        return(file_content)
+      })
+
+      index_gene <- which(file_content)
 })
 
 
