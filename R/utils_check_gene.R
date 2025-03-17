@@ -7,11 +7,14 @@
 #'
 #' @noRd
 check_gene <- function(gene, check){
+  #browser()
   # for(gene in 1:length(list)){
    if(check == "name"){
      # check for presence of Traes
      out <- stringr::str_detect(gene,"TraesCS")
    }else if (check == "size"){
+     gene <- strsplit(gene, "[, ]+")
+
      out <- (nchar(gene) == 19)
    }
   # }
