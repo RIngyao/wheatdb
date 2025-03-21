@@ -34,11 +34,11 @@ golem::add_utils("index_gene", with_test = TRUE) # for small function
 ## Creates .js and .css files at inst/app/www
 golem::add_js_file("script")
 golem::add_js_handler("handlers")
-golem::add_css_file("custom")
+golem::add_css_file("link")
 golem::add_sass_file("custom")
 golem::add_any_file("file.json")
 golem::add_html_template("index")
-golem::add_html_template("snps")
+golem::add_html_template("link")
 golem::add_css_file("flexbox")
 
 ## Add internal datasets ----
