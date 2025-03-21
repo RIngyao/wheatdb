@@ -28,7 +28,7 @@ header p{
   margin: 5px;
 
 }
- h2{
+ /*h2{
    text-decoration: underline;
    color: black;
     line-height: 1.6;
@@ -36,7 +36,7 @@ header p{
 
 
 
-}
+}*/
 
 .box-header {
   font-size: 40px;
@@ -52,12 +52,23 @@ header p{
     padding: 10px;
 
 }
-.container img {
-  display: block;
-  margin: auto;
-  width: 70%;
-
+.main-content h2{
+  font-family: Pacifico;
+  font-display: swap;
+  text-align: right;
+  margin-right: 0;
+  margin-right: 0;
+  font-weight: bold;
+  color: #025b05"
 }
+
+/*.container img {
+
+  margin-left: 2px;
+  margin-right: 2px;
+  align: center;
+
+}*/
 
 .parent {
   text-decoration: underline;
@@ -85,6 +96,24 @@ header p{
   float: right;
   margin-right: 10px;
 }
+.another {
+  width: 30%;
+  padding: 32px 32px;
+  border: 1px solid black;
+  margin-right: 10px;
+  display:flex;
+  justify-items:center;
+  justify-content:center;
+
+
+}
+.another h4{
+
+  color: green;
+  font-family: Pacifico;
+  font-weight: bold;
+}
+
 .child img {
   display: inline-block;
     width: 100px;
@@ -95,7 +124,17 @@ header p{
     width: 150px;
     height: 100px;
 }
-
+.another img{
+  display: inline-block;
+    width: 150px;
+    height: 100px;
+}
+.parent h4{
+  text-align: center;
+  color: green;
+  font-family: Pacifico;
+  font-weight: bold;
+}
 #alert {
   color: red;
   font-weight: bold;

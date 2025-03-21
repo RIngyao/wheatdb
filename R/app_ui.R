@@ -15,11 +15,12 @@ app_ui <- function(request) {
   frontPage <- div(
     HTML('
       <div id="image" class="main-content">
-              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRLtZNUd3macbfno8gEEcJRSlLlNJq6cFzBA&s" alt="wheat picture">
+              <h2>Wheat Genomic Portal</h2>
+
       </div>
 
-      <div id="introduction" class="container">
-        <h2>Welcome to Genome Browser</h2>
+        <div id="introduction" class="container">
+
           <p>Wheat is one of the world\'s three leading cereal crops that include rice and corn, providing about 20%
          of the calories we consume every day, and is also a leading source of protein. However, the global
          wheat supply and demand has become critical in recent years due to global environmental changes
@@ -36,35 +37,43 @@ wet climate
 
              <div class=parent">
              <h2>RELATED WEBSITES</h2>
+
                <div class="child">
-              <a href="https://www.ecpgr.org/resources/germplasm-databases/ecpgr-central-crop-databases" target="_blank>
+              <a href="https://www.ecpgr.org/" target="_blank>
                      <link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon">
+
 
                      <img src="https://www.ecpgr.org/fileadmin/templates/ecpgr.org/Assets/images/ECPGRtext_black.png" style="width=50px;height=50px">
                        <h4>ECPGR central crop databases</h4>
                      </a>
                      <p>The databases hold passport data and, to varying degrees, characterization and primary evaluation data of the major collections of the respective crops in Europe.</p>
                </div>
+
                <div class="link"
                <a href="https://www.ncbi.nlm.nih.gov/" target="_blank>
-                   <span><link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon"></span>
+                   <link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon">
 
                   <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfIHPYlZzIl63NHd2gfVIPrhwx6f_IYpMODQ&s" style="width=50px;height=50px">
                   <h4>National Center for biological Information</h4>
                   </a>
                   <p>The National centre for Biotechnology Information advances science and health by providing access to biomedical and genomic information</p>
                </div>
+
+               <div class = "another"
+               <a href = "https://genomeindia.in/" target = "_blank>
+                <link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon">
+
+                <img src="www/genome.jpg" style="width=50px;height=50px">
+                 <h4>Genome India Project(GIP)</h4>
+               </a>
+               <p>Genome India Project(GIP) is a government-funded initiative to sequence the genomes of 10,000 healthy Indians. The project\'s goal is to create a comprehensive catalog of genetic variations in the Indian population. </p>
+              </div>
                </div>
 
 
        ')
   )
-      # snp_page <- div(
-      #   HTML('
-      #        <div id="alert>alert</div>
-      #
-      #        ')
-      # )
+
 
  # bs_theme(
  #    version = 5,
