@@ -1,7 +1,15 @@
 /* General Body display*/
 
+.logo {
+  width: 100px;
+  height: 100px;
+  margin-left: 0px;
+  font-family: Verdana (sans-serif);
+
+}
 body, .content-wrapper {
 background-color: white;
+background-size: 100;
 }
 /*Display for headers*/
 
@@ -22,13 +30,13 @@ header p{
   font: center;
 }
 /* Display for containers */
-
+/*
 .container {
 
   margin: 5px;
 
 }
- /*h2{
+ h2{
    text-decoration: underline;
    color: black;
     line-height: 1.6;
@@ -36,6 +44,95 @@ header p{
 
 
 
+}*/
+
+#slideshow-container {
+  position: relative;
+  max-width: 1000px;
+  margin: auto;
+  overflow: hidden ;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 4px black solid;
+}
+
+/*
+.slide {
+  display: none;
+}
+
+.slide {
+  animation-name: fade;
+  animation-duration: 12s;
+  animation-iteration-count: infinite;
+}
+
+.slide: first-child {
+  display: block;
+}
+*/
+
+#slide img {
+  width: calc(25% - 10px);
+  height: 150px;
+  object-fit: cover;
+  margin: 5px;
+  border: 2px black solid;
+  animation: FadeInOut 30s linear infinite 0s;
+}
+/*
+.slide fade {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  animation: flexAnimation -5s infinite ease-in-out;
+}
+*/
+#fading img.slide {
+-webkit-animation-name: FadeInOut;
+-webkit-animation-timing-function: ease-in-out;
+-webkit-animation-iteration-count: infinite;
+-webkit-animation-duration: 10s;
+-webkit-animation-direction: alternate;
+}
+
+@keyframes FadeInOut {
+  0%  {opacity: 1;
+    animation-timing-function: ease-in;
+  }
+
+  25% {opacity: 1;
+    animation-timing-function: ease-out;
+  }
+
+  50% {opacity: 1;}
+
+  100% {opacity: 0;}
+
+}
+
+
+
+/*
+.slide:nth-child(1) {
+   animation-delay: 0s;
+}
+.slide:nth-child(2) {
+   animation-delay: 4s;
+}
+.slide:nth-child(3) {
+   animation-delay: 8s;
+}
+*/
+
+/*
+div {
+  width: 100px;
+  height: 100px;
+  position: relative;
+  animation-name: example;
+  animation-duration: 3s;
+  animation-delay: -2s;
 }*/
 
 .box-header {
@@ -49,15 +146,15 @@ header p{
 
     color: black;
     line-height: 1.6;
-    padding: 10px;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
 
 }
 .main-content h2{
   font-family: Pacifico;
   font-display: swap;
-  text-align: right;
-  margin-right: 0;
-  margin-right: 0;
+ text-align: right;
   font-weight: bold;
   color: #025b05"
 }
@@ -71,25 +168,28 @@ header p{
 }*/
 
 .parent {
-  text-decoration: underline;
-   color: black;
-    line-height: 1.6;
+
+  line-height: 1.6;
   text-align: center;
   margin: 16px;
-  padding: 32px 32px;
+  width: auto;
   border: 1px solid black;
-  background-color: white;
+  display: grid;
+  grid-template-columns: fit-content;
+
 }
 
 .child {
+
   width: 30%;
   padding: 32px 32px;
   border: 1px solid black;
   float: left;
   margin: 10px;
-   background-color: white;
+
 }
 .link {
+
   width: 30%;
   padding: 32px 32px;
   border: 1px solid black;
@@ -97,22 +197,22 @@ header p{
   margin-right: 10px;
 }
 .another {
+
   width: 30%;
   padding: 32px 32px;
   border: 1px solid black;
-  margin-right: 10px;
-  display:flex;
-  justify-items:center;
-  justify-content:center;
-
+  margin-right: 20px;
+  display: inline-block;
 
 }
+/*
 .another h4{
 
   color: green;
   font-family: Pacifico;
-  font-weight: bold;
+
 }
+*/
 
 .child img {
   display: inline-block;
@@ -175,8 +275,36 @@ a{
 .link a:hover {
   text-decoration: underline;
 }
+
+
 /* Responsive Layout*/
-@media screen and (max-width: 768px) {
+
+@media screen and (max-width: 600px) {
+  body {
+    background-color: white;
+  }
+ container {
+        flex-direction: column;
+  }
+   main-content {
+        margin-left: 0;
+  }
+
+}
+
+@media screen and (min-width: 600px) {
+  body {
+    background-color: white;
+  }
+ container {
+        flex-direction: column;
+  }
+   main-content {
+        margin-left: 0;
+  }
+}
+
+@media screen and (min-width: 768px) {
      body {
        background-color: white;
      }
@@ -195,4 +323,46 @@ a{
         margin-left: 0;
     }
 }
+
+@media screen and (min-width: 992px) {
+     body {
+       background-color: white;
+     }
+
+     sidenav {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    container {
+        flex-direction: column;
+    }
+
+    main-content {
+        margin-left: 0;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+     body {
+       background-color: white;
+     }
+
+     sidenav {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    container {
+        flex-direction: column;
+    }
+
+    main-content {
+        margin-left: 0;
+    }
+}
+
+
 
