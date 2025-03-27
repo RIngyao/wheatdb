@@ -476,35 +476,7 @@ snp_table_server <- function(id, snps_df) {
 
 
 
-    # observe({
-    #
-    # #gene_data <- reactive(input$upload)
-    #
-    # #browser()
-    # ext <- tools::file_ext(input$upload$datapath)
-    # ext2 <- tools::file_ext(input$upload$name)
-    #
-    # # print(ext)
-    # # print(ext2)
-    #
-    # validate(need(ext %in% c("csv", "tsv"), "Please upload a valid file type"))
-    #
-    # output$table_output <- renderDT({
-    #   read.csv(input$upload$datapath)
-    #
-    #   #file_content <- read.csv(input$upload$datapath)
-    # # splitfile <- strsplit(file_content, split = "[, ]+")[[1]]
-    # # for (i in 1:length(splitString)) {
-    # #      cat(splitString[i])
-    # #        if (splitString[i] == "[, ]+") {
-    # #             cat("\n")
-    # #         }
-    # #    }
-    #
-    #   #read.tsv(input$upload$datapath)
-    #  })
-    #
-    # })
+
 
    # processing the final table--------------------------
 
@@ -678,13 +650,19 @@ snp_table_server <- function(id, snps_df) {
 
      # subset of df_plot--------------------------------------------
      # browser()
+
+
+
      observe({
        req(input$plot_click, df_plot(), input$click)
 
-       # browser()
+        #browser()
        clicked <- reactive(input$plot_click$domain$discrete_limits$x)
+       x_pos <- reactive(round(input$plot_click$x))
+       y_pos <- reactive(round(input$plot_click$y))
+        print(y_pos())
        # req(df_plot())
-    #   browser()
+      # browser()
       # print(str(clicked()))
       # print(clicked())
       #  print(input$plot_click$x)
@@ -692,90 +670,88 @@ snp_table_server <- function(id, snps_df) {
 
        # process it
        plot_info_click <- df_plot() %>% group_by(TYPE) %>% summarize(count = n(), GENE_ID = unique(GENE_ID))
-       gene_selected <- reactive(plot_info_click[plot_info_click$TYPE %in% clicked()]$GENE_ID %>% unique())
-      # link <- a("Google homepage", href = "https://www.google.com")
-       browser()
-       print(gene_selected())
+       printed_gene <- reactive(unique(plot_info_click$GENE_ID[plot_info_click$TYPE %in% clicked()]))
+       print(printed_gene())
+     #  gene_selected <- reactive(plot_info_click[plot_info_click$TYPE == clicked()]$GENE_ID %>% unique())
+       click_type_x <- reactive(input$plot_click$domain$discrete_limits$x[x_pos()])
 
-       #tags$a(href="https://www.google.com/")
+       type_c <- plot_info_click[plot_info_click$TYPE == click_type_x(), "count", drop = TRUE]
+       print(type_c)
+
+
+       if(all(y_pos() >= 0) & all(y_pos() <= type_c)){
+
+           output$info_click <- renderPrint({
+             print(printed_gene())
+         })
+
+      # browser()
+
 
         output$info_click <- renderUI({
-
-         # print(clicked())
-        # HTML(href = "https://www.ncbi.nlm.nih.gov/")
-
-       # print(HTML(tags$a(href="https://www.google.com/", "link")))
-         print(gene_selected())
+          print(printed_gene())
           tags$a(href = "https://www.google.com/",
                  target = "_blank",
-                 paste("View",gene_selected())
+                 paste("View",printed_gene())
                  )
-        #  HTML(href = "https://www.google.com/", text = "gene link: ")
+
 
           })
-        # getlink <- function() {
-        #   return(HTML(href = "https://www.ncbi.nlm.nih.gov/"))
-        # }
-#
-#          output$show_link <- renderUI({
-#            tagList(
-#            tags$link(
-#              href = "https://www.google.com/",
-#              target = "_blank",
-#              style = "font-size: 10px; color: blue; text-decoration: underline"
-#            ))
-#          })
 
-        # output$show_link <- renderUI({includeHTML(path = "https://www.google.com")})
+       } else {
+         output$info_click <- NULL
+       }
+
+
 
      })
 
-  #      observe({
-  #        req(input$plot_hover, df_plot(), input$click,
-  #            is.numeric(input$plot_hover$x), is.numeric(input$plot_hover$y))
-  #
-  #        # data for display
-  #        plot_info_hover <- df_plot() %>% group_by(TYPE) %>% summarise(count = n(), unique_count = n_distinct(GENE_ID))
-  #        # print(plot_info_hover)
-  #        count_type <- reactive(df_plot() %>% group_by(TYPE) %>% summarise(count = n()))
-  #
-  #
-  #         # browser()
-  #        print(input$plot_hover)
-  #         # get the x-axis position
-  #        print(input$plot_hover$y)
-  #        print(input$plot_hover$x)
-  #        x_pos <- reactive(round(input$plot_hover$x))
-  #        y_pos <- reactive(round(input$plot_hover$y))
-  #
-  #        print(str(x_pos()))
-  #        print(str(y_pos()))
-  #
-  #         # extract the type for the x-position
-  #         # req(x_pos() %in% c(1:10))
-  #        hover_type_x <- reactive(input$plot_hover$domain$discrete_limits$x[x_pos()])
-  #        # count of gene for the type
-  #        hover_df <- plot_info_hover %>% filter(TYPE == hover_type_x()) # && (plot_info_hover %>% filter(count == y_pos()))
-  #        hover_df_y <- plot_info_hover %>% filter(count == y_pos())
-  #        gene_count <- reactive(sum(hover_df$unique_count))
-  #        type_c <- plot_info_hover[plot_info_hover$TYPE == hover_type_x(), "count", drop = TRUE]
-  #         # req(y_pos() <= type_c)
-  #
-  #
-  #        if(y_pos() >= 0 && y_pos() <= type_c){
-  #
-  #          output$info_hover <- renderPrint({
-  #            print(paste(hover_type_x(), ": unique gene count = ", gene_count()))
-  #
-  #
-  #          })
-  #
-  #        } else {
-  #          output$info_hover <- NULL
-  #
-  #        }
-  #
-  # })
+       observe({
+         req(input$plot_hover, df_plot(), input$click,
+             is.numeric(input$plot_hover$x), is.numeric(input$plot_hover$y))
+
+         # data for display
+         plot_info_hover <- df_plot() %>% group_by(TYPE) %>% summarise(count = n(), unique_count = n_distinct(GENE_ID))
+         # print(plot_info_hover)
+         count_type <- reactive(df_plot() %>% group_by(TYPE) %>% summarise(count = n()))
+
+
+          # browser()
+         print(input$plot_hover)
+          # get the x-axis position
+         print(input$plot_hover$y)
+         print(input$plot_hover$x)
+         x_pos <- reactive(round(input$plot_hover$x))
+         y_pos <- reactive(round(input$plot_hover$y))
+
+         print(str(x_pos()))
+         print(str(y_pos()))
+
+          # extract the type for the x-position
+          # req(x_pos() %in% c(1:10))
+         hover_type_x <- reactive(input$plot_hover$domain$discrete_limits$x[x_pos()])
+         # count of gene for the type
+         hover_df <- plot_info_hover %>% filter(TYPE == hover_type_x()) # && (plot_info_hover %>% filter(count == y_pos()))
+         hover_df_y <- plot_info_hover %>% filter(count == y_pos())
+         gene_count <- reactive(sum(hover_df$unique_count))
+         type_c <- plot_info_hover[plot_info_hover$TYPE == hover_type_x(), "count", drop = TRUE]
+          # req(y_pos() <= type_c)
+
+
+         if(y_pos() >= 0 && y_pos() <= type_c){
+
+           output$info_hover <- renderPrint({
+             print(paste(hover_type_x(), ": unique gene count = ", gene_count()))
+
+
+           })
+
+         } else {
+           output$info_hover <- NULL
+
+         }
+
+  })
 
         #display the graph
         observe({
@@ -895,7 +871,7 @@ snp_table_server <- function(id, snps_df) {
 
 
 
-#  https://www.ecpgr.org/resources/germplasm-databases/ecpgr-central-crop-databases
+
 
 
 
