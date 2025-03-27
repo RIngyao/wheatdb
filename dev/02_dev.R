@@ -32,7 +32,7 @@ golem::add_utils("index_gene", with_test = TRUE) # for small function
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
-golem::add_js_file("script")
+golem::add_js_file("custom")
 golem::add_js_handler("handlers")
 golem::add_css_file("link")
 golem::add_sass_file("custom")

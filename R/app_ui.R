@@ -21,22 +21,21 @@ app_ui <- function(request) {
 
       </div>
 
-
       <div id = "slideshow-container">
 
-           <img class="slide" src = "www/wheat1.jpg" />
-           <img class="slide" src = "www/wheat2.jpg" />
-           <img class="slide" src = "www/wheat3.jpg" />
-           <img class="slide" src = "www/normalwheat11.jpg" />
-           <img class="slide" src = "www/normalwheat12.jpg" />
-           <img class="slide" src = "www/normalwheat6.jpg" />
-           <img class="slide" src = "www/normalwheat7.jpg" />
-           <img class="slide" src = "www/normalwheat8.jpg" />
-           <img class="slide" src = "www/normalwheat9.jpg" />
-           <img class="slide" src = "www/normalwheat10.jpg" />
+  <img class="slide" src = "www/wheat1.jpg" />
+  <img class="slide" src = "www/wheat2.jpg" />
+  <img class="slide" src = "www/wheat3.jpg" />
+  <img class="slide" src = "www/normalwheat11.jpg" />
+  <img class="slide" src = "www/normalwheat12.jpg" />
+  <img class="slide" src = "www/normalwheat6.jpg" />
+  <img class="slide" src = "www/normalwheat7.jpg" />
+  <img class="slide" src = "www/normalwheat8.jpg" />
+  <img class="slide" src = "www/normalwheat9.jpg" />
+  <img class="slide" src = "www/normalwheat10.jpg" />
 
-      </div>
-      <br>
+  </div>
+   <br>
          <div class="container">
 
 
@@ -54,21 +53,23 @@ app_ui <- function(request) {
       </div>
 
 
-             <div class=parent">
+            <div class= "parent">
              <h2>RELATED WEBSITES</h2>
-
-               <div class="child">
-              <a href="https://www.ecpgr.org/" target="_blank>
-                     <link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon">
+             </div>
 
 
-                     <img src="https://www.ecpgr.org/fileadmin/templates/ecpgr.org/Assets/images/ECPGRtext_black.png" style="width=50px;height=50px">
+             <div id = "link-container">
+
+                   <div class="child">
+                   <a href="https://www.ecpgr.org/" target="_blank>
+                   <link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon">
+                   <img src="https://www.ecpgr.org/fileadmin/templates/ecpgr.org/Assets/images/ECPGRtext_black.png" style="width=50px;height=50px">
                        <h4>ECPGR central crop databases</h4>
                      </a>
                      <p>The databases hold passport data and, to varying degrees, characterization and primary evaluation data of the major collections of the respective crops in Europe.</p>
                </div>
 
-               <div class="link"
+               <div class="link">
                <a href="https://www.ncbi.nlm.nih.gov/" target="_blank>
                    <link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon">
 
@@ -77,17 +78,18 @@ app_ui <- function(request) {
                   </a>
                   <p>The National centre for Biotechnology Information advances science and health by providing access to biomedical and genomic information</p>
                </div>
-
-               <div class = "another"
+                <div class = "another"
                <a href = "https://genomeindia.in/" target = "_blank>
                 <link rel="icon" href="favicon.ico" sizes="16x16" type="image/x-icon">
 
                 <img src="www/genome.jpg" style="width=50px;height=50px">
-                 <h4>Genome India Project(GIP)</h4>
+                <h4>Genome India Project</h4>
                </a>
-               <p>Genome India Project(GIP) is a government-funded initiative to sequence the genomes of 10,000 healthy Indians. The project\'s goal is to create a comprehensive catalog of genetic variations in the Indian population. </p>
+               <p>A government-funded initiative to sequence the genomes of 10,000 healthy Indians. The project\'s goal is to create a comprehensive catalog of genetic variations in the Indian population. </p>
               </div>
-               </div>
+
+
+             </div>
 
 
        ')
