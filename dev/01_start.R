@@ -45,6 +45,7 @@ usethis::use_package("shinydashboardPlus", type = "depends")
 usethis::use_package("ggplot2", type = "depends")
 usethis::use_package("shinythemes", type = "depends")
 usethis::use_package("bslib", type = "depends")
+usethis::use_package("slickR", type = "depends")
 usethis::use_package("plotly", type = "depends")
 usethis::use_package("shinyFeedback", type = "depends")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages

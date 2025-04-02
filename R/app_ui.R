@@ -21,21 +21,15 @@ app_ui <- function(request) {
 
       </div>
 
-      <div id = "slideshow-container">
+      <div class = "carousel.animate">
 
-  <img class="slide" src = "www/wheat1.jpg" />
-  <img class="slide" src = "www/wheat2.jpg" />
-  <img class="slide" src = "www/wheat3.jpg" />
-  <img class="slide" src = "www/normalwheat11.jpg" />
-  <img class="slide" src = "www/normalwheat12.jpg" />
-  <img class="slide" src = "www/normalwheat6.jpg" />
-  <img class="slide" src = "www/normalwheat7.jpg" />
-  <img class="slide" src = "www/normalwheat8.jpg" />
-  <img class="slide" src = "www/normalwheat9.jpg" />
-  <img class="slide" src = "www/normalwheat10.jpg" />
+  <img src = "www/pixabaywheat1.jpg">
+ <img src = "www/pixabaywheat2.jpg">
+ <img src = "www/pixabaywheat3.jpg">
+  <img src = "www/pixabaywheat4.jpg">
 
-  </div>
-   <br>
+      </div>
+     <br>
          <div class="container">
 
 

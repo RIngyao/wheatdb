@@ -33,5 +33,6 @@ Depends:
     shinyFeedback,
     shinyjs,
     shinythemes,
+    slickR,
     tidyverse,
     vroom
