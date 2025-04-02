@@ -337,7 +337,6 @@ snp_table_server <- function(id, snps_df) {
         hideFeedback(inputId = "upload")
       }
       output$table_output <- renderDT((NULL))
-
       output$uiFiletype <- renderUI((NULL))
       null_table$show <- TRUE
       output$plot <- renderPlot(NULL)

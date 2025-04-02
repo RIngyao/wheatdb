@@ -15,6 +15,8 @@
 #'@import shinythemes
 #'@import bslib
 #'@import plotly
+#'@import slickR
+
 ## usethis names
 
 NULL
