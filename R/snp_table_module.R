@@ -687,13 +687,13 @@ snp_table_server <- function(id, snps_df) {
       # browser()
 
 
-        output$info_click <- renderUI({
+        output$info_click <- renderPrint({
           print(printed_gene())
-          tags$a(href = "https://www.google.com/",
-                 target = "_blank",
-                 paste("View",printed_gene())
-                 )
-
+          # tags$a(href = "https://www.google.co.in/",
+          #        target = "_blank",
+          #        paste(printed_gene())
+          #        )
+          #
 
           })
 
@@ -882,9 +882,12 @@ snp_table_server <- function(id, snps_df) {
 # TraesCS1A03G0010400
 # TraesCS1A03G0009800
 # TraesCS1A03G0007600
-# TraesCS1A03G0005600
+# TraesCS1A03G0011500
 # TraesCS1A03G0005200
 # TraesCS1A03G0003200
+
+
+
 ## To be copied in the UI
 # mod_name_of_module1_ui("name_of_module1_1")
 
