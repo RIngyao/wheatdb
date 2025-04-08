@@ -16,6 +16,8 @@
 #'@import bslib
 #'@import plotly
 #'@import slickR
+#'@import igvShiny
+
 
 ## usethis names
 

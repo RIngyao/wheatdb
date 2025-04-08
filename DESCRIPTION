@@ -27,6 +27,7 @@ Depends:
     bs4Dash,
     bslib,
     ggplot2,
+    igvShiny,
     openxlsx,
     plotly,
     shinydashboardPlus,
