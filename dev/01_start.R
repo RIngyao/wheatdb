@@ -38,7 +38,16 @@ renv::init() # initiate the env
 #renv::install("shinydashboard") # install package or
 # install package and update DESCRIPTION
 usethis::use_package_doc() # create a doc file for updating the NAMESPACE
-usethis::use_package("shinydashboard") # this will auto add to the DESCRIPTION
+usethis::use_package("golex") # this will auto add to the DESCRIPTION
+usethis::use_package("BiocManager", type = "depends")
+usethis::use_package("dplyr", type = "depends")
+usethis::use_package("future", type = "depends")
+usethis::use_package("promises", type = "depends")
+usethis::use_package("vroom", type = "depends")
+usethis::use_package("seqinr", type = "depends")
+usethis::use_package("Biostrings", type = "depends")
+usethis::use_package("DT", type = "depends")
+usethis::use_package("tidyverse", type = "depends")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
 renv::snapshot() # take a snapshot of the packages
 renv::status() #check renv status
@@ -46,7 +55,7 @@ renv::status() #check renv status
 ## Install the required dev dependencies ----
 golem::install_dev_deps()
 
-
+# remove package from description, then remove package from namespace
 # add a documentation
 devtools::document()
 
