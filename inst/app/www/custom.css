@@ -1,0 +1,430 @@
+
+/* General Body display*/
+
+  .logo {
+    width: 100px;
+    height: 100px;
+    margin-left: 0px;
+    font-family: Verdana (sans-serif);
+
+  }
+body, .content-wrapper {
+  background-color: white;
+  background-size: 100;
+}
+/*Display for headers*/
+
+  .dropdown{
+    background-color: #ebf2f1;
+    text-align: right;
+    padding: 5px;
+   }
+
+   .main-header {
+     max-height: 30px;
+   }
+   .main-header logo {
+     a
+   }
+ .header-font {
+   text-align: right;
+   font-family: Times New Roman;
+   font-size: 20px;
+ }
+
+header h1{
+  font-size: 3em;
+  margin: 0;
+}
+.header h3{
+  font-size: 1.5em;
+  margin-top: 5px;
+  font: center;
+}
+/* Display for containers */
+  /*
+  .container {
+
+    margin: 5px;
+
+  }
+h2{
+  text-decoration: underline;
+  color: black;
+  line-height: 1.6;
+  padding: 10px;
+
+
+
+}
+/* Animation effects */
+
+ .carousel {
+   display: flex;
+   overflow: hidden;
+   width: 100px;
+   height: 300px;
+ }
+
+ .carousel img {
+   width: 100%;
+   transition: transform 1s ease-in-out;
+ }
+
+@keyframes carousel {
+   0% {transform: translate(0);}
+   0% {transform: translate(-100);}
+   0% {transform: translate(-200);}
+   0% {transform: translate(0);}
+}
+
+ .carousel.animate img {
+   animation: slide 4s infinite;
+ }
+
+  /*
+  #slideshow-container {
+  position: relative;
+max-width: 1000px;
+margin: auto;
+overflow: hidden ;
+display: grid;
+grid-template-columns: repeat(5, 1fr);
+border: 4px black solid;
+}
+
+/*
+  .slide {
+    display: none;
+  }
+
+.slide {
+  animation-name: fade;
+  animation-duration: 12s;
+  animation-iteration-count: infinite;
+}
+
+.slide: first-child {
+  display: block;
+}
+
+
+  #slide img {
+  width: calc(25% - 10px);
+height: 150px;
+object-fit: cover;
+margin: 5px;
+border: 2px black solid;
+animation: FadeInOut 30s linear infinite 0s;
+}
+/*
+  .slide fade {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    animation: flexAnimation -5s infinite ease-in-out;
+  }
+
+  #fading img.slide {-animation-name: FadeInOut;
+-webkit-animation-timing-function: ease-in-out;
+-webkit-animation-iteration-count: infinite;
+-webkit-animation-duration: 10s;
+-webkit-animation-direction: alternate;
+}
+
+@keyframes FadeInOut {
+  0%  {opacity: 1;
+    animation-timing-function: ease-in;
+  }
+
+  25% {opacity: 1;
+    animation-timing-function: ease-out;
+  }
+
+  50% {opacity: 1;}
+
+  100% {opacity: 0;}
+
+}
+
+
+
+/*
+  .slide:nth-child(1) {
+    animation-delay: 0s;
+  }
+.slide:nth-child(2) {
+  animation-delay: 4s;
+}
+.slide:nth-child(3) {
+  animation-delay: 8s;
+}
+*/
+
+  /*
+  div {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    animation-name: example;
+    animation-duration: 3s;
+    animation-delay: -2s;
+  }*/
+
+  .box-header {
+    font-size: 40px;
+    font-weight: bold;
+    color: darkblue;
+    text-transform: uppercase;
+    font-family: Times New Roman, serif;
+  }
+.container p{
+
+  color: black;
+  line-height: 1.6;
+  margin-left: 0;
+  margin-right: 0;
+  max-width: 100%;
+
+}
+.main-content h2{
+  font-family: Pacifico;
+  font-display: swap;
+  text-align: right;
+  font-weight: bold;
+  color: #025b05"
+}
+
+/*.container img {
+
+  margin-left: 2px;
+  margin-right: 2px;
+  align: center;
+
+}*/
+
+.parent {
+
+    line-height: 1.6;
+    text-align: center;
+    margin: 16px;
+    width: auto;
+
+}
+
+.parent h2{
+   text-decoration: underline;
+}
+
+ #link-container {
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           width: auto;
+            }
+
+
+
+ .child {
+
+  width: 20%;
+  padding: 30px 30px;
+  border: 1px solid black;
+  float: left;
+ margin-right: 15px;
+  text-align: left;
+
+}
+ .link {
+
+  width: 20%;
+ padding: 30px 30px;
+  border: 1px solid black;
+  float: right;
+  margin-right: 15px;
+  text-align: left;
+}
+
+ .another {
+
+  width: 20%;
+ padding: 30px 30px;
+  border: 1px solid black;
+  margin-right: 15px;
+  text-align: left;
+
+}
+
+.ricebean {
+
+  width: 20%;
+ padding: 30px 30px;
+  border: 1px solid black;
+  margin-right: 15px;
+  text-align: left;
+
+}
+
+ .riceblight {
+
+ width: 20%;
+padding: 30px 30px;
+  border: 1px solid black;
+  margin-right: 15px;
+  text-align: left;
+
+}
+
+/*
+ .child img {
+
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+  }
+ .link img{
+
+  justify-content: center;
+  width: 150px;
+  height: 100px;
+}
+ .another img{
+
+  justify-content: center;
+  width: 150px;
+  height: 100px;
+}
+*/
+.parent h4{
+  text-align: center;
+  color: green;
+  font-family: Pacifico;
+  font-weight: bold;
+}
+
+.footermsg {
+  text-align: center;
+  height: 300px;
+  background-color: #66b6d4;
+
+}
+.footermsg h3 {
+  color: white;
+  font-size: 30px;
+  margin-top: 0px;
+  margin-left: 50px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+p{
+  color: black;
+  line-height: 1.5;
+
+}
+
+a{
+  text-decoration: none;
+  color:black;
+}
+.child a:link {
+  color: green;
+}
+.child a:hover {
+  text-decoration: underline;
+}
+.link a:link {
+  color: green;
+}
+.link a:hover {
+  text-decoration: underline;
+}
+
+
+/* Responsive Layout*/
+
+  @media screen and (max-width: 600px) {
+    body {
+      background-color: white;
+    }
+    container {
+      flex-direction: column;
+    }
+    main-content {
+      margin-left: 0;
+    }
+
+  }
+
+@media screen and (min-width: 600px) {
+  body {
+    background-color: white;
+  }
+  container {
+    flex-direction: column;
+  }
+  main-content {
+    margin-left: 0;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  body {
+    background-color: white;
+  }
+
+  sidenav {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  container {
+    flex-direction: column;
+  }
+
+  main-content {
+    margin-left: 0;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  body {
+    background-color: white;
+  }
+
+  sidenav {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  container {
+    flex-direction: column;
+  }
+
+  main-content {
+    margin-left: 0;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  body {
+    background-color: white;
+  }
+
+  sidenav {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  container {
+    flex-direction: column;
+  }
+
+  main-content {
+    margin-left: 0;
+  }
+}
+
+
