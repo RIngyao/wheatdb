@@ -305,15 +305,32 @@ blast_ui <- function(id) {
      }) %...>% # promises
        {
          progressSweetAlert(
-           session=session, id = "myprogress",
+           session=session,
+           id = "myprogress",
            title = "BLAST is running.....",
-           display_pct = TRUE, value = 0
+           display_pct = TRUE,
+           value = 0
          )
+         for (i in seq_len(50)) {
+           Sys.sleep(0.1)
+           updateProgressBar(
+             session = session,
+             id = "myprogress",
+             value = i*2
+           )
+         }
 
+         closeSweetAlert(session = session)
+
+         sendSweetAlert(
+           session = session,
+           title ="BLAST results done!", style = "width:50px;",
+           type = "success",
+         )
 
           blast_output <- vroom::vroom("blast_result.out", delim = "\t", col_names = FALSE)
 
-          closeSweetAlert(session = session)
+
           output$blast_table <- renderDT({
             datatable(cbind(blast_output),
                        options = list(
@@ -335,8 +352,17 @@ blast_ui <- function(id) {
            progressSweetAlert(
              session=session, id = "myprogress",
              title = "BLAST is running.....",
-             display_pct = TRUE, value = 0
+             display_pct = TRUE,
+             value = 0
            )
+           for (i in seq_len(50)) {
+             Sys.sleep(0.1)
+             updateProgressBar(
+               session = session,
+               id = "myprogress",
+               value = i*2
+             )
+           }
 
            closeSweetAlert(session = session)
 

@@ -126,7 +126,8 @@ app_ui <- function(request) {
           shinydashboard::sidebarMenu(
             menuItem("Home", tabName="home", icon=icon("home")),
             menuItem("Markers", tabName="markers", icon = icon("table")),
-            menuItem("BLAST", tabName="BLAST", icon = icon("list"))
+            menuItem("BLAST", tabName="BLAST", icon = icon("list")),
+            menuItem("Genetic resources", tabName="Genres", icon = icon("list"))
           )
 
           #
@@ -208,8 +209,15 @@ app_ui <- function(request) {
                       column(12, blast_ui("blast")),
 
                     ) #end fliudRow
-            ) #end blast
+            ), #end blast
 
+            tabItem(tabName = "Genres",
+                    fluidRow(
+
+                      column(12, genetic_resources_ui("resource")),
+
+                    ) #end fliudRow
+            ) #end genetic resources
 
           ) #end tabItems
         ),#end dashboardbody
