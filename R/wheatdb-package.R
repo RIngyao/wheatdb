@@ -11,6 +11,7 @@
 #'@import seqinr
 #'@import Biostrings
 #'@import DT
+#'@import shinyWidgets
 
 ## usethis namespace: end
 NULL

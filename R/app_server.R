@@ -17,4 +17,5 @@ app_server <- function(input, output, session) {
   # Your application server logic
  # snp_table_server("table")
   blast_server("blast")
+  genetic_resources_server("resource")
 }
