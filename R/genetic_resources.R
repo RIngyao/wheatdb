@@ -85,10 +85,12 @@ genetic_resources_server <- function(id){
 
         output$show <- renderUI({
 
+          shiny::addResourcePath(system.file("app/www/test.html", package = "wheatdb"))
 
           # tags$iframe(src="../wheatdb/inst/app/www/seedspike.html", height = 600, width = 600)
           # test <- tags$iframe("seedspike.html", height = 1000, width = 1000)
-          includeHTML(system.file("app/www/seedspike.html", package = "wheatdb")) #../wheatdb/inst/app/
+          includeHTML("test.html")
+          # includeHTML(system.file("app/www/test.html", package = "wheatdb")) #../wheatdb/inst/app/
           # test <- tags$iframe(id="gr", src = "www.google.com") #inst/app/www/seedspike.html
           # test
         })
