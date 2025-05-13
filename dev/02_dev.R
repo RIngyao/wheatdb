@@ -44,6 +44,7 @@ golem::add_css_file("custom")
 golem::add_sass_file("custom")
 golem::add_any_file("file.json")
 golem::add_html_template("gen_res")
+golem::add_html_template("select")
 
 ## Add internal datasets ----
 ## If you have data in your package
