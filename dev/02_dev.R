@@ -20,13 +20,21 @@ attachment::att_amend_desc()
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module(name = "name_of_module1", with_test = TRUE) # Name of the module
+ # Name of the module
 golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the module
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct("helpers", with_test = TRUE)
 golem::add_utils("helpers", with_test = TRUE)
+golem::add_utils("max_target", with_test = TRUE)
+golem::add_utils("score", with_test = TRUE)
+golem::add_utils("word_size", with_test = TRUE)
+golem::add_utils("e_value", with_test = TRUE)
+golem::add_utils("gap_ext", with_test = TRUE)
+golem::add_utils("gap_op", with_test = TRUE)
+golem::add_utils("reward", with_test = TRUE)
+golem::add_utils("penalty", with_test = TRUE)
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
@@ -35,6 +43,7 @@ golem::add_js_handler("handlers")
 golem::add_css_file("custom")
 golem::add_sass_file("custom")
 golem::add_any_file("file.json")
+golem::add_html_template("gen_res")
 
 ## Add internal datasets ----
 ## If you have data in your package
