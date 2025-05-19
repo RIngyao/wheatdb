@@ -9,7 +9,7 @@ app_server <- function(input, output, session) {
 
   # data---------------------------------
   # snps data
- # snps_df = vroom::vroom("data-raw/snps_final_data.tsv", delim = "\t")
+ # snps_df = vroom::vroom("data-raw/snps_final_data.tsv", deliFm = "\t")
 
 
  # blast_df = vroom::vroom("data-raw/snps_data.tsv", delim = "\t")
