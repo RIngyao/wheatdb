@@ -222,6 +222,8 @@ genetic_resources_server <- function(id){
         alt = "spike image")
     }, deleteFile = FALSE)
 
+
+
    # output$spike_img <- renderImage({
    #   req(select_id1(), select_id2())
    #
