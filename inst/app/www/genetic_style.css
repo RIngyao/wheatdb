@@ -1,0 +1,192 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.image-row1 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row2 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row3 { /* First row */
+  display: flex;
+  justify-content: center;
+ padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row4 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row5 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row6 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row7 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row8 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row9 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row10 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row11 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row12 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row13 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row14 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row15 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row16 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row17 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row18 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row19 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row20 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row21 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+.image-row22 { /* First row */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  column-gap: 50px;
+}
+
+
+/* Image-pair will have the same style for all the rows */
+.image-pair {
+  display: flex;
+  flex-direction: column;  /* caption should be below the image*/
+  align-items: center;
+}
+
+/* pair box */
+.image-box {
+  display: flex;
+  flex-direction: row; /* Images in each pair side-by-side */
+  padding: 0px;
+}
+
+/* individual  image */
+.image-pair img {
+  width: 150px;
+  height: 150px;
+  margin: 0 5px;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Name of image will have the same style for all */
+.caption {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+

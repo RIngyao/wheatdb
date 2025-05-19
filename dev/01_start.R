@@ -49,16 +49,19 @@ usethis::use_package("Biostrings", type = "depends")
 usethis::use_package("shinyWidgets", type = "depends")
 usethis::use_package("DT", type = "depends")
 usethis::use_package("tidyverse", type = "depends")
+# usethis::use_package("magick", type = "import")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
+# remove package from description, then remove package from namespace
+# add a documentation
+
+devtools::document()
+
 renv::snapshot() # take a snapshot of the packages
 renv::status() #check renv status
 
 ## Install the required dev dependencies ----
 golem::install_dev_deps()
 
-# remove package from description, then remove package from namespace
-# add a documentation
-devtools::document()
 
 ## Create Common Files ----
 ## See ?usethis for more information

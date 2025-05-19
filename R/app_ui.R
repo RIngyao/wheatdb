@@ -6,6 +6,8 @@
 #' @noRd
 app_ui <- function(request) {
 
+ addResourcePath("www", system.file("app/www", package = "wheatdb"))
+
   frontPage <- div(
     HTML('
 
@@ -85,6 +87,18 @@ app_ui <- function(request) {
                    </div>
 
 
+             </div>
+
+             <div class = "logo-pair">
+             <div class="logo-box">
+             <img src="images/f-l9.jpg alt="logo1"><img src="images/f-l8.jpg alt="logo2"><img src="images/f-l7.jpg alt="logo3"><img src="images/f-l6.png alt="logo4">
+             </div>
+             <div class="logo-box">
+             <img src="images/f-l5.png alt="logo5"><img src="images/f-l4.jpg alt="logo6"><img src="images/f-l3.jpg alt="logo7"><img src="images/f-l2.jpg alt="logo8">
+             </div>
+             <div class="logo-box">
+             <img src="images/f-l1.jpg alt="logo9"><img src="images/f-l11.png alt="logo10"><img src="images/f-l10.jpg alt="logo11">
+             </div>
              </div>
 
 
@@ -226,9 +240,10 @@ app_ui <- function(request) {
       #footer
       footer <- div(
         HTML('
-             <div class="footermsg">
+             <div class = "footermsg">
              <h3>Copyright All Rights Reserved 2025</h3>
-              ')
+             </div>
+            ')
       )
 
 

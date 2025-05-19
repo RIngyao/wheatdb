@@ -129,7 +129,7 @@ blast_ui <- function(id) {
     #    })
 
     # gap_cost <- reactive(
-    #   if(purrr::is_empty(input$gap)){
+    #   if(purr::is_empty(input$gap)){
     #     input <- NULL
     #   } else{
     #     input <- input$gap
