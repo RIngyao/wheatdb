@@ -21,3 +21,6 @@ check_gene <- function(gene, check){
 
   return(out)
 }
+
+
+?is_empty

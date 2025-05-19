@@ -13,18 +13,29 @@ body, .content-wrapper {
 }
 /*Display for headers*/
 
-  header{
-    background-color: black;
-    text-align: center;
+  .dropdown{
+    background-color: #ebf2f1;
+    text-align: right;
     padding: 5px;
-    color: white;
+   }
 
-  }
+   .main-header {
+     max-height: 30px;
+   }
+   .main-header logo {
+     a
+   }
+ .header-font {
+   text-align: right;
+   font-family: Times New Roman;
+   font-size: 20px;
+ }
+
 header h1{
   font-size: 3em;
   margin: 0;
 }
-header p{
+.header h3{
   font-size: 1.5em;
   margin-top: 5px;
   font: center;
@@ -216,34 +227,54 @@ animation: FadeInOut 30s linear infinite 0s;
  .child {
 
   width: 20%;
-  padding: 32px 32px;
+  padding: 30px 30px;
   border: 1px solid black;
   float: left;
-  margin: 20px;
+ margin-right: 15px;
   text-align: left;
 
 }
  .link {
 
   width: 20%;
-  padding: 32px 32px;
+ padding: 30px 30px;
   border: 1px solid black;
   float: right;
-  margin-right: 20px;
+  margin-right: 15px;
   text-align: left;
 }
 
  .another {
 
   width: 20%;
-  padding: 32px 32px;
+ padding: 30px 30px;
   border: 1px solid black;
-  margin-right: 20px;
+  margin-right: 15px;
   text-align: left;
 
 }
 
+.ricebean {
 
+  width: 20%;
+ padding: 30px 30px;
+  border: 1px solid black;
+  margin-right: 15px;
+  text-align: left;
+
+}
+
+ .riceblight {
+
+ width: 20%;
+padding: 30px 30px;
+  border: 1px solid black;
+  margin-right: 15px;
+  text-align: left;
+
+}
+
+/*
  .child img {
 
     justify-content: center;
@@ -262,28 +293,26 @@ animation: FadeInOut 30s linear infinite 0s;
   width: 150px;
   height: 100px;
 }
+*/
 .parent h4{
   text-align: center;
   color: green;
   font-family: Pacifico;
   font-weight: bold;
 }
-#alert {
-color: red;
-font-weight: bold;
-text-align: center;
-}
+
 .footermsg {
-  text-align: left;
-  height: 10px;
+  text-align: center;
+  height: 300px;
+  background-color: #66b6d4;
 
 }
 .footermsg h3 {
-  color: black;
-  font-size: 20px;
-  margin-bottom: 40px;
-  margin-left: 20px;
-  padding-bottom: 10px;
+  color: white;
+  font-size: 30px;
+  margin-top: 0px;
+  margin-left: 50px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 p{
