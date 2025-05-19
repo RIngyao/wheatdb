@@ -118,7 +118,7 @@ snp_table_ui <- function(id) {
       # button for submitting the query-----------------------------------------
       conditionalPanel(condition = sprintf("input['%s'] != 'None'", ns("query_menu")),
                        actionButton(inputId = ns("click"), label = "SUBMIT",
-                                    width = "70%",
+                                    width = "10%",
                                     # class = "btn-primary btn-lg",
                                     class = "btn-info btn-sm",
                                     style = "font-weight:bold;")
@@ -655,8 +655,9 @@ snp_table_server <- function(id, snps_df) {
      observe({
        req(input$plot_click, df_plot(), input$click)
 
-        #browser()
+       # browser()
        clicked <- reactive(input$plot_click$domain$discrete_limits$x)
+       #browser()
        x_pos <- reactive(round(input$plot_click$x))
        y_pos <- reactive(round(input$plot_click$y))
         print(y_pos())
@@ -680,21 +681,57 @@ snp_table_server <- function(id, snps_df) {
 
        if(all(y_pos() >= 0) & all(y_pos() <= type_c)){
 
-           output$info_click <- renderPrint({
-             print(printed_gene())
-         })
+         #   output$info_click <- renderPrint({
+         #     print(printed_gene())
+         # }) unix
 
       # browser()
 
 
         output$info_click <- renderUI({
           print(printed_gene())
-          tags$a(href = "https://www.google.com/",
+          tags$a(href = "https://www.google.co.in/",
                  target = "_blank",
-                 paste("View",printed_gene())
-                 )
+                 paste(printed_gene()),
 
 
+          # # defining custom genomes with data provided by URLs-------------------------
+          # base_url <- "https://gladki.pl/igvr/testFiles"
+          # title <- "ribo remote"
+          # fasta_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.fasta")
+          # fasta_index_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.fasta.fai")
+          # annotation_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.gff3")
+          # locus <- "U13369.1:7,276-8,225"
+          # genomeOptions <- parseAndValidateGenomeSpec(
+          #   genomeName = "hg38",
+          #   initialLocus = "NDUFS2",
+          #   dataMode = "http",
+          #   stockGenome = FALSE,
+          #   fasta = fasta_file,
+          #   fastaIndex = fasta_index_file,
+          #   genomeAnnotation = annotation_file
+          #
+          # )
+          # genomeOptions
+
+
+#
+# # defining custom genomes with data provided on local files------------------
+# data_directory <- system.file(package = "igvShiny", "extdata"),
+# fasta_file <- file.path(data_directory, "ribosomal-RNA-gene.fasta"),
+# fasta_index_file <- file.path(data_directory, "ribosomal-RNA-gene.fasta.fai"),
+# annotation_file <- file.path(data_directory, "ribosomal-RNA-gene.gff3"),
+# genomeOptions2 <- parseAndValidateGenomeSpec(
+#   genomeName = "ribo local",
+#   initialLocus = "U13369.1:7,276-8,225",
+#   dataMode = "localFiles",
+#   stockGenome = FALSE,
+#   fasta = fasta_file,
+#   fastaIndex = fasta_index_file,
+#   genomeAnnotation = annotation_file
+# ),
+
+)
           })
 
        } else {
@@ -715,13 +752,16 @@ snp_table_server <- function(id, snps_df) {
          count_type <- reactive(df_plot() %>% group_by(TYPE) %>% summarise(count = n()))
 
 
-          # browser()
-         print(input$plot_hover)
+         #  browser()
+        # print(input$plot_hover)
           # get the x-axis position
-         print(input$plot_hover$y)
-         print(input$plot_hover$x)
-         x_pos <- reactive(round(input$plot_hover$x))
-         y_pos <- reactive(round(input$plot_hover$y))
+        # print(input$plot_hover$y)
+        # print(input$plot_hover$x)
+
+         x_pos <- reactive(round(as.numeric(input$plot_hover$x)))
+         y_pos <- reactive(round(as.numeric(input$plot_hover$y)))
+         # rf <- class(x_pos)
+         # print (rf)
 
          print(str(x_pos()))
          print(str(y_pos()))
@@ -734,6 +774,7 @@ snp_table_server <- function(id, snps_df) {
          hover_df_y <- plot_info_hover %>% filter(count == y_pos())
          gene_count <- reactive(sum(hover_df$unique_count))
          type_c <- plot_info_hover[plot_info_hover$TYPE == hover_type_x(), "count", drop = TRUE]
+         print(type_c)
           # req(y_pos() <= type_c)
 
 
@@ -745,10 +786,11 @@ snp_table_server <- function(id, snps_df) {
 
            })
 
-         } else {
-           output$info_hover <- NULL
-
          }
+          else {
+            output$info_hover <- NULL
+          }
+
 
   })
 
@@ -882,9 +924,11 @@ snp_table_server <- function(id, snps_df) {
 # TraesCS1A03G0010400
 # TraesCS1A03G0009800
 # TraesCS1A03G0007600
-# TraesCS1A03G0005600
 # TraesCS1A03G0005200
 # TraesCS1A03G0003200
+
+
+
 ## To be copied in the UI
 # mod_name_of_module1_ui("name_of_module1_1")
 

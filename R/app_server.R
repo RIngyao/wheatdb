@@ -11,6 +11,9 @@ app_server <- function(input, output, session) {
     snps_df = vroom::vroom("data-raw/snps_final_data.tsv", delim = "\t")
 
 
+    blast_df = vroom::vroom("data-raw/snps_data.tsv", delim = "\t")
+
   # Your application server logic
   snp_table_server("table", snps_df=snps_df)
+  blast_server("blast", blast_df=blast_df)
 }
