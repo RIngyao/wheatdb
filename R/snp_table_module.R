@@ -118,7 +118,7 @@ snp_table_ui <- function(id) {
       # button for submitting the query-----------------------------------------
       conditionalPanel(condition = sprintf("input['%s'] != 'None'", ns("query_menu")),
                        actionButton(inputId = ns("click"), label = "SUBMIT",
-                                    width = "70%",
+                                    width = "10%",
                                     # class = "btn-primary btn-lg",
                                     class = "btn-info btn-sm",
                                     style = "font-weight:bold;")
@@ -131,23 +131,26 @@ snp_table_ui <- function(id) {
      fluidRow(
       box( height = "600", solidHeader = T, #title = "SNP Table",
 
-           column(1, align = "right", offset = 9,
-                  uiOutput(ns("uiDownload"))
+           column(12,
+                  column(8, align = "left", offset = 0,
+                         uiOutput(ns("uiFiletype"))
                   ),
-                  # downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
-           column(2, align = "left", offset = 10,
-                  uiOutput(ns("uiFiletype"))
-                  ),
+                  column(2, align = "right", offset = 10,
+                         uiOutput(ns("uiDownload"))
+                  )
+
+                ),
+
            DTOutput(outputId = ns("table_output"))
          ),#for table output
       br(),
       box( height = "650", solidHeader = T, #title = "SNP Plot analysis",
-          column(1, align = "right", offset = 8,
-                 uiOutput(ns("UiDownloadBar"))
-                 ),
-          column(2, align = "left", offset = 10,
-                 uiOutput(ns("uiImageType"))
-                 ),
+
+        column(12,
+               column(8, align = "left", offset = 0, uiOutput(ns("uiImageType"))),
+               column(2, align = "right", offset = 10, uiOutput(ns("UiDownloadBar")))
+        ),
+
           column(12,
               div(height=600, width = 600,
                     plotOutput(outputId = ns("plot"), click = ns("plot_click"), hover= ns("plot_hover")))
@@ -288,6 +291,7 @@ snp_table_server <- function(id, snps_df) {
         showFeedbackWarning(inputId="start_coord", text = error_msg$msg, color = "#ff0000",
                             icon = shiny::icon("warning-sign", lib = "glyphicon"))
          output$uiDownload <- renderUI(NULL)
+         output$uiDownloadBar <- renderUI(NULL)
          track_error_df$status <- FALSE
         # error_msg$msg <- TRUE
       } else{
@@ -295,8 +299,10 @@ snp_table_server <- function(id, snps_df) {
 
       }
       output$table_output <- renderDT((NULL))
-      #output$UiDownload <- renderUI((NULL))
+      output$UiDownload <- renderUI((NULL))
+      output$uiDownloadBar <- renderUI((NULL))
       output$uiFiletype <- renderUI((NULL))
+      output$uiImageType <- renderUI((NULL))
       null_table$show <- TRUE
       output$plot <- renderPlot(NULL)
       null_plot$imgplot <- TRUE
@@ -315,12 +321,15 @@ snp_table_server <- function(id, snps_df) {
                             icon = shiny::icon("warning-sign", lib = "glyphicon"))
 
         output$uiDownload <- renderUI(NULL)
+        output$uiDownloadBar <- renderUI(NULL)
       } else{
         hideFeedback(inputId = "enter_gene")
       }
       output$table_output <- renderDT((NULL))
-      #output$UiDownload <- renderUI((NULL))
+      output$UiDownload <- renderUI((NULL))
+      output$UiDownloadBar <- renderUI((NULL))
       output$uiFiletype <- renderUI((NULL))
+      output$uiImageType <- renderUI((NULL))
       null_table$show <- TRUE
       output$plot <- renderPlot(NULL)
       null_plot$imgplot <- TRUE
@@ -333,12 +342,15 @@ snp_table_server <- function(id, snps_df) {
         showFeedback(inputId = "upload", text = gene_error())
 
         output$uiDownload <- renderUI(NULL)
+        output$uiDownloadBar <- renderUI(NULL)
       } else{
         hideFeedback(inputId = "upload")
       }
       output$table_output <- renderDT((NULL))
-
+      output$UiDownload <- renderUI((NULL))
+      output$UiDownloadBar <- renderUI((NULL))
       output$uiFiletype <- renderUI((NULL))
+      output$uiImageType <- renderUI((NULL))
       null_table$show <- TRUE
       output$plot <- renderPlot(NULL)
       null_plot$imgplot <- TRUE
@@ -557,7 +569,7 @@ snp_table_server <- function(id, snps_df) {
           )
           # show the file type
           output$uiFiletype <- renderUI(
-            selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))
+            radioButtons(inputId = ns("filetype"), inline = TRUE, label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))
           )
           output$table_output <- renderDT({
             datatable(
@@ -623,7 +635,7 @@ snp_table_server <- function(id, snps_df) {
           #  print(df_plot())
             plot_info <- df_plot() %>% group_by(TYPE) %>% summarize(count = n(), GENE_ID = unique(GENE_ID))
             #print(plot_info)
-            data_plot <-  ggplot(data = plot_info, aes(x = TYPE, y = count)) +
+            data_plot <-  ggplot(data = plot_info, aes(x = TYPE, y = count, fill = TYPE)) +
             geom_bar(stat = "identity")+
             theme_classic() +
             theme(
@@ -656,8 +668,9 @@ snp_table_server <- function(id, snps_df) {
      observe({
        req(input$plot_click, df_plot(), input$click)
 
-        #browser()
+       # browser()
        clicked <- reactive(input$plot_click$domain$discrete_limits$x)
+       #browser()
        x_pos <- reactive(round(input$plot_click$x))
        y_pos <- reactive(round(input$plot_click$y))
         print(y_pos())
@@ -681,21 +694,57 @@ snp_table_server <- function(id, snps_df) {
 
        if(all(y_pos() >= 0) & all(y_pos() <= type_c)){
 
-           output$info_click <- renderPrint({
-             print(printed_gene())
-         })
+         #   output$info_click <- renderPrint({
+         #     print(printed_gene())
+         # }) unix
 
       # browser()
 
 
         output$info_click <- renderUI({
           print(printed_gene())
-          tags$a(href = "https://www.google.com/",
+          tags$a(href = "https://www.google.co.in/",
                  target = "_blank",
-                 paste("View",printed_gene())
-                 )
+                 paste(printed_gene()),
 
 
+          # # defining custom genomes with data provided by URLs-------------------------
+          # base_url <- "https://gladki.pl/igvr/testFiles"
+          # title <- "ribo remote"
+          # fasta_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.fasta")
+          # fasta_index_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.fasta.fai")
+          # annotation_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.gff3")
+          # locus <- "U13369.1:7,276-8,225"
+          # genomeOptions <- parseAndValidateGenomeSpec(
+          #   genomeName = "hg38",
+          #   initialLocus = "NDUFS2",
+          #   dataMode = "http",
+          #   stockGenome = FALSE,
+          #   fasta = fasta_file,
+          #   fastaIndex = fasta_index_file,
+          #   genomeAnnotation = annotation_file
+          #
+          # )
+          # genomeOptions
+
+
+#
+# # defining custom genomes with data provided on local files------------------
+# data_directory <- system.file(package = "igvShiny", "extdata"),
+# fasta_file <- file.path(data_directory, "ribosomal-RNA-gene.fasta"),
+# fasta_index_file <- file.path(data_directory, "ribosomal-RNA-gene.fasta.fai"),
+# annotation_file <- file.path(data_directory, "ribosomal-RNA-gene.gff3"),
+# genomeOptions2 <- parseAndValidateGenomeSpec(
+#   genomeName = "ribo local",
+#   initialLocus = "U13369.1:7,276-8,225",
+#   dataMode = "localFiles",
+#   stockGenome = FALSE,
+#   fasta = fasta_file,
+#   fastaIndex = fasta_index_file,
+#   genomeAnnotation = annotation_file
+# ),
+
+)
           })
 
        } else {
@@ -716,13 +765,16 @@ snp_table_server <- function(id, snps_df) {
          count_type <- reactive(df_plot() %>% group_by(TYPE) %>% summarise(count = n()))
 
 
-          # browser()
-         print(input$plot_hover)
+         #  browser()
+        # print(input$plot_hover)
           # get the x-axis position
-         print(input$plot_hover$y)
-         print(input$plot_hover$x)
-         x_pos <- reactive(round(input$plot_hover$x))
-         y_pos <- reactive(round(input$plot_hover$y))
+        # print(input$plot_hover$y)
+        # print(input$plot_hover$x)
+
+         x_pos <- reactive(round(as.numeric(input$plot_hover$x)))
+         y_pos <- reactive(round(as.numeric(input$plot_hover$y)))
+         # rf <- class(x_pos)
+         # print (rf)
 
          print(str(x_pos()))
          print(str(y_pos()))
@@ -735,6 +787,7 @@ snp_table_server <- function(id, snps_df) {
          hover_df_y <- plot_info_hover %>% filter(count == y_pos())
          gene_count <- reactive(sum(hover_df$unique_count))
          type_c <- plot_info_hover[plot_info_hover$TYPE == hover_type_x(), "count", drop = TRUE]
+         print(type_c)
           # req(y_pos() <= type_c)
 
 
@@ -746,10 +799,11 @@ snp_table_server <- function(id, snps_df) {
 
            })
 
-         } else {
-           output$info_hover <- NULL
-
          }
+          else {
+            output$info_hover <- NULL
+          }
+
 
   })
 
@@ -762,7 +816,7 @@ snp_table_server <- function(id, snps_df) {
               downloadButton(outputId = ns("download_bar"), label = "Download image", icon = shiny::icon("download"))
             )
             output$uiImageType <- renderUI(
-              selectInput(inputId = ns("imgtype"), label = "File Type:", choices = c("png", "pdf", "jpeg"))
+              radioButtons(inputId = ns("imgtype"), inline = TRUE, label = "File Type:", choices = c("png", "pdf", "jpeg"))
             )
 
            output$plot <- renderPlot(final_plot())
@@ -869,10 +923,13 @@ snp_table_server <- function(id, snps_df) {
 
 
 
+# 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
+# @jbrowse/cli/node_modules/@oclif/core/lib/command.js
+#'/usr/lib/node_modules/@jbrowse/cli/node_modules/@oclif/core/lib/command.js'
+# /node_modules/@oclif/core/lib/command.js:45
 
 
-
-
+# commit 56675c785332172b22ff12f9a28f6a1eb3902a2a (HEAD -> blast)
 
 
 #"TraesCS1A03G0011000"
@@ -883,9 +940,11 @@ snp_table_server <- function(id, snps_df) {
 # TraesCS1A03G0010400
 # TraesCS1A03G0009800
 # TraesCS1A03G0007600
-# TraesCS1A03G0005600
 # TraesCS1A03G0005200
 # TraesCS1A03G0003200
+
+
+
 ## To be copied in the UI
 # mod_name_of_module1_ui("name_of_module1_1")
 
