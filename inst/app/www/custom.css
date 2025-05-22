@@ -44,9 +44,33 @@ h2{
 
 
 
-}*/
+}
+/* Animation effects */
 
+ .carousel {
+   display: flex;
+   overflow: hidden;
+   width: 100px;
+   height: 300px;
+ }
 
+ .carousel img {
+   width: 100%;
+   transition: transform 1s ease-in-out;
+ }
+
+@keyframes carousel {
+   0% {transform: translate(0);}
+   0% {transform: translate(-100);}
+   0% {transform: translate(-200);}
+   0% {transform: translate(0);}
+}
+
+ .carousel-animate img {
+   animation: slide 4s infinite;
+ }
+
+  /*
   #slideshow-container {
   position: relative;
 max-width: 1000px;
@@ -71,7 +95,7 @@ border: 4px black solid;
 .slide: first-child {
   display: block;
 }
-*/
+
 
   #slide img {
   width: calc(25% - 10px);
@@ -88,9 +112,8 @@ animation: FadeInOut 30s linear infinite 0s;
     height: 100px;
     animation: flexAnimation -5s infinite ease-in-out;
   }
-*/
-  #fading img.slide {
-  -webkit-animation-name: FadeInOut;
+
+  #fading img.slide {-animation-name: FadeInOut;
 -webkit-animation-timing-function: ease-in-out;
 -webkit-animation-iteration-count: infinite;
 -webkit-animation-duration: 10s;
@@ -373,3 +396,5 @@ a{
     margin-left: 0;
   }
 }
+
+

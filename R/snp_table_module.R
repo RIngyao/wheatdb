@@ -347,8 +347,11 @@ snp_table_server <- function(id, snps_df) {
         hideFeedback(inputId = "upload")
       }
       output$table_output <- renderDT((NULL))
+<<<<<<< HEAD
       output$UiDownload <- renderUI((NULL))
       output$UiDownloadBar <- renderUI((NULL))
+=======
+>>>>>>> 3d1aca5e53b3e9330879299356b967ea33dd07a0
       output$uiFiletype <- renderUI((NULL))
       output$uiImageType <- renderUI((NULL))
       null_table$show <- TRUE
@@ -701,12 +704,20 @@ snp_table_server <- function(id, snps_df) {
       # browser()
 
 
-        output$info_click <- renderUI({
+        output$info_click <- renderPrint({
           print(printed_gene())
+<<<<<<< HEAD
           tags$a(href = "https://www.google.co.in/",
                  target = "_blank",
                  paste(printed_gene()),
 
+=======
+          # tags$a(href = "https://www.google.co.in/",
+          #        target = "_blank",
+          #        paste(printed_gene())
+          #        )
+          #
+>>>>>>> 3d1aca5e53b3e9330879299356b967ea33dd07a0
 
           # # defining custom genomes with data provided by URLs-------------------------
           # base_url <- "https://gladki.pl/igvr/testFiles"
@@ -940,6 +951,10 @@ snp_table_server <- function(id, snps_df) {
 # TraesCS1A03G0010400
 # TraesCS1A03G0009800
 # TraesCS1A03G0007600
+<<<<<<< HEAD
+=======
+# TraesCS1A03G0011500
+>>>>>>> 3d1aca5e53b3e9330879299356b967ea33dd07a0
 # TraesCS1A03G0005200
 # TraesCS1A03G0003200
 

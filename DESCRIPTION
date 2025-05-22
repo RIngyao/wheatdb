@@ -27,11 +27,13 @@ Depends:
     bs4Dash,
     bslib,
     ggplot2,
+    igvShiny,
     openxlsx,
     plotly,
     shinydashboardPlus,
     shinyFeedback,
     shinyjs,
     shinythemes,
+    slickR,
     tidyverse,
     vroom
