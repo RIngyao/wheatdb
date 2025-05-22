@@ -131,23 +131,26 @@ snp_table_ui <- function(id) {
      fluidRow(
       box( height = "600", solidHeader = T, #title = "SNP Table",
 
-           column(1, align = "right", offset = 9,
-                  uiOutput(ns("uiDownload"))
+           column(12,
+                  column(8, align = "left", offset = 0,
+                         uiOutput(ns("uiFiletype"))
                   ),
-                  # downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))),
-           column(2, align = "left", offset = 10,
-                  uiOutput(ns("uiFiletype"))
-                  ),
+                  column(2, align = "right", offset = 10,
+                         uiOutput(ns("uiDownload"))
+                  )
+
+                ),
+
            DTOutput(outputId = ns("table_output"))
          ),#for table output
       br(),
       box( height = "650", solidHeader = T, #title = "SNP Plot analysis",
-          column(1, align = "right", offset = 8,
-                 uiOutput(ns("UiDownloadBar"))
-                 ),
-          column(2, align = "left", offset = 10,
-                 uiOutput(ns("uiImageType"))
-                 ),
+
+        column(12,
+               column(8, align = "left", offset = 0, uiOutput(ns("uiImageType"))),
+               column(2, align = "right", offset = 10, uiOutput(ns("UiDownloadBar")))
+        ),
+
           column(12,
               div(height=600, width = 600,
                     plotOutput(outputId = ns("plot"), click = ns("plot_click"), hover= ns("plot_hover")))
@@ -288,6 +291,7 @@ snp_table_server <- function(id, snps_df) {
         showFeedbackWarning(inputId="start_coord", text = error_msg$msg, color = "#ff0000",
                             icon = shiny::icon("warning-sign", lib = "glyphicon"))
          output$uiDownload <- renderUI(NULL)
+         output$uiDownloadBar <- renderUI(NULL)
          track_error_df$status <- FALSE
         # error_msg$msg <- TRUE
       } else{
@@ -295,8 +299,10 @@ snp_table_server <- function(id, snps_df) {
 
       }
       output$table_output <- renderDT((NULL))
-      #output$UiDownload <- renderUI((NULL))
+      output$UiDownload <- renderUI((NULL))
+      output$uiDownloadBar <- renderUI((NULL))
       output$uiFiletype <- renderUI((NULL))
+      output$uiImageType <- renderUI((NULL))
       null_table$show <- TRUE
       output$plot <- renderPlot(NULL)
       null_plot$imgplot <- TRUE
@@ -315,12 +321,15 @@ snp_table_server <- function(id, snps_df) {
                             icon = shiny::icon("warning-sign", lib = "glyphicon"))
 
         output$uiDownload <- renderUI(NULL)
+        output$uiDownloadBar <- renderUI(NULL)
       } else{
         hideFeedback(inputId = "enter_gene")
       }
       output$table_output <- renderDT((NULL))
-      #output$UiDownload <- renderUI((NULL))
+      output$UiDownload <- renderUI((NULL))
+      output$UiDownloadBar <- renderUI((NULL))
       output$uiFiletype <- renderUI((NULL))
+      output$uiImageType <- renderUI((NULL))
       null_table$show <- TRUE
       output$plot <- renderPlot(NULL)
       null_plot$imgplot <- TRUE
@@ -333,11 +342,15 @@ snp_table_server <- function(id, snps_df) {
         showFeedback(inputId = "upload", text = gene_error())
 
         output$uiDownload <- renderUI(NULL)
+        output$uiDownloadBar <- renderUI(NULL)
       } else{
         hideFeedback(inputId = "upload")
       }
       output$table_output <- renderDT((NULL))
+      output$UiDownload <- renderUI((NULL))
+      output$UiDownloadBar <- renderUI((NULL))
       output$uiFiletype <- renderUI((NULL))
+      output$uiImageType <- renderUI((NULL))
       null_table$show <- TRUE
       output$plot <- renderPlot(NULL)
       null_plot$imgplot <- TRUE
@@ -556,7 +569,7 @@ snp_table_server <- function(id, snps_df) {
           )
           # show the file type
           output$uiFiletype <- renderUI(
-            selectInput(inputId = ns("filetype"), label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))
+            radioButtons(inputId = ns("filetype"), inline = TRUE, label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))
           )
           output$table_output <- renderDT({
             datatable(
@@ -622,7 +635,7 @@ snp_table_server <- function(id, snps_df) {
           #  print(df_plot())
             plot_info <- df_plot() %>% group_by(TYPE) %>% summarize(count = n(), GENE_ID = unique(GENE_ID))
             #print(plot_info)
-            data_plot <-  ggplot(data = plot_info, aes(x = TYPE, y = count)) +
+            data_plot <-  ggplot(data = plot_info, aes(x = TYPE, y = count, fill = TYPE)) +
             geom_bar(stat = "identity")+
             theme_classic() +
             theme(
@@ -803,7 +816,7 @@ snp_table_server <- function(id, snps_df) {
               downloadButton(outputId = ns("download_bar"), label = "Download image", icon = shiny::icon("download"))
             )
             output$uiImageType <- renderUI(
-              selectInput(inputId = ns("imgtype"), label = "File Type:", choices = c("png", "pdf", "jpeg"))
+              radioButtons(inputId = ns("imgtype"), inline = TRUE, label = "File Type:", choices = c("png", "pdf", "jpeg"))
             )
 
            output$plot <- renderPlot(final_plot())
@@ -910,9 +923,10 @@ snp_table_server <- function(id, snps_df) {
 
 
 
-
-
-
+# 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
+# @jbrowse/cli/node_modules/@oclif/core/lib/command.js
+#'/usr/lib/node_modules/@jbrowse/cli/node_modules/@oclif/core/lib/command.js'
+# /node_modules/@oclif/core/lib/command.js:45
 
 
 
