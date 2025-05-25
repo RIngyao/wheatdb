@@ -130,26 +130,26 @@ snp_table_ui <- function(id) {
     # display the download button only when the data is ready (table and figure)----------------
      fluidRow(
       box( height = "600", solidHeader = T, #title = "SNP Table",
-
-           column(12,
-                  column(8, align = "left", offset = 0,
-                         uiOutput(ns("uiFiletype"))
-                  ),
-                  column(2, align = "right", offset = 10,
-                         uiOutput(ns("uiDownload"))
-                  )
-
-                ),
+       div(
+         style = "display: flex; justify-content: flex-end; gap: 15px; padding: 10px;",
+         uiOutput(ns("uiFiletype")),
+         uiOutput(ns("uiDownload"))
+       ),
 
            DTOutput(outputId = ns("table_output"))
          ),#for table output
       br(),
       box( height = "650", solidHeader = T, #title = "SNP Plot analysis",
 
-        column(12,
-               column(8, align = "left", offset = 0, uiOutput(ns("uiImageType"))),
-               column(2, align = "right", offset = 10, uiOutput(ns("UiDownloadBar")))
-        ),
+           div(
+             style = "display: flex; justify-content: flex-end; gap: 15px; padding: 10px;",
+             uiOutput(ns("uiImageType")),
+             uiOutput(ns("UiDownloadBar"))
+           ),
+        # column(12,
+        #        column(8, align = "left", offset = 0, uiOutput(ns("uiImageType"))),
+        #        column(2, align = "right", offset = 10, uiOutput(ns("UiDownloadBar")))
+        # ),
 
           column(12,
               div(height=600, width = 600,
@@ -565,11 +565,13 @@ snp_table_server <- function(id, snps_df) {
         if(nrow(final_table()) > 1){
           # show download button for table
           output$uiDownload <- renderUI(
-            downloadButton(outputId = ns("Download"), label = "Download table", icon = shiny::icon("download"))
+            downloadButton(outputId = ns("Download"), label = "Table",
+                           icon = shiny::icon("download"), class = "btn btn-info",
+                           style = "color:white", title = "Download table")
           )
           # show the file type
           output$uiFiletype <- renderUI(
-            radioButtons(inputId = ns("filetype"), inline = TRUE, label = "File Type:", choices = c("csv", "tsv", "xlsx", "xls"))
+            radioButtons(inputId = ns("filetype"), inline = TRUE, label = NULL, choices = c("csv", "tsv", "xlsx"))
           )
           output$table_output <- renderDT({
             datatable(
@@ -813,10 +815,12 @@ snp_table_server <- function(id, snps_df) {
         #browser()
             # show download button and type here
             output$UiDownloadBar <- renderUI(
-              downloadButton(outputId = ns("download_bar"), label = "Download image", icon = shiny::icon("download"))
+              downloadButton(outputId = ns("download_bar"), label = "Image",
+                             icon = shiny::icon("download"), class = "btn, btn-info", style="color:white",
+                             title = "Download Image")
             )
             output$uiImageType <- renderUI(
-              radioButtons(inputId = ns("imgtype"), inline = TRUE, label = "File Type:", choices = c("png", "pdf", "jpeg"))
+              radioButtons(inputId = ns("imgtype"), inline = TRUE, label = NULL, choices = c("png", "pdf", "jpeg"))
             )
 
            output$plot <- renderPlot(final_plot())
