@@ -162,6 +162,7 @@ app_ui <- function(request) {
       #footer
       footer <- div(
         HTML('
+        <div class="footer-wrapper">
              <div class="footermsg">
              <h3>Copyright All Rights Reserved 2025</h3>
              <div class = "logo-pair">
@@ -173,7 +174,7 @@ app_ui <- function(request) {
              </div>
              </div>
              </div>
-
+          </div>
               ')
       )
 
