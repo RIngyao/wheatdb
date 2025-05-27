@@ -3,15 +3,20 @@
 
 ## usethis namespace: start
 #'@import shinydashboard
-#'@import BiocManager
-#'@import dplyr
-#'@import vroom
-#'@import future
-#'@import promises
-#'@import seqinr
-#'@import Biostrings
 #'@import DT
-#'@import shinyWidgets
+#'@import tidyverse
+#'@import shinyFeedback
+#'@import vroom
+#'@import shinyjs
+#'@import openxlsx
+#'@import bs4Dash
+#'@import shinydashboardPlus
+#'@import ggplot2
+#'@import shinythemes
+#'@import bslib
+#'@import plotly
+#'@import slickR
 
-## usethis namespace: end
+## usethis names
+
 NULL
