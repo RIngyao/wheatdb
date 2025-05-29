@@ -517,6 +517,8 @@ snp_table_server <- function(id, snps_df) {
          req(gene_sample())
          gene <- unlist(strsplit(gene_sample(), "[, ]+")) %>% unique() #splitting the gene on the basis of comma or space
 
+         #extract data from mariadb------------------------------------------
+         # query <- "select  from vcf_table;"
          df_table <- df_sample()[df_sample()$GENE_ID %in% gene, col_list]
 
 
