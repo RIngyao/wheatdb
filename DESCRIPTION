@@ -19,10 +19,12 @@ Config/testthat/edition: 3
 Depends: 
     BiocManager,
     Biostrings,
+    DBI,
     dplyr,
     DT,
     future,
     promises,
+    RMariaDB,
     seqinr,
     shinyWidgets,
     tidyverse,

@@ -12,6 +12,16 @@
 #'@import Biostrings
 #'@import DT
 #'@import shinyWidgets
+#'@import tidyverse
+#'@import shinyFeedback
+#'@import vroom
+#'@import shinyjs
+#'@import openxlsx
+#'@import shinydashboardPlus
+#'@import ggplot2
+#'@import RMariaDB
+#'@import DBI
 
-## usethis namespace: end
+## usethis names
+
 NULL

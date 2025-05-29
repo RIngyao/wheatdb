@@ -49,6 +49,8 @@ usethis::use_package("Biostrings", type = "depends")
 usethis::use_package("shinyWidgets", type = "depends")
 usethis::use_package("DT", type = "depends")
 usethis::use_package("tidyverse", type = "depends")
+usethis::use_package("RMariaDB", type = "depends")
+usethis::use_package("DBI", type = "depends")
 # usethis::use_package("magick", type = "import")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
 # remove package from description, then remove package from namespace

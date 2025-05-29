@@ -212,7 +212,7 @@ app_ui <- function(request) {
             tabItem(tabName = "markers",
                     fluidRow(
 
-                      #column(12, snp_table_ui("table")),
+                      column(12, snp_table_ui("table")),
 
                     ) #end fliudRow
             ),#end markers

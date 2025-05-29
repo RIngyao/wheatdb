@@ -9,13 +9,13 @@ app_server <- function(input, output, session) {
 
   # data---------------------------------
   # snps data
- # snps_df = vroom::vroom("data-raw/snps_final_data.tsv", deliFm = "\t")
+ # snps_df = dbGetQuery(con, "SELECT * FROM vcf_table")
 
 
  # blast_df = vroom::vroom("data-raw/snps_data.tsv", delim = "\t")
 
   # Your application server logic
- # snp_table_server("table")
+  snp_table_server("table")
   blast_server("blast")
   genetic_resources_server("resource")
 }
