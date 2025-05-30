@@ -84,7 +84,7 @@ genetic_resources_server <- function(id){
 
     })
 
-    # show the images based on user's choice
+   # show the images based on user's choice
     observe({
       req(choice())
       # browser()
