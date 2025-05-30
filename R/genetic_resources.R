@@ -14,7 +14,7 @@ idmap <- read_delim("id_map.txt", delim = "\t", col_names = c("variety", "id")) 
 
 genetic_resources_ui <- function(id) {
   ns <- NS(id)
-  cultivar_list <- idmap$variety
+
   # c("Arjun(HD2009)[IC111822]", "PBW-343[IC0240801]", "K-65[IC128211]", "LOK-1[IC144915]",
   #                    "Halna(K-7903)[IC296743]", "HI-617(Sujata)[IC321936]", "Sharbati Sonora[IC384542]", "Agra Local[IC112111]",
   #                    "BANSI-224(GULAB)[IC145237]", "Mundia[IC406697]", "Jhusia[IC564106]", "K-68[IC0128212]", "Vidisha(DL 788-2)[IC0138631]", "VL-829[IC0532689]", "Lal-bahadur[IC0111806]",
@@ -30,27 +30,30 @@ genetic_resources_ui <- function(id) {
 
 
   tagList(
-    fluidRow(
+    # cultivar_list <- idmap$variety
+    selectInput(ns("test"), label = "test", choices = c("jjs","uuu"))
+    #  fluidRow(
+    #
+    #   column(8,
+    #          radioButtons(inputId = ns("user_choice"), inline = TRUE, label = "Choose", choices = c("Show all", "Compare"))
+    #          ),
+    #
+    #   conditionalPanel(condition = sprintf("input['%s'] == 'Compare'", ns("user_choice")),
+    #                     fluidRow(
+    #                       column(12,
+    #                              column(6, selectInput(inputId = ns("variety1"), label = "Select from the following", choices = c("if", "else"), selected = NULL)),
+    #
+    #                              column(6, selectInput(inputId = ns("variety2"), label = "Select from the following", choices = c("if", "else"), selected = NULL))
+    #                       ) # column end
+    #                     )# end of inner fluidrow
+    #    )
+    #
+    #
+    # )
 
-      column(8, radioButtons(inputId = ns("user_choice"), inline = TRUE, label = "Choose", choices = c("Show all", "Compare"))),
 
-      conditionalPanel(condition = sprintf("input['%s'] == 'Compare'", ns("user_choice")),
-
-                       fluidRow(
-                         column(12,
-                                column(6, selectInput(inputId = ns("variety1"), label = "Select from the following", choices = cultivar_list, selected = NULL)),
-
-                                column(6, selectInput(inputId = ns("variety2"), label = "Select from the following", choices = cultivar_list, selected = NULL))
-                         ) # column end
-                       )# end of inner fluidrow
-      )
-
-
-    ),
-
-
-    # use uioutput instead of htmloutput
-    uiOutput(ns("show"))
+     # use uioutput instead of htmloutput
+     # uiOutput(ns("show"))
 
   ) # end of tagList
 }
@@ -58,105 +61,118 @@ genetic_resources_ui <- function(id) {
 #' name_of_module2 Server Functions
 #'
 #' @noRd
+
 genetic_resources_server <- function(id){
-  #addResourcePath("wheatdb", getwd())
+
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    choice <- reactive(input$user_choice)
-    select1 <- reactive(input$variety1)
-    # option_vec <- unlist(cultivar_list)
-    select2 <- reactive(input$variety2)
-
-    cultivar_list <- idmap$variety
-
-    # update the selectinput
-    observe({
-      req(choice() == "Compare", select1())
-
-      second_var <- reactive(cultivar_list[!cultivar_list %in% select1()])
-      # print(second_var())
-      updateSelectInput(session,"variety2",
-                        choices = second_var(),
-                        selected = second_var()[1]
-      )
-
-
-    })
-
-   # show the images based on user's choice
-    observe({
-      req(choice())
-      # browser()
-      if(choice() == "Show all"){
-        output$show <- renderUI({
-          tags$iframe(src = "www/genetic.html",
-                      width = "100%",
-                      height = "600px",
-                      style = "border:none") #inst/app/www/seedspike.html
-          # test
-        })
-      } else if(choice() == "Compare"){
-
-        user_input1 <- reactive(input$variety1)
-        user_input2 <- reactive(input$variety2)
-
-        select_id1 <- reactive({
-          first <- idmap$id[idmap$variety %in% user_input1()]
-        })
-
-        select_id2 <- reactive({
-          second <- idmap$id[idmap$variety %in% user_input2()]
-        })
-
-        output$show <- renderUI({
-          div(
-            style = " display: flex; padding: 20px; column-gap: 50px;",
-
-            div(
-              style = "flex-direction: column;",
-
-              div(
-                style = "display: flex; flex-direction: row; padding: 0px; margin: 0px;",
-                tags$img(
-                  src = paste0("www/images/seeds_", select_id1(),".jpg"), height="200px"
-                ),
-                tags$img(
-                  src = paste0("www/images/spikes_", select_id2(),".JPG"), height = "200px"
-                )
-              ),
-
-              tags$p(paste0(user_input1()), style = " margin-top: 10px; margin-left: 100px; font-size: 16px; font-weight: bold; color: #333;")
-            ),
-
-
-            div(
-              style = "flex-direction: column;",
-
-              div(
-                style = "display: flex; flex-direction: row; padding: 0px; margin-left: 30px;",
-                tags$img(
-                  src = paste0("www/images/seeds_", select_id2(), ".jpg"), height = "200px"
-                ),
-
-                tags$img(
-                  src = paste0("www/images/spikes_", select_id2(), ".JPG"), height = "200px"
-                )
-
-              ),
-              tags$p(paste0(user_input2()),  style = " margin-top: 10px; margin-left: 150px; font-size: 16px; font-weight: bold; color: #333;")
-            )
-
-
-          )
-
-        })
-      }
-
-
-    })
-
-
+    #  choice <- reactive(input$user_choice)
+    #  select1 <- reactive(input$variety1)
+    #  # option_vec <- unlist(cultivar_list)
+    #  select2 <- reactive(input$variety2)
+    #
+    # cultivar_list <- idmap$variety
+    #
+    # # update the selectinput
+    # observe({
+    #   req(choice() == "Compare", select1())
+    #
+    #   second_var <- reactive(cultivar_list[!cultivar_list %in% select1()])
+    #   # print(second_var())
+    #   updateSelectInput(session,"variety2",
+    #                     choices = second_var(),
+    #                     selected = second_var()[1]
+    #   )
+    #
+    #
+    # })
+    #
+    # observe({
+    #   req(choice() == "Compare", select2())
+    #
+    #   first_var <- reactive(cultivar_list[!cultivar_list %in% select2()])
+    #   # print(second_var())
+    #   updateSelectInput(session,"variety1",
+    #                     choices = first_var(),
+    #                     selected = first_var()[1]
+    #   )
+    #
+    #
+    # })
+    #
+    # # show the images based on user's choice
+    # observe({
+    #   req(choice())
+    #   # browser()
+    #   if(choice() == "Show all"){
+    #     output$show <- renderUI({
+    #       tags$iframe(src = "www/genetic.html",
+    #                   width = "100%",
+    #                   height = "600px",
+    #                   style = "border:none") #inst/app/www/seedspike.html
+    #       # test
+    #     })
+    #   } else if(choice() == "Compare"){
+    #
+    #     user_input1 <- reactive(input$variety1)
+    #     user_input2 <- reactive(input$variety2)
+    #
+    #     select_id1 <- reactive({
+    #       first <- idmap$id[idmap$variety %in% user_input1()]
+    #     })
+    #
+    #     select_id2 <- reactive({
+    #       second <- idmap$id[idmap$variety %in% user_input2()]
+    #     })
+    #
+    #     output$show <- renderUI({
+    #       div(
+    #         style = " display: flex; padding: 20px; column-gap: 50px;",
+    #
+    #         div(
+    #           style = "flex-direction: column;",
+    #
+    #           div(
+    #             style = "display: flex; flex-direction: row; padding: 0px; margin: 0px;",
+    #             tags$img(
+    #               src = paste0("www/images/seeds_", select_id1(),".jpg"), height="200px"
+    #             ),
+    #             tags$img(
+    #               src = paste0("www/images/spikes_", select_id2(),".JPG"), height = "200px"
+    #             )
+    #           ),
+    #
+    #           tags$p(paste0(user_input1()), style = " margin-top: 10px; margin-left: 100px; font-size: 16px; font-weight: bold; color: #333;")
+    #         ),
+    #
+    #
+    #         div(
+    #           style = "flex-direction: column;",
+    #
+    #           div(
+    #             style = "display: flex; flex-direction: row; padding: 0px; margin-left: 30px;",
+    #             tags$img(
+    #               src = paste0("www/images/seeds_", select_id2(), ".jpg"), height = "200px"
+    #             ),
+    #
+    #             tags$img(
+    #               src = paste0("www/images/spikes_", select_id2(), ".JPG"), height = "200px"
+    #             )
+    #
+    #           ),
+    #           tags$p(paste0(user_input2()),  style = " margin-top: 10px; margin-left: 150px; font-size: 16px; font-weight: bold; color: #333;")
+    #         )
+    #
+    #
+    #       )
+    #
+    #     })
+    #   }
+    #
+    #
+    # })
+    #
 
 
   }) # module_server
