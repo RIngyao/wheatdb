@@ -1,3 +1,28 @@
+.genetic-resources-ui {
+  padding: 20px;
+}
+
+.control-panel {
+  background-color: #f9f9f9;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.image-display {
+  padding: 0px;
+}
+
+.comparison-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+
+
 body {
   margin: 0;
   padding: 0;
@@ -8,161 +33,161 @@ body {
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row2 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row3 { /* First row */
   display: flex;
   justify-content: center;
  padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row4 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row5 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row6 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row7 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row8 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row9 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row10 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row11 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row12 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row13 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row14 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row15 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row16 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row17 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row18 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row19 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row20 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row21 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 .image-row22 { /* First row */
   display: flex;
   justify-content: center;
   padding: 20px;
-  column-gap: 50px;
+  column-gap: 20px;
 }
 
 
 /* Image-pair will have the same style for all the rows */
 .image-pair {
   display: flex;
-  flex-direction: column;  /* caption should be below the image*/
+  flex-direction: column;
   align-items: center;
 }
 

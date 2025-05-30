@@ -16,6 +16,11 @@
 #'@import bslib
 #'@import plotly
 #'@import slickR
+#'@import promises
+#'@import future
+#'@import RMariaDB
+#'@import DBI
+#'@import shinyWidgets
 
 ## usethis names
 

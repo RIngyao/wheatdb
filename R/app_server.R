@@ -15,5 +15,10 @@ app_server <- function(input, output, session) {
 
   # Your application server logic
   snp_table_server("table", snps_df=snps_df)
-  blast_server("blast", blast_df=blast_df)
+
+  # blast module
+  blast_server("blast") #, blast_df=blast_df)
+
+  # genetic resource module
+  genetic_resources_server("resource")
 }

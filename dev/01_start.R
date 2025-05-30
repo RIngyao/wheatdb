@@ -48,7 +48,14 @@ usethis::use_package("bslib", type = "depends")
 usethis::use_package("slickR", type = "depends")
 usethis::use_package("plotly", type = "depends")
 usethis::use_package("shinyFeedback", type = "depends")
+usethis::use_package("promises")
+usethis::use_package("future")
+usethis::use_package("DBI")
+usethis::use_package("RMariaDB")
+usethis::use_package("shinyWidgets")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
+# update the NAMESPACE
+devtools::document()
 renv::snapshot() # take a snapshot of the packages
 renv::status() #check renv status
 renv::restore()
@@ -58,8 +65,7 @@ golem::install_dev_deps()
 
 ## run app
 golem::run_dev()
-# add a documentation
-devtools::document()
+
 
 
 

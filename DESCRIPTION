@@ -7,11 +7,16 @@ Description: PKG_DESC.
 License: What license is it under?
 Imports: 
     config,
+    DBI,
     DT,
+    future,
     golem,
     pkgload,
+    promises,
+    RMariaDB,
     shiny,
-    shinydashboard
+    shinydashboard,
+    shinyWidgets
 Suggests: 
     knitr,
     rmarkdown,

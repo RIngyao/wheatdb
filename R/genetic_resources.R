@@ -15,45 +15,31 @@ idmap <- read_delim("id_map.txt", delim = "\t", col_names = c("variety", "id")) 
 genetic_resources_ui <- function(id) {
   ns <- NS(id)
   cultivar_list <- idmap$variety
-  # c("Arjun(HD2009)[IC111822]", "PBW-343[IC0240801]", "K-65[IC128211]", "LOK-1[IC144915]",
-  #                    "Halna(K-7903)[IC296743]", "HI-617(Sujata)[IC321936]", "Sharbati Sonora[IC384542]", "Agra Local[IC112111]",
-  #                    "BANSI-224(GULAB)[IC145237]", "Mundia[IC406697]", "Jhusia[IC564106]", "K-68[IC0128212]", "Vidisha(DL 788-2)[IC0138631]", "VL-829[IC0532689]", "Lal-bahadur[IC0111806]",
-  #                    "Motia[IC0111868]", "Narmada-4[IC0111848]","Sonora-64[EC597821]", "HS-240[IC0128195]", "HW-741[IC0128201]", "GW-322[IC0303072]", "AMRITA(HI1500)[IC0296308]",
-  #                    "WH -147[IC0393877]", "K-53[IC0443747]", "HD-2888[IC0528118]", "HUW-234(Malvia Wheat-234)[IC0128199]", "NI-5439[IC0073206]",
-  #                    "UP-2338[IC0445595]", "[HD2931]", "HD-2932[IC0519900]", "MACS-6222[IC0574481]", "A 090[IC112049]", "NP-4[IC128237]", "[Type-1]",
-  #                    "HI-1531(Harshita)[IC527448]", "Kharchia-lal-gehun[IC619437]", "Safed Mundia[IC564129]", "Katha Gehun[IC265322]", "Narmada-l12[IC128236]",
-  #                    "C-306[IC128151]", "WR-544(PUSA GOLD)[IC253015]", "Raj-3765[IC0443766]", "Niphad-4[IC0111801]", "Sonalika[EC597826]", "UP-262[IC0128257]",
-  #                    "LGM-165[IC128317]", "Pissi-local[IC321856]", "HD-2189[IC0128167]", "HD-2967[IC0574476]", "DWR-225[IC0252526]", "DWR-162[IC0128161]",
-  #                    "DWR-16(Keerthi) [IC0075206]", "NP-101[IC0138588]", "Hango 2[IC640652]", "Daulat Khani[IC573144]", "MACS2496[IC128225]", "Mundri[IC107371]",
-  #                    "Sathi[IC398298]", "WL711[IC296443]", "8A[IC0111853]", "Narendra Wheat 2036(NW 2036)[IC0443761]", "Dharwad[IC277741]", "NP846[IC128239]",
-  #                    "Mondhya[IC138466]", "Type-II[IC0111855]", "GW 2[IC401925]")
-
 
   tagList(
-    fluidRow(
+    div(class = "genetic-resources-ui",
 
-      column(8, radioButtons(inputId = ns("user_choice"), inline = TRUE, label = "Choose", choices = c("Show all", "Compare"))),
+        # Selection Panel
+        div(class = "control-panel",
+            radioButtons(inputId = ns("user_choice"), inline = TRUE, label = "Display Mode",
+                         choices = c("Show all", "Compare"), selected = "Show all"),
 
-      conditionalPanel(condition = sprintf("input['%s'] == 'Compare'", ns("user_choice")),
+            conditionalPanel(
+              condition = sprintf("input['%s'] == 'Compare'", ns("user_choice")),
+              fluidRow(
+                column(6, selectInput(ns("variety1"), "Select Genotype 1", choices = cultivar_list)),
+                column(6, selectInput(ns("variety2"), "Select Genotype 2", choices = cultivar_list))
+              )
+            )
+        ),
 
-                       fluidRow(
-                         column(12,
-                                column(6, selectInput(inputId = ns("variety1"), label = "Select from the following", choices = cultivar_list, selected = NULL)),
-
-                                column(6, selectInput(inputId = ns("variety2"), label = "Select from the following", choices = cultivar_list, selected = NULL))
-                         ) # column end
-                       )# end of inner fluidrow
-      )
-
-
-    ),
-
-
-    # use uioutput instead of htmloutput
-    uiOutput(ns("show"))
-
-  ) # end of tagList
+        # Display Panel
+        # div(class = "image-display", uiOutput(ns("show")))
+        uiOutput(ns("show"))
+    )
+  )
 }
+
 
 #' name_of_module2 Server Functions
 #'
@@ -63,7 +49,8 @@ genetic_resources_server <- function(id){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    choice <- reactive(input$user_choice)
+    # browser()
+    choice <- reactive(req(input$user_choice))
     select1 <- reactive(input$variety1)
     # option_vec <- unlist(cultivar_list)
     select2 <- reactive(input$variety2)
@@ -80,11 +67,11 @@ genetic_resources_server <- function(id){
                         choices = second_var(),
                         selected = second_var()[1]
       )
-
-
     })
 
+
    # show the images based on user's choice
+
     observe({
       req(choice())
       # browser()
@@ -92,7 +79,7 @@ genetic_resources_server <- function(id){
         output$show <- renderUI({
           tags$iframe(src = "www/genetic.html",
                       width = "100%",
-                      height = "600px",
+                      height = "900px",
                       style = "border:none") #inst/app/www/seedspike.html
           # test
         })
@@ -156,6 +143,9 @@ genetic_resources_server <- function(id){
 
     })
 
+
+
+# jsj ---------------------------------------------------------------------
 
 
 

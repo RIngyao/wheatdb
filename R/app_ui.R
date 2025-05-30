@@ -103,7 +103,7 @@ app_ui <- function(request) {
           menuItem("Home", tabName="home", icon=icon("home")),
           menuItem("Markers", tabName="markers", icon = icon("table")),
           menuItem("BLAST", tabName="BLAST", icon = icon("list")),
-          menuItem("Genetic Resources", tabName="Genetic Resources", icon = icon("list"))
+          menuItem(HTML("Seed & Spikelet<br>Archive"), tabName="Genetics", icon = icon("list"))
         )
 
       ),
@@ -140,27 +140,15 @@ app_ui <- function(request) {
           ),# end of Home
 
           tabItem(tabName = "markers",
-                  fluidRow(
-
-                    column(12, snp_table_ui("table")),
-
-                  ) #end fliudRow
+                  snp_table_ui("table")
           ),#end markers
 
           tabItem(tabName = "BLAST",
-                  fluidRow(
-
-                    column(12, blast_ui("blast")),
-
-                  ) #end fliudRow
+                  blast_ui("blast")
           ), #end blast
 
-          tabItem(tabName = "Genetic Resources",
-                  fluidRow(
-
-                    column(12, genetic_resources_ui("resource")),
-
-                  ) #end fliudRow
+          tabItem(tabName = "Genetics",
+                  genetic_resources_ui("resource")
           ) #end genetic_resources
 
 
