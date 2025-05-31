@@ -644,12 +644,13 @@ snp_table_server <- function(id, snps_df) {
             theme_classic() +
             theme(
               axis.text.x = element_text(size = 10, face = "bold", angle = 45, hjust = 1),
-              axis.text.y = element_text(size = 10, face = "bold"),
-              axis.title = element_text(size=10, face = "bold"),
-              axis.ticks = element_line(linewidth = 2)
+              axis.text.y = element_text(size = 12, face = "bold"),
+              axis.title = element_text(size=12, face = "bold"),
+              axis.ticks = element_line(linewidth = 2),
+              legend.position = "none"
             ) +
               geom_text(aes(label = count), vjust = -0.6, size = 4, color = "black") +
-            labs(title="Analysis of snp data",
+            labs(title="Number of genes overlap with the SNPs. It can be either within genic or intergenic regions",
                  x = "Type",
                  y = "count")
 

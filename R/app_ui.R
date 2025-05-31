@@ -81,21 +81,48 @@ app_ui <- function(request) {
         tags$li(class = "dropdown",
                 tags$style(".main-header {max-height: 30px}"),
                 tags$style(".main-header .logo {height: 60px;}")
-        ),
-         title = tags$img(src="www/new_download.png", width = '30%')),
+                ),
+
+
+        # title = tags$div(
+        #   style = "display: flex; align-items: center;",
+        #   tags$img(src = "www/new_download.png", height = "40px"),
+        # #   tags$span("Indian Wheat Germplasm Characterization and Trait Discovery - DBT Sponsored Project",
+        # #             style = "margin-left: 10px; font-weight: bold; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;")
+        # )
+        #------------------------------------
+         # title = tags$img(src="www/new_download.png", width = '30%')
+        title = tags$div(
+          style = "display: flex; align-items: center;",
+          tags$img(src = "www/new_download.png", height = "40px"),
+          tags$span("  WheatDB", style = "margin-left: 10px; font-weight: bold; font-size: 20px;"),
+          # tags$li(
+          #   class = "dropdown",
+          #   tags$div("Indian Wheat Germplasm Characterization and Trait Discovery - DBT Sponsored Project")
+          #   # style = "padding: 15px 20px;  font-size: 16px;")
+          # )
+        )
+        # end of old title-------------------------
+        ), # end of dashboardHeader
                         # taags$li(class = "text_title",
                         #          tags$p("Wheat Genome Portal")
                         #          )),
 
 
       dashboardSidebar(
-        width = 150,
+        width = 200,
         br(),
         shinydashboard::sidebarMenu(
           menuItem("Home", tabName="home", icon=icon("home")),
-          menuItem("Markers", tabName="markers", icon = icon("table")),
-          menuItem("BLAST", tabName="BLAST", icon = icon("list")),
-          menuItem(HTML("Seed & Spikelet<br>Archive"), tabName="Genetics", icon = icon("list"))
+          menuItem("Variants", tabName="markers", icon = icon("table")),
+          menuItem(HTML("Seed & Spikelet Archive"), tabName="Genetics", icon = icon("list")),
+          # if href is used, don't use tabName and newTab
+          menuItem(text = tags$span(
+            HTML("Genome Tracks"),
+            title = "It will redirect to new tab"
+          ), icon = icon("dna"),
+                   href = "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants"),
+          menuItem("BLAST", tabName="BLAST", icon = icon("list"))
         )
 
       ),
@@ -105,7 +132,9 @@ app_ui <- function(request) {
 
 
         tags$head(
-          tags$link(rel="stylesheet", text="text/css", href="custom.css"),
+          tags$link(rel="stylesheet", type="text/css", href="custom.css")
+          # remove the sidebar toggle button
+          # tags$style(HTML(".main-header .sidebar-toggle {display: none;}"))
         ),
 
         tabItems(
@@ -142,7 +171,6 @@ app_ui <- function(request) {
           tabItem(tabName = "Genetics",
                   genetic_resources_ui("resource")
           ) #end genetic_resources
-
 
         ) #end tabItems
       ),#end dashboardbody

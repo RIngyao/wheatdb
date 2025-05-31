@@ -38,36 +38,31 @@ renv::init() # initiate the env
 #renv::install("shinydashboard") # install package or
 # install package and update DESCRIPTION
 usethis::use_package_doc() # create a doc file for updating the NAMESPACE
-usethis::use_package("tidyverse", type = "depends") # this will auto add to the DESCRIPTION
-usethis::use_package("openxlsx", type = "depends")
-usethis::use_package("bs4Dash", type = "depends")
-usethis::use_package("shinydashboardPlus", type = "depends")
-usethis::use_package("ggplot2", type = "depends")
-usethis::use_package("shinythemes", type = "depends")
-usethis::use_package("bslib", type = "depends")
-usethis::use_package("slickR", type = "depends")
-usethis::use_package("plotly", type = "depends")
-usethis::use_package("shinyFeedback", type = "depends")
-usethis::use_package("promises")
-usethis::use_package("future")
-usethis::use_package("DBI")
-usethis::use_package("RMariaDB")
-usethis::use_package("shinyWidgets")
+usethis::use_package("golex") # this will auto add to the DESCRIPTION
+usethis::use_package("BiocManager", type = "depends")
+usethis::use_package("dplyr", type = "depends")
+usethis::use_package("future", type = "depends")
+usethis::use_package("promises", type = "depends")
+usethis::use_package("vroom", type = "depends")
+usethis::use_package("seqinr", type = "depends")
+usethis::use_package("Biostrings", type = "depends")
+usethis::use_package("shinyWidgets", type = "depends")
+usethis::use_package("DT", type = "depends")
+usethis::use_package("tidyverse", type = "depends")
+# remove unused package
+# usethis::use_package("bs4Dash", remove = TRUE)
+# usethis::use_package("magick", type = "import")
 attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
-# update the NAMESPACE
+# remove package from description, then remove package from namespace
+# add a documentation
+
 devtools::document()
+
 renv::snapshot() # take a snapshot of the packages
 renv::status() #check renv status
-renv::restore()
 
 ## Install the required dev dependencies ----
 golem::install_dev_deps()
-
-## run app
-golem::run_dev()
-
-
-
 
 
 ## Create Common Files ----
@@ -77,7 +72,10 @@ golem::use_readme_rmd(open = FALSE)
 devtools::build_readme()
 # Note that `contact` is required since usethis version 2.1.5
 # If your {usethis} version is older, you can remove that param
-2
+usethis::use_code_of_conduct(contact = "Golem User")
+usethis::use_lifecycle_badge("Experimental")
+usethis::use_news_md(open = FALSE)
+
 ## Init Testing Infrastructure ----
 ## Create a template for tests
 golem::use_recommended_tests()
@@ -90,7 +88,6 @@ golem::use_favicon() # path = "path/to/ico". Can be an online file.
 ## Add helper functions ----
 golem::use_utils_ui(with_test = TRUE)
 golem::use_utils_server(with_test = TRUE)
-golem::run_dev()
 
 ## Use git ----
 usethis::use_git()
@@ -104,4 +101,3 @@ usethis::use_git_remote(
 
 # go to dev/02_dev.R
 rstudioapi::navigateToFile("dev/02_dev.R")
-
