@@ -27,8 +27,8 @@ genetic_resources_ui <- function(id) {
             conditionalPanel(
               condition = sprintf("input['%s'] == 'Compare'", ns("user_choice")),
               fluidRow(
-                column(6, selectInput(ns("variety1"), "Select Genotype 1", choices = cultivar_list)),
-                column(6, selectInput(ns("variety2"), "Select Genotype 2", choices = cultivar_list))
+                column(6, selectInput(ns("variety1"), "Select Variety 1", choices = cultivar_list)),
+                column(6, selectInput(ns("variety2"), "Select Variety 2", choices = cultivar_list))
               )
             )
         ),
@@ -49,7 +49,6 @@ genetic_resources_server <- function(id){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
 
-    # browser()
     choice <- reactive(req(input$user_choice))
     select1 <- reactive(input$variety1)
     # option_vec <- unlist(cultivar_list)
@@ -142,12 +141,6 @@ genetic_resources_server <- function(id){
 
 
     })
-
-
-
-# jsj ---------------------------------------------------------------------
-
-
 
   }) # module_server
 

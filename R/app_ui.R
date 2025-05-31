@@ -10,7 +10,7 @@
 
 
 app_ui <- function(request) {
-
+  # front page html---------------------------------------------------------------
   frontPage <- div(
     HTML('
         <div class="container">
@@ -69,16 +69,8 @@ app_ui <- function(request) {
   )
 
 
-  # bs_theme(
-  #    version = 5,
-  #    bg = "#FFFFFF",
-  #    fg = "#000000",
-  #    primary = "#0199F8",
-  #    secondary = "#FF374B",
-  #    base_font = "Maven Pro"
-  #  )
+# end of front page html --------------------------------------------------
 
-  #  bs_theme_preview(theme = custom_theme, with_themer = FALSE)
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
