@@ -119,9 +119,15 @@ app_ui <- function(request) {
           # if href is used, don't use tabName and newTab
           menuItem(text = tags$span(
             HTML("Genome Tracks"),
-            title = "It will redirect to new tab"
-          ), icon = icon("dna"),
-                   href = "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants"),
+            title = "JBrowse2"
+          ), tabName="jbwheatdb", icon = icon("dna")),
+
+          # menuItem(text = tags$span(
+          #   HTML("Genome Tracks"),
+          #   title = "It will redirect to new tab"
+          # ), icon = icon("dna"),
+          #          href = "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants"
+          # ),
           menuItem("BLAST", tabName="BLAST", icon = icon("list"))
         )
 
@@ -168,8 +174,15 @@ app_ui <- function(request) {
                   blast_ui("blast")
           ), #end blast
 
-          tabItem(tabName = "Genetics",
-                  genetic_resources_ui("resource")
+          tabItem(tabName = "jbwheatdb",
+                  tags$iframe(
+                    # below link is configured for  reverse proxy
+                    # it will say page not found in shiny-server
+                    # to work in shiny-server prefix with: https://223.31.159.7/
+                    src = "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants",
+                    height = "900px",
+                    width = "100%",
+                  )
           ) #end genetic_resources
 
         ) #end tabItems

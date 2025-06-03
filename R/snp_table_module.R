@@ -184,18 +184,287 @@ snp_table_server <- function(id, snps_df) {
     # browser()
     # important variables----------------
     # check the snps_df and update the sample name menu
-    sample_list <- reactive(colnames(snps_df))
+
+    con <- dbConnect(duckdb::duckdb(), dbdir = "data-raw/final.duckdb")
+
+    q_create <- "CREATE TABLE snp_table (
+        CHROM varchar(50),
+        POS int,
+        REF varchar(50),
+        ALT varchar(50),
+        TYPE varchar(100),
+        IMPACT varchar(100),
+        GENE varchar(100),
+        agra_local_IC112111 TEXT,
+        dharwad_IC277741 TEXT,
+        hindi_62_IC0296681 TEXT,
+        IC107371 TEXT,
+        IC398298 TEXT,
+        IC573144 TEXT,
+        IC640652 TEXT,
+        jhusia_IC564106 TEXT,
+        kharchia_local_IC296742 TEXT,
+        kharchia_lal_gehun_IC619437 TEXT,
+        lgm_165_IC128317 TEXT,
+        mundia_IC406697 TEXT,
+        NBPGR_11_IC_0624737 TEXT,
+        NBPGR_12_IC_0624748 TEXT,
+        NBPGR_13_IC_0624751 TEXT,
+        NBPGR_41_IC_0624744 TEXT,
+        NBPGR_47_IC_0624742 TEXT,
+        NBPGR_49_IC_0634050 TEXT,
+        pissi_local_IC321856 TEXT,
+        safed_mundia_IC564129 TEXT,
+        IC0534106 TEXT,
+        IC0534107 TEXT,
+        IC0534133 TEXT,
+        IC0534135 TEXT,
+        IC0534139 TEXT,
+        IC0534196 TEXT,
+        IC0534218 TEXT,
+        IC0534220 TEXT,
+        IC0534234 TEXT,
+        IC0534241 TEXT,
+        IC0534253 TEXT,
+        IC0534254 TEXT,
+        IC0534318 TEXT,
+        IC0534320 TEXT,
+        IC0534337 TEXT,
+        IC0534348 TEXT,
+        IC0534350 TEXT,
+        IC0534351 TEXT,
+        IC0534352 TEXT,
+        IC0534356 TEXT,
+        IC0534357 TEXT,
+        IC0534390 TEXT,
+        IC0534454 TEXT,
+        IC0534456 TEXT,
+        IC0534041 TEXT,
+        IC0534050 TEXT,
+        IC0534017 TEXT,
+        IC0534045 TEXT,
+        IC0534049 TEXT,
+        IC0534082 TEXT,
+        IC0534354 TEXT,
+        IC0534389 TEXT,
+        IC0534471 TEXT,
+        IC0534449 TEXT,
+        IC0534527 TEXT,
+        IC0534528 TEXT,
+        IC0534571 TEXT,
+        IC0534237 TEXT,
+        IC0534547 TEXT,
+        IC0534464 TEXT,
+        IC0534525 TEXT,
+        IC0534040 TEXT,
+        IC0534069 TEXT,
+        IC0534084 TEXT,
+        IC0534085 TEXT,
+        IC0534086 TEXT,
+        IC0534089 TEXT,
+        IC0534104 TEXT,
+        IC0534117 TEXT,
+        IC0534126 TEXT,
+        IC0534130 TEXT,
+        IC0534140 TEXT,
+        IC0534145 TEXT,
+        IC0534233 TEXT,
+        IC0534239 TEXT,
+        IC0534324 TEXT,
+        IC0534355 TEXT,
+        IC0534436 TEXT,
+        IC0534448 TEXT,
+        IC0534530 TEXT,
+        IC0534533 TEXT,
+        IC0534535 TEXT,
+        IC0534570 TEXT,
+        IC0534472 TEXT,
+        IC0534546 TEXT,
+        IC0534067 TEXT,
+        IC0534116 TEXT,
+        IC0534128 TEXT,
+        IC0534103 TEXT,
+        IC0534485 TEXT,
+        IC0534548 TEXT,
+        IC0534028 TEXT,
+        IC0534029 TEXT,
+        IC0534054 TEXT,
+        IC0534070 TEXT,
+        IC0534075 TEXT,
+        IC0534095 TEXT,
+        IC0534096 TEXT,
+        IC0534127 TEXT,
+        IC0534131 TEXT,
+        IC0534155 TEXT,
+        IC0534242 TEXT,
+        IC0534349 TEXT,
+        IC0534463 TEXT,
+        IC0534473 TEXT,
+        IC0534536 TEXT,
+        IC0534975 TEXT,
+        IC0535039 TEXT,
+        IC530051 TEXT,
+        IC128386 TEXT,
+        IC423446 TEXT,
+        IC082279 TEXT,
+        IC082302 TEXT,
+        IC138553 TEXT,
+        IC082281 TEXT,
+        IC082283 TEXT,
+        IC138487 TEXT,
+        IC598261 TEXT,
+        IC252844 TEXT,
+        IC36701 TEXT,
+        IC138419 TEXT,
+        IC36722 TEXT,
+        IC398287 TEXT,
+        IC529410 TEXT,
+        IC573159 TEXT,
+        IC401935 TEXT,
+        IC0534063 TEXT,
+        IC0534037 TEXT,
+        IC0534053 TEXT,
+        IC0534027 TEXT,
+        IC0534552 TEXT,
+        IC0534551 TEXT,
+        IC0534062 TEXT,
+        RS31_1_IC443767 TEXT,
+        NP_846_IC128239 TEXT,
+        c_306_IC128151 TEXT,
+        k_53_IC0443747 TEXT,
+        k_65_IC128211 TEXT,
+        mondhya_IC138466 TEXT,
+        motia_IC0111868 TEXT,
+        niphad_4_IC0111801 TEXT,
+        np_101_IC0138588 TEXT,
+        np_4_IC128237 TEXT,
+        type_11_IC0111855 TEXT,
+        IC_111837 TEXT,
+        IC_111838 TEXT,
+        IC0111853 TEXT,
+        IC0112039 TEXT,
+        IC0112047 TEXT,
+        IC_112048 TEXT,
+        ao_90_IC112049 TEXT,
+        IC_138560 TEXT,
+        type_1_evo_revo TEXT,
+        Chhoti_lerma TEXT,
+        Sonora_64 TEXT,
+        Lerma_rojo TEXT,
+        Kalyansona TEXT,
+        dl_788_2_vidisha_IC0138631 TEXT,
+        dwr_162_IC0128161 TEXT,
+        dwr_16_keerthi_IC0075206 TEXT,
+        dwr_225_IC0252526 TEXT,
+        gw2_IC401925 TEXT,
+        gw_322_IC0303072 TEXT,
+        h1_1531_IC527448 TEXT,
+        hd_2009_arjun_IC111822 TEXT,
+        hd_2189_IC0128167 TEXT,
+        hd_2888_IC0528118 TEXT,
+        hd_2931  TEXT,
+        hd_2932_IC0519900 TEXT,
+        hd_2967_IC0574476 TEXT,
+        hi_1500_amrita_IC0296308 TEXT,
+        hi_617_sujata_IC321936 TEXT,
+        hs_240_IC0128195 TEXT,
+        huw_234_malviya_234_IC0128199 TEXT,
+        hw_741_IC0128201 TEXT,
+        IC_128159 TEXT,
+        IC128225 TEXT,
+        IC0296443 TEXT,
+        k_68_IC0128212 TEXT,
+        k_7903_halna_IC296743 TEXT,
+        lal_bahadur_IC0111806 TEXT,
+        lok_1_IC144915 TEXT,
+        macs_6222_IC0574481 TEXT,
+        narmada_4_IC0111848 TEXT,
+        narmada_112_IC0128236 TEXT,
+        ni_5439_IC0073206 TEXT,
+        pbw343_IC0240801 TEXT,
+        raj_3765_IC0443766 TEXT,
+        sonalika_EC597826 TEXT,
+        up_2338_IC0445595 TEXT,
+        up_262_IC0128257 TEXT,
+        vl_829_IC0532689 TEXT,
+        wh_147_IC0393877 TEXT,
+        wr544_IC253015 TEXT,
+        IC0443761 TEXT,
+        sphaerococcum_IC0634028 TEXT,
+        IC533826 TEXT,
+        IC534021 TEXT,
+        IC212160 TEXT,
+        IC534882 TEXT,
+        IC53387 TEXT,
+        IC534522 TEXT,
+        IC397363 TEXT,
+        TS1_EC1009782 TEXT,
+        TS4_EC1009785 TEXT,
+        TS5_EC1009786 TEXT,
+        TS7_EC1009788 TEXT,
+        TS13_EC1009767 TEXT,
+        TS14_EC1009768 TEXT,
+        TS15_EC1009769 TEXT,
+        TS16_EC1009770 TEXT,
+        TS18_EC1009772 TEXT,
+        TS27_EC1009781 TEXT,
+        TS_49 TEXT,
+        TS71_EC1035313 TEXT,
+        TS72_EC1035314 TEXT,
+        TS74_EC1035316 TEXT,
+        TS79_EC1035321 TEXT,
+        PAU_TS_12 TEXT,
+        PAU_TS_6 TEXT,
+        PAU_TS_2 TEXT,
+        FC1514B TEXT,
+        FC1519B TEXT,
+        FC1523B TEXT,
+        FC1524B TEXT,
+        FC1531B TEXT,
+        FC1536B TEXT,
+        FC1543B TEXT,
+        FC1564B TEXT,
+        FC1569B TEXT,
+        FC1589B TEXT,
+        FC1593B TEXT,
+        FC1594B TEXT,
+        FC1603B TEXT,
+        FC1616B TEXT,
+        FC1674B TEXT,
+        FC1712B TEXT,
+        FC1718A TEXT,
+        FC1728B TEXT,
+        FC1730B TEXT,
+        FC1732A TEXT,
+        FC1759B TEXT,
+        FC1796B TEXT,
+        FC1813B TEXT,
+        FC1826B TEXT,
+        FC1876A TEXT,
+        Aegilops_speltoides TEXT,
+        Triticum_dicocioides TEXT,
+        Triticum_boeticum TEXT,
+        Triticum_monococum TEXT,
+        Triticum_polonicum TEXT,
+        Triticum_multiflorate TEXT,
+        Aegilops_tauchii TEXT,
+        IC0534129 TEXT,
+        katha_gehyun_IC265322 TEXT,
+        bansi_224_IC145237 TEXT
+
+);"
+   # sample_list <- reactive(colnames(snps_df))
 
 
-    observe({
-      req(is.data.frame(snps_df), sample_list())
-      # browser()
-
-      llst <- sample_list()[8:length(sample_list())]
-      updateSelectInput(inputId = "sample_name", label = "Cultivar name",
-                        choices = c("All",llst))
-
-    })
+    # observe({
+    #   req(is.data.frame(snps_df))
+    #   # browser()
+    #
+    #   llst <- sample_list()[8:length(sample_list())]
+    #   updateSelectInput(inputId = "sample_name", label = "Cultivar name",
+    #                     choices = c("All",llst))
+    #
+    # })
 
      # get the input  info  for coordinate and  return TRUE for numeric,  else FALSE for  non-numeric
     start_coordTF <- reactive({
@@ -236,6 +505,9 @@ snp_table_server <- function(id, snps_df) {
     null_table <- reactiveValues(show=NULL)
     #table_download <- reactiveValues(download=NULL) # for displaying table download option
     null_plot <- reactiveValues(imgplot=NULL) #true for NULL and false for displaying the plot
+
+
+   # con <- dbConnect(duckdb::duckdb(), dbdir = "data-raw/final.duckdb")
 
     # checking validity of the coordinates--------------------------
     observe({
@@ -364,29 +636,17 @@ snp_table_server <- function(id, snps_df) {
       req(gene_choice())
       if(gene_choice() == "Upload"){
         path <- reactive(input$upload$datapath)
-        #file_content <- read_delim(input$upload$datapath, delim = ",")
+
         # get the file extension
         ext <- reactive(tools::file_ext(input$upload$name))
-        # check the extension and return feedback
-         #print(ext())
-         print(str(ext()))
+        print(str(ext()))
 
-      # if(!isTRUE(ext() == "csv" || ext() == "tsv")) {
         if(!isTRUE(ext() %in% c("csv", "tsv"))) {
         gene_error(paste0("Please upload a valid file type"))
         }
          else {
         gene_error(TRUE)
         }
-
-
-
-        # validate(
-        # need( ext() %in% c("csv", "tsv"), "Please upload valid file"))
-       # need(ext == "tsv", "Please upload a tsv file"))
-
-
-        # return(gene_error())
 
         # load the data
         gene <- reactive(
@@ -398,8 +658,6 @@ snp_table_server <- function(id, snps_df) {
 
        }
 
-     # print(str(gene))
-     # print(gene_choice())
       req(gene_choice(), gene_sample())
         if(gene_choice() == "Enter"){
         # manually entered gene ID
@@ -412,17 +670,6 @@ snp_table_server <- function(id, snps_df) {
       return(gene())
     })
 
-   # checking for validty of geneId in upload---------------
-    # observe({
-
-    #
-    #   error_upload <- validate(need(ext %in% c("csv", "tsv"), "Please upload a valid file type"))
-    #
-    #   if (!isTRUE(error_upload)){
-    #     gene_error(paste0("Invalid file type"))
-    #   }
-    #
-    # })
 
     #checking for validity of geneId-------------
     observe({
@@ -459,37 +706,6 @@ snp_table_server <- function(id, snps_df) {
         }
     })
 
-
-
-
-         # observe({
-         #
-         #  req( file_upload())
-         #   browser()
-         #  # file_upload <- reactive(input$Upload)
-         #   # file_content <- read_delim(input$upload$datapath, delim = ",")
-         #   path <- reactive(input$upload$datapath)
-         #   ext <- reactive(tools::file_ext(input$upload$name))
-         #   # print(ext)
-         #   switch(ext(),
-         #          "csv" = read_csv(file_content),
-         #          "tsv" = read_tsv(file_content)
-         #   )
-         #   #  if (ext == "csv" || ext == "tsv") {
-         #   #   output$table_outout <- renderDT(return(file_content))
-         #   #  }
-         #   # else {
-         #   #   output$table_output <- renderDT(NULL)
-         #   # }
-         #   })
-
-
-
-
-
-
-
-
    # processing the final table--------------------------
 
      final_table <- eventReactive(input$click,{
@@ -497,32 +713,27 @@ snp_table_server <- function(id, snps_df) {
        # browser()
 
        # first arrange proper column name
-       if(sample_name() == "All") {
-         col_list <- colnames(snps_df)
-         df_sample <- reactive(snps_df)
-       }
-       else{
-         col_list <- c("#CHROM", "POS", "REF", "ALT", "TYPE", "IMPACT", "GENE_ID", sample_name())
-         df_sample <- reactive(snps_df[,col_list])
-       }
+       # if(sample_name() == "All") {
+       #   col_list <- colnames(snps_df)
+       #   df_sample <- reactive(snps_df)
+       # }
+       # else{
+       #   col_list <- c("#CHROM", "POS", "REF", "ALT", "TYPE", "IMPACT", "GENE_ID", sample_name())
+       #   df_sample <- reactive(snps_df[,col_list])
+       # }
 
 
       # check for error and extract the data
 
-      #if(isTRUE(display_error$gene)) {
-       #browser()
        if(query() == "geneID") {
 
          # query with only gene ID
          req(gene_sample())
          gene <- unlist(strsplit(gene_sample(), "[, ]+")) %>% unique() #splitting the gene on the basis of comma or space
 
-         #extract data from mariadb------------------------------------------
-         # query <- "select  from vcf_table;"
-         df_table <- df_sample()[df_sample()$GENE_ID %in% gene, col_list]
+         #extract data from duckdb------------------------------------------
+         df_table <- dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene) )
 
-
-      # }
        }
        else{
 
@@ -532,17 +743,19 @@ snp_table_server <- function(id, snps_df) {
            if(query() == "coordinates") {
 
              req(start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table  <- df_sample()[df_sample()$POS >= start_coord$coord() & df_sample()$POS <= end_coord$coord() & df_sample()$`#CHROM` == chr_sample(), col_list]
-           }
+             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord(), end_coord()))
+
+             }
            else if(query() == "type") {
              req(type_sample(), start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table <- df_sample()[df_sample()$POS >= start_coord$coord() & df_sample()$POS <= end_coord$coord() & df_sample()$TYPE == type_sample() & df_sample()$`#CHROM` == chr_sample(), col_list]
+             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord(), end_coord(), type_sample()))
+
            }
            else if(query() == "impact") {
              req(chr_sample(), impact_sample(), start_coord$coord(), end_coord$coord(), track_error_df$status)
-             df_table <- df_sample()[df_sample()$POS >= start_coord$coord() & df_sample()$POS <= end_coord$coord() & df_sample()$IMPACT == impact_sample() & df_sample()$`#CHROM` == chr_sample(), col_list]
+             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord(), end_coord(), impact_sample()))
 
-           }
+          }
 
          }else {
            # Default will be null for table
@@ -600,7 +813,8 @@ snp_table_server <- function(id, snps_df) {
 
          req(gene_sample())
          if(isTRUE(gene_error()) && (nrow(final_table()) > 1)) {
-           df <- snps_df %>% filter(GENE_ID %in% gene())
+          df <- dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene))
+
          }
 
        }
@@ -610,15 +824,18 @@ snp_table_server <- function(id, snps_df) {
            if(nrow(final_table()) > 1) {
              if(query() == "type") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), type_sample())
-               df <- snps_df %>% filter(`#CHROM` == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()) & TYPE == type_sample())
+               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord(), end_coord(), type_sample()))
+
              }
              else if(query() == "impact") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), impact_sample())
-               df <- snps_df %>% filter(`#CHROM` == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()) & IMPACT == impact_sample())
+               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord(), end_coord(), impact_sample()))
+
              }
              else if(query() == "coordinates") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample())
-               df <- snps_df %>% filter(`#CHROM` == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()))
+               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord(), end_coord()))
+
              }
            }
 
