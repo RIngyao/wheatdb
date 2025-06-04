@@ -94,7 +94,7 @@ app_ui <- function(request) {
          # title = tags$img(src="www/new_download.png", width = '30%')
         title = tags$div(
           style = "display: flex; align-items: center;",
-          tags$img(src = "www/new_download.png", height = "40px"),
+          tags$img(src = "www/new_download.png", height = "60px"),
           tags$span("  WheatDB", style = "margin-left: 10px; font-weight: bold; font-size: 20px;"),
           # tags$li(
           #   class = "dropdown",

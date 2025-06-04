@@ -79,10 +79,12 @@ blast_ui <- function(id) {
     ),
 
     actionButton(inputId = ns("click"), label = "BLAST", width = "10%", class = "btn-info btn-sm", style = "font-weight:bold; align: center;"),
-    verbatimTextOutput(outputId = ns("blast_out")),  #give the blast results here
+    uiOutput(outputId = ns("blast_out")),  #give the blast results here
 
     #TableOutput(outputId = ns("blast_table"))
      DTOutput(outputId = ns("blast_table")),
+     verbatimTextOutput(outputId = ns("display"))
+
     # hidden(div(id = "loading",
     #        tags$strong("BLAST is loading......")))
 
@@ -120,20 +122,6 @@ blast_ui <- function(id) {
       } else {
         input <- input$exp_thres
       })
-
-    # score <- reactive(
-    #    if(purr::is_empty(input$score)) {
-    #      input <- NULL
-    #    } else {
-    #      input <- input$score
-    #    })
-
-    # gap_cost <- reactive(
-    #   if(purr::is_empty(input$gap)){
-    #     input <- NULL
-    #   } else{
-    #     input <- input$gap
-    #   })
 
    })
     file_upload <- reactive(input$upload)
@@ -200,11 +188,7 @@ blast_ui <- function(id) {
           else if(isTRUE(valid_file()) && (!is.null(file_upload())) ) {  #check for file validity and file is not empty
 
            # upload the file
-
-           # path <- reactive(input$upload$datapath)
-           # ext <- tools::file_ext(input$upload$name)  #checking the file extension
-
-           sequence <- readDNAStringSet("run/media/data3/user1/ref_data/sequence_chr1a.fa", format = "fasta")
+           sequence <- readDNAStringSet("run/media/data3/user1/ref_data/iwgsc_refseqv2.1_assembly.fa.gz", format = "fasta")
           }
          }
 
@@ -228,8 +212,6 @@ blast_ui <- function(id) {
             pos <- reactive(reward(input$rewards, 2))
             neg <- reactive(penalty(input$pen, -3))
 
-           # score_pos <- reactive(score_get(input_val = score(), "reward"))
-           # score_neg <- reactive(score_get(input_val = score(), "penalty"))
 
            #for e-value score
            evalue <- e_value(input$eval, 0.05)
@@ -254,7 +236,7 @@ blast_ui <- function(id) {
      if(choice() == "Enter"){
        user_seq <- "TTCACGGTTCAGAATTTATATTGCGGGACGTTCGACCTCCAATTACATGTTTTAA"
        query <- paste(">query",user_seq, sep = "\n")
-       write_lines(query,"user_sequence.fa")
+       write_lines(query,"iwgsc_refseqv2.1_assembly.fa.gz")
      }else if(choice() == "Upload"){
 
        # import the file using Biostring
@@ -264,7 +246,7 @@ blast_ui <- function(id) {
 
 
         # and save it to user_sequence.fa
-        writeXStringSet(seqs, filepath = "user_sequence.fa")
+        writeXStringSet(seqs, filepath = "iwgsc_refseqv2.1_assembly.fa.gz")
 
      }
 
@@ -280,19 +262,7 @@ blast_ui <- function(id) {
      reward_val <- reward(input$rewards, 1)
      penalty_val <- penalty(input$pen, -2)
      max_target_val <- max_target(input$max, 10)
-     # blast_db <- "../ref_data/blast_db/blast_db"
-     # outputfile <- "../wheatdb/blast_result.out"
 
-
-     # blastcmd <- sprintf("nohup ./run_blast.sh %s %f %.0f %.0f %.0f %.0f %.0f %.0f", "user_sequence.fa" e_val, word_size_val, gap_op_val,
-     #                     gap_ext_val, reward_val,penalty_val, max_target_val)
-
-     # blastcmd <- sprintf("blastn -query %s -evalue %f -word_size %.0f -gapopen %.0f -gapextend %.0f -reward %.0f -penalty %.0f -max_target_seqs %.0f -outfmt 6",
-     #                     query, e_val, word_size_val, gap_op_val, gap_ext_val, reward_val, penalty_val, max_target_val)
-
-
-     # show("loading")
-     # output$blast_out <- renderText("")
      future::plan(multisession, workers = 10)
 
      future({
@@ -301,7 +271,7 @@ blast_ui <- function(id) {
                            gap_ext_val, reward_val,penalty_val, max_target_val)
 
        system(blastcmd, wait = TRUE)
-       # blast_output <- vroom::vroom( "blast_result.out", delim = "\t", col_names = FALSE)
+
      }) %...>% # promises
        {
          progressSweetAlert(
@@ -328,22 +298,42 @@ blast_ui <- function(id) {
            type = "success",
          )
 
-          blast_output <- vroom::vroom("blast_result.out", delim = "\t", col_names = FALSE)
+
+          blast_output <- vroom::vroom("blast_result.out", delim = "\t", col_names = c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore"))
 
 
-          output$blast_table <- renderDT({
-            datatable(cbind(blast_output),
-                       options = list(
-                         scrollX = TRUE,
-                         scrollY = "250px"
-                       ))
+          observe({
+            req(query())
+            output$blast_table <- renderDT({
+              datatable(cbind(blast_output),
+                        options = list(
+                          scrollX = TRUE,
+                          scrollY = "250px"
+                        ))
 
+            })
           })
+
+
          function(blast_output) {
-           if(length(blast_output) == 0) {
-             output$blast_out <- renderText(paste("No matches found"))
+           browser()
+           if(length(blast_output) == 0 ) {
+             output$blast_out <- renderUI(paste("No matches found"))
            } else {
-             output$blast_out <- renderText(paste(blast_output))
+             output$blast_out <- renderUI(paste(blast_output))
+             output$display <- renderText(print(
+                                            "qseqid:  query or source (gene) sequence id",
+                                            "sseqid:  subject or target (reference genome) sequence id",
+                                            "pident:  percentage of identical positions",
+                                            "length:  alignment length (sequence overlap)",
+                                            "mismatch:    number of mismatches",
+                                            "gapopen: number of gap openings",
+                                            "qstart: start of alignment in query",
+                                            "qend:  end of alignment in query",
+                                            "sstart: start of alignment in subject",
+                                            "send:  end of alignment in subject",
+                                            "evalue: expect value",
+                                            "bitscore:  bit score"))
            }
          }
        } %...!% # promise error
@@ -366,46 +356,16 @@ blast_ui <- function(id) {
 
            closeSweetAlert(session = session)
 
-           output$blast_out <- renderText(paste("Error in BLAST result", e$msg))
+           output$blast_out <- renderUI(paste("Error in BLAST result", e$msg))
          }
        }
 
-     # read the blast ouput only when it completes
 
-     # h <- file.size("blast_result.out")
-     #
-     # if(h > 0){
-     #   blast_res <- vroom::vroom( "blast_result.out", delim = "\t", col_names = FALSE)
-
-     # }
 
 
    })
 
 
-
-      # blastcmd <- sprintf("nohup blastn -query %s -db db -evalue %d -outfmt 6 &", query, database, p_value, outputfile)
-      # query, evalue, word_size, gapopen, gapextend, gap_cost, penalty =0, reward = 0, max_target_seqs = 1,
-# browser()
-# str(word_size)
-# str(e_value)
-# str(gap_op)
-# print(max_target)
-# print(reward)
-# print(penalty)
-# print(gap_ext)
-
-      #   $query="run/media/data3/user1/ref_data/test.fa",
-      # $evalue="1e-5"
-      # $database = "blast_db"
-      # $outputfile = "run/media/data3/user1/ref_data/result.out"
-      # #construct the BLAST command
-      # $blastcmd = "blastn -query $query -db $database -out $outputfile -evalue $evalue -outfmt 7"
-      # p=input$pvalue # 0.05
-      # query_file <- tempfiles(filext = ".fasta")
-      # output_file <- tempfiles(filext = ".txt")
-      # blastcmd <- sprintf("nohup blastn -query $query -db $database -evalue $evalue -outfmt 7 &", query_file, output_file)
-      # blastcmd <- sprintf("nohup blastn -query %s -db db -evalue %d -outfmt 7 -max &", query_file, p, output_file)
 
 
   })
