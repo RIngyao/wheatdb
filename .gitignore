@@ -3,6 +3,7 @@
 .Rhistory
 .RData
 .Ruserdata
+data-raw/final.duckdb
 inst/doc
 /doc/
 /Meta/
