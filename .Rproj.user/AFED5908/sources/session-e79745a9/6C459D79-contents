@@ -51,7 +51,7 @@ snp_table_ui <- function(id) {
 
         fluidRow(
           column(6,selectInput(inputId = ns("query_menu"), label = "Query type", choices = c("None", "geneID", "type", "impact", "coordinates"))),
-          column(6,selectInput(inputId = ns("sample_name"), label = "Cultivar name", choices = c("None", "All"), selected = "None"))
+          column(6,selectInput(inputId = ns("sample_name"), label = "Cultivar name", choices = c("All"), selected = "All"))
         )
       ),
 
