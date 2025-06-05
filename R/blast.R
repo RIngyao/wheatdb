@@ -314,28 +314,25 @@ blast_ui <- function(id) {
             })
           })
 
+          observe({
+            req(query())
+            output$display <- renderText(paste(
+              "qseqid: query or source (gene) sequence id;",
+              "sseqid: subject or target (reference genome) sequence id;",
+              "pident: percentage of identical positions;",
+              "length: alignment length (sequence overlap);",
+              "mismatch: number of mismatches;",
+              "gapopen: number of gap openings;",
+              "qstart: start of alignment in query;",
+              "qend: end of alignment in query;",
+              "sstart: start of alignment in subject;",
+              "send: end of alignment in subject;",
+              "evalue: expect value;",
+              "bitscore: bit score",
+              sep = "\n"))
+          })
 
-         function(blast_output) {
-           browser()
-           if(length(blast_output) == 0 ) {
-             output$blast_out <- renderUI(paste("No matches found"))
-           } else {
-             output$blast_out <- renderUI(paste(blast_output))
-             output$display <- renderText(print(
-                                            "qseqid:  query or source (gene) sequence id",
-                                            "sseqid:  subject or target (reference genome) sequence id",
-                                            "pident:  percentage of identical positions",
-                                            "length:  alignment length (sequence overlap)",
-                                            "mismatch:    number of mismatches",
-                                            "gapopen: number of gap openings",
-                                            "qstart: start of alignment in query",
-                                            "qend:  end of alignment in query",
-                                            "sstart: start of alignment in subject",
-                                            "send:  end of alignment in subject",
-                                            "evalue: expect value",
-                                            "bitscore:  bit score"))
-           }
-         }
+
        } %...!% # promise error
        {
          function(e) {
