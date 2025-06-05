@@ -1,0 +1,7 @@
+{
+    "installOptions": {
+        "installFromRepository": true,
+        "libraryPath": "/home/user1/.cache/R/renv/library/wheatdb-ed39f7d5/linux-centos-8/R-4.4/x86_64-redhat-linux-gnu",
+        "installDependencies": true
+    }
+}

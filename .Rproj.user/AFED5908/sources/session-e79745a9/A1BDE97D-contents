@@ -1,0 +1,33 @@
+
+df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?",
+                 params = list("Chr1A", 20009, 12888982))
+
+
+df
+cul <- dbGetQuery(con, "desc snp_table;")
+cul$column_name
+TraesCS1A03G0012700
+ll <- "TraesCS1A03G0012700"
+df_table <- DBI::dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(ll) ) %>% as.tibble()
+str(df_table)
+function(blast_output) {
+  browser()
+  if(length(blast_output) == 0 ) {
+    output$blast_out <- renderUI(paste("No matches found"))
+  } else {
+    output$blast_out <- renderUI(paste(blast_output))
+    output$display <- renderText(print(
+      "qseqid:  query or source (gene) sequence id",
+      "sseqid:  subject or target (reference genome) sequence id",
+      "pident:  percentage of identical positions",
+      "length:  alignment length (sequence overlap)",
+      "mismatch:    number of mismatches",
+      "gapopen: number of gap openings",
+      "qstart: start of alignment in query",
+      "qend:  end of alignment in query",
+      "sstart: start of alignment in subject",
+      "send:  end of alignment in subject",
+      "evalue: expect value",
+      "bitscore:  bit score"))
+  }
+}

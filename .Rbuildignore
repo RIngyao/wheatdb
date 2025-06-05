@@ -11,3 +11,4 @@
 ^app\.R$
 ^rsconnect$
 ^\.rscignore$
+^iwgsc_refseqv2.1_assembly.fa.gz:$

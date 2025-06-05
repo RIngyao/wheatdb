@@ -1,0 +1,28 @@
+{
+    "id": "6C459D79",
+    "path": "/run/media/data3/user1/wheatdb/R/snp_table_module.R",
+    "project_path": "R/snp_table_module.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1748955342966.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "445,32",
+        "scrollLine": "438",
+        "docOutlineVisible": "0",
+        "docOutlineSize": "51"
+    },
+    "folds": "350|67|390|0|\n",
+    "lastKnownWriteTime": 1749030793,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1749030793739,
+    "read_only": false,
+    "read_only_alternatives": []
+}

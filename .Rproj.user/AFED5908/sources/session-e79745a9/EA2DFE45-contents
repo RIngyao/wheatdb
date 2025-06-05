@@ -1,0 +1,56 @@
+/* Header container styling */
+.header-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 60px;
+  padding-left: 15px;
+  padding-right: 15px;
+  background-color: #222d32;
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+}
+
+ /* Top row: logo + project short name */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+.logo-container img {
+  display: block;
+}
+
+.project-title {
+  color: #ffffff;
+}
+
+/* Second row: project description
+.project-description {
+  font-size: 14px;
+  font-weight: 400;
+  color: #cfd8dc;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+} */
+
+/* Override default header height */
+.main-header .navbar {
+  min-height: 10px !important;
+}
+
+.main-header .logo {
+  height: auto !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* Sidebar toggle left as default - can add style if needed */
+
