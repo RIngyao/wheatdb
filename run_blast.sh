@@ -14,8 +14,8 @@ gap_ext_val=$5
 reward_val=$6
 penalty_val=$7
 max_target_val=$8
-blast_db="../ref_data/blast_db/blast_db"
-outputfile="blast_result"
+blast_db="data-raw/blast_db/blast_db"
+outputfile="data-raw/blast_result"
 
 
 blastn -query $query \
@@ -28,12 +28,10 @@ blastn -query $query \
 	-max_target_seqs $max_target_val \
 	-db $blast_db \
 	-out $outputfile \
-        -outfmt 6 	
+	-num_threads 25 \
+        -outfmt 6 >"data-raw/blast.log" 2>&1  	
 	
 
-#blast command 
 
 #blastcmd <- sprintf("blastn -query %s -evalue %f -word_size %.0f -gapopen %.0f -gapextend %.0f -penalty %.0f -reward %.0f -max_target_seqs %.0f -db %s -outfmt 6", query, e_val, word_size_val, gap_op_val, gap_ext_val, penalty_val, reward_val, max_target_val, blast_db)
 
-#blast result
- # blast_res <- vroom::vroom("../wheatdb/blast_result.out", delim = "\t", col_names = FALSE)

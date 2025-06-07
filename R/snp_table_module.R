@@ -9,170 +9,128 @@
 #' @importFrom shiny NS tagList
 snp_table_ui <- function(id) {
   ns <- NS(id)
-  # important variables-------------------------------------------------------------------------------------------------------------------------------
-  # type for SNPs
-  type <- c("intergenic_region", "upstream_gene_variant",
-            "intron_variant", "conservative_inframe_deletion",
-            "3_prime_UTR_variant", "5_prime_UTR_variant",
-            "downstream_gene_variant", "splice_region_variant&intron_variant",
-            "frameshift_variant", "conservative_inframe_insertion",
-            "disruptive_inframe_insertion", "frameshift_variant&stop_gained",
-            "frameshift_variant&splice_region_variant", "stop_gained&conservative_inframe_insertion",
-            "disruptive_inframe_deletion", "non_coding_transcript_exon_variant",
-            "missense_variant", "frameshift_variant&start_lost",
-            "conservative_inframe_insertion&splice_region_variant", "splice_acceptor_variant&splice_region_variant&intron_variant",
-            "splice_acceptor_variant&intron_variant", "splice_region_variant",
-            "splice_donor_variant&intron_variant", "start_lost&conservative_inframe_insertion")
-  chrom <- c("Chr1A", "Chr1B", "Chr1D",
-             "Chr2A", "Chr2B", "Chr2D",
-             "Chr3A", "Chr3B", "Chr3D",
-             "Chr4A", "Chr4B", "Chr4D",
-             "Chr5A", "Chr5B", "Chr5D",
-             "Chr6A", "Chr6B", "Chr6D",
-             "Chr7A", "Chr7B", "Chr7D")
-  # start ui-------------------------------------------------------------------------------------------------------------------------------------------
+
+  type <- c(
+    "intergenic_region", "upstream_gene_variant", "intron_variant", "conservative_inframe_deletion",
+    "3_prime_UTR_variant", "5_prime_UTR_variant", "downstream_gene_variant", "splice_region_variant&intron_variant",
+    "frameshift_variant", "conservative_inframe_insertion", "disruptive_inframe_insertion",
+    "frameshift_variant&stop_gained", "frameshift_variant&splice_region_variant",
+    "stop_gained&conservative_inframe_insertion", "disruptive_inframe_deletion",
+    "non_coding_transcript_exon_variant", "missense_variant", "frameshift_variant&start_lost",
+    "conservative_inframe_insertion&splice_region_variant",
+    "splice_acceptor_variant&splice_region_variant&intron_variant",
+    "splice_acceptor_variant&intron_variant", "splice_region_variant",
+    "splice_donor_variant&intron_variant", "start_lost&conservative_inframe_insertion"
+  )
+
+  chrom <- paste0("Chr", rep(1:7, each = 3), rep(c("A", "B", "D"), 7))
+
   tagList(
     shinyFeedback::useShinyFeedback(),
-    # box for query parameters--------------------------------------------------
-    div(
-      style= "margin-top:2px;
-      background-image:radial-gradient(white,white, #dbf1f9);
-      box-shadow:0px 2px 20px -15px inset;
-      padding:5px;
-      text-align:center;
-      align:center;
-      font-weight:bold;
-      ",
-      h2("Query Parameters", style = "margin-top:1px; text-align:center; font-weight:bold; color:#025b05"),
-      div(
-        style ="display:flex;
-        justify-content:center;
-        padding: 5px;",
 
+    # Query Panel Section
+    div(
+      class = "query-section",
+      style = "margin-top:10px; padding: 20px; background: #f7fafd; border: 1px solid #cce5ff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);",
+      h3("SNP Query Parameters", style = "color:#025b05; text-align:center; margin-bottom: 20px;"),
+
+      fluidRow(
+        column(6, selectInput(ns("query_menu"), "Query type", choices = c("None", "geneID", "type", "impact", "coordinates"))),
+        column(6, selectInput(ns("sample_name"), "Cultivar name", choices = "All", selected = "All"))
+      ),
+
+      conditionalPanel(
+        condition = sprintf("input['%s'] == 'geneID'", ns("query_menu")),
         fluidRow(
-          column(6,selectInput(inputId = ns("query_menu"), label = "Query type", choices = c("None", "geneID", "type", "impact", "coordinates"))),
-          column(6,selectInput(inputId = ns("sample_name"), label = "Cultivar name", choices = c("All"), selected = "All"))
+          column(4, radioButtons(ns("gene_choice"), "Choose", choices = c("Enter", "Upload"), inline = TRUE)),
+          conditionalPanel(
+            condition = sprintf("input['%s'] == 'Enter'", ns("gene_choice")),
+            column(8, textInput(ns("enter_gene"), "Enter GENE ID", placeholder = "Comma or space separated"))
+          ),
+          conditionalPanel(
+            condition = sprintf("input['%s'] == 'Upload'", ns("gene_choice")),
+            column(8, fileInput(ns("upload"), "Upload GENE ID"))
+          )
         )
       ),
 
-      div(
-        style = "display:flex; justify-content:center; padding: 5px",
-
-        conditionalPanel(condition = sprintf("input['%s'] == 'geneID'", ns("query_menu")),
-
-                         # change the button type: use raditobutton
-                         fluidRow(
-                           column(4, radioButtons(inputId = ns("gene_choice"), inline = TRUE, label = "Choose", choices = c("Enter", "Upload"))),
-
-                          conditionalPanel(condition = sprintf("input['%s'] == 'Enter'", ns("gene_choice")),
-                                           column(8,textInput(inputId = ns("enter_gene"), label = "Enter GENE ID", placeholder = c("Must be comma or space separated!")))
-                                           ),
-
-                          conditionalPanel(condition = sprintf("input['%s'] == 'Upload'", ns("gene_choice")),
-                                             column(8,fileInput(inputId = ns("upload"), label = "Upload GENE ID", placeholder = "No files selected" ))
-                                             )
-
-                         )
-
-                         ), # end of conditionpanel geneID
-
-        # ui for type-----------------------------------------------------------
-        conditionalPanel(condition = sprintf("input['%s'] == 'type' ", ns("query_menu")),
-                           tagList(
-                             fluidRow(
-                               column(4, selectInput(inputId = ns("type_name"), label = "TYPE", choices = type)),
-                               column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = chrom, selected = "Chr1A")),
-                               column(2, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
-                               column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
-                             )
-                           )
-
-                         ), # end of type
-
-        # ui for coorindates ---------------------------------------------------
-        conditionalPanel(condition = sprintf("input['%s'] == 'impact' ", ns("query_menu")),
-                         tagList(
-                           fluidRow(
-                             column(4, selectInput(inputId = ns("impact_name"), label = "IMPACT", choices = c("MODIFIER", "MODERATE", "LOW", "HIGH"))),
-                             column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = chrom, selected = "Chr1A")),
-                             column(2, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
-                             column(2, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
-                           )
-                         )
-
-        ), # end of impact
-
-        conditionalPanel(condition = sprintf("input['%s'] == 'coordinates' ", ns("query_menu")),
-                         tagList(
-                           fluidRow(
-                             column(4, selectInput(inputId = ns("chr"), label = "Chromosome", choices = chrom, selected = "Chr1A")),
-                             column(4, textInput(inputId = ns("start_coord"), label = "Coordinate Start", placeholder = c("Start value"))),
-                             column(4, textInput(inputId = ns("end_coord"), label = "Coordinate End", placeholder = c("End value")))
-                           )
-                         )
-
-        ) # end of coordinates
-
+      conditionalPanel(
+        condition = sprintf("input['%s'] == 'type'", ns("query_menu")),
+        fluidRow(
+          column(4, selectInput(ns("type_name"), "TYPE", choices = type)),
+          column(4, selectInput(ns("chr"), "Chromosome", choices = chrom, selected = "Chr1A")),
+          column(2, textInput(ns("start_coord"), "Start", placeholder = "Start value")),
+          column(2, textInput(ns("end_coord"), "End", placeholder = "End value"))
+        )
       ),
 
-      # button for submitting the query-----------------------------------------
-      conditionalPanel(condition = sprintf("input['%s'] != 'None'", ns("query_menu")),
-                       actionButton(inputId = ns("click"), label = "SUBMIT",
-                                    width = "10%",
-                                    # class = "btn-primary btn-lg",
-                                    class = "btn-info btn-sm",
-                                    style = "font-weight:bold;")
-                       )
+      conditionalPanel(
+        condition = sprintf("input['%s'] == 'impact'", ns("query_menu")),
+        fluidRow(
+          column(4, selectInput(ns("impact_name"), "IMPACT", choices = c("MODIFIER", "MODERATE", "LOW", "HIGH"))),
+          column(4, selectInput(ns("chr"), "Chromosome", choices = chrom, selected = "Chr1A")),
+          column(2, textInput(ns("start_coord"), "Start", placeholder = "Start value")),
+          column(2, textInput(ns("end_coord"), "End", placeholder = "End value"))
+        )
+      ),
 
+      conditionalPanel(
+        condition = sprintf("input['%s'] == 'coordinates'", ns("query_menu")),
+        fluidRow(
+          column(4, selectInput(ns("chr"), "Chromosome", choices = chrom, selected = "Chr1A")),
+          column(4, textInput(ns("start_coord"), "Start", placeholder = "Start value")),
+          column(4, textInput(ns("end_coord"), "End", placeholder = "End value"))
+        )
+      ),
+
+      conditionalPanel(
+        condition = sprintf("input['%s'] != 'None'", ns("query_menu")),
+        div(style = "text-align:center; margin-top: 20px;",
+            actionButton(ns("click"), "Submit", class = "btn btn-success", style = "font-weight:bold;"))
+      )
     ),
 
+    br(),
 
-    # display the download button only when the data is ready (table and figure)----------------
-     fluidRow(
-      box( height = "600", solidHeader = T, #title = "SNP Table",
-       div(
-         style = "display: flex; justify-content: flex-end; gap: 15px; padding: 10px;",
-         uiOutput(ns("uiFiletype")),
-         uiOutput(ns("uiDownload"))
-       ),
+    # Table Output and Download UI
+    fluidRow(
+      box(title = "SNP Table", height = "600px", width = 12, solidHeader = TRUE, status = "primary",
+          div(style = "display: flex; justify-content: flex-end; gap: 10px; padding: 5px;",
+              uiOutput(ns("uiFiletype")),
+              uiOutput(ns("uiDownload"))
+          ),
+          DTOutput(ns("table_output"))
+      )
+    ),
 
-           DTOutput(outputId = ns("table_output"))
-         ),#for table output
-      br(),
-      box( height = "650", solidHeader = T, #title = "SNP Plot analysis",
-
-           div(
-             style = "display: flex; justify-content: flex-end; gap: 15px; padding: 10px;",
-             uiOutput(ns("uiImageType")),
-             uiOutput(ns("UiDownloadBar"))
-           ),
-        # column(12,
-        #        column(8, align = "left", offset = 0, uiOutput(ns("uiImageType"))),
-        #        column(2, align = "right", offset = 10, uiOutput(ns("UiDownloadBar")))
-        # ),
-
-          column(12,
-              div(height=600, width = 600,
-                    plotOutput(outputId = ns("plot"), click = ns("plot_click"), hover= ns("plot_hover")))
-                ),
-          column(12,
-                 div(height=300, width = 300,
-                    # verbatimTextOutput(outputId = ns("info_click")))),
-                    uiOutput(ns("info_click"))
-                    )
-                 ),
-          column(12,
-                 div(height=300, width = 300,
-                     verbatimTextOutput(outputId = ns("info_hover")))),
-          column(12,
-                 div(height = 300, width = 300,
-                     htmlOutput(outputId = ns("show_link"))))
-
-      ),
-
+    # Plot + Click Info
+    fluidRow(
+      box(title = "SNP Plot", height = "700px", width = 12, solidHeader = TRUE, status = "info",
+          fluidRow(
+            column(12,
+                   div(style = "display: flex; justify-content: flex-end; gap: 10px; padding: 5px;",
+                       uiOutput(ns("uiImageType")),
+                       uiOutput(ns("UiDownloadBar"))
+                   )
+            )
+          ),
+          fluidRow(
+            column(8,
+                   plotOutput(ns("plot"), height = "600px", click = ns("plot_click"), hover = ns("plot_hover"))
+            ),
+            column(4,
+                   div(
+                     style = "height: 600px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; background: #fefefe;",
+                     # h4("Clicked the gene to view in JBrowse"),
+                     uiOutput(ns("info_click"))
+                   )
+            )
+          )
+      )
     )
-)
+  )
 }
+
 
 #' name_of_module1 Server Functions
 #'
@@ -434,22 +392,6 @@ snp_table_server <- function(id) {
          lgt <- length(col$column_name)
           col_list <- as.character(col$column_name[-c(1:4,lgt,lgt-1,lgt-2)])
        }
-       # else {
-       #  col_list <-
-       #
-       # }
-
-
-
-       # first arrange proper column name
-       # if(sample_name() == "All") {
-       #   col_list <- colnames(snps_df)
-       #   df_sample <- reactive(snps_df)
-       # }
-       # else{
-       #   col_list <- c("#CHROM", "POS", "REF", "ALT", "TYPE", "IMPACT", "GENE", sample_name())
-       #   df_sample <- reactive(snps_df[,col_list])
-       # }
 
 
       # check for error and extract the data
@@ -472,17 +414,17 @@ snp_table_server <- function(id) {
            if(query() == "coordinates") {
 
              req(start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord(), end_coord()))
+             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord()))
 
              }
            else if(query() == "type") {
              req(type_sample(), start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord(), end_coord(), type_sample()))
+             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample()))
 
            }
            else if(query() == "impact") {
              req(chr_sample(), impact_sample(), start_coord$coord(), end_coord$coord(), track_error_df$status)
-             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord(), end_coord(), impact_sample()))
+             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample()))
 
           }
 
@@ -532,19 +474,17 @@ snp_table_server <- function(id) {
      gene <- reactive(unlist(strsplit(gene_sample(), "[, ]+")) %>% unique()) #splitting the gene on the basis of comma or space
 
      # data for graph------------
-     # df_plot <- eventReactive(input$click,{
+
      df_plot <- reactive({
        # req(gene_sample(), gene_error())
        req(gene_error(), input$click)
        # browser()
        if(query() == "geneID") {
-
          req(gene_sample())
+
          if(isTRUE(gene_error()) && (nrow(final_table()) > 1)) {
           df <- final_table() #dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene))
-
          }
-
        }
        else {
          # check for error and then proceed
@@ -552,17 +492,17 @@ snp_table_server <- function(id) {
            if(nrow(final_table()) > 1) {
              if(query() == "type") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), type_sample())
-               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord(), end_coord(), type_sample()))
+               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample()))
 
              }
              else if(query() == "impact") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), impact_sample())
-               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord(), end_coord(), impact_sample()))
+               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample()))
 
              }
              else if(query() == "coordinates") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample())
-               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord(), end_coord()))
+               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord()))
 
              }
            }
@@ -582,20 +522,23 @@ snp_table_server <- function(id) {
           if(nrow(df_plot()) > 1){
            # browser()
           #  print(df_plot())
-            plot_info <- df_plot() %>% group_by(TYPE) %>% summarize(count = n(), GENE = unique(GENE))
+            plot_info <- df_plot() %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
             #print(plot_info)
             data_plot <-  ggplot(data = plot_info, aes(x = TYPE, y = count, fill = TYPE)) +
-            geom_bar(stat = "identity", width = 0.35)+
-            theme_classic() +
-            theme(
-              axis.text.x = element_text(size = 10, face = "bold", angle = 45, hjust = 1),
-              axis.text.y = element_text(size = 12, face = "bold"),
-              axis.title = element_text(size=12, face = "bold"),
-              axis.ticks = element_line(linewidth = 2),
-              legend.position = "none"
-            ) +
+              geom_bar(stat = "identity", width = 0.35)+
+              coord_cartesian(clip = "off") +
+              theme_classic() +
+              theme(
+                axis.text.x = element_text(size = 10, face = "bold", angle = 45, hjust = 1),
+                axis.text.y = element_text(size = 12, face = "bold"),
+                axis.title = element_text(size=12, face = "bold"),
+                axis.ticks = element_line(linewidth = 2),
+                legend.position = "none",
+                plot.margin = margin(t=10, r=10, b=10, l=10, unit = "mm")
+              ) +
               geom_text(aes(label = count), vjust = -0.6, size = 4, color = "black") +
-            labs(title="Number of genes overlap with the SNPs. It can be either within genic or intergenic regions",
+              labs(title="Number of genes overlap with the SNPs.\nIncluded nearby genes (intergenic regions)",
+                   subtitle = "Click the bar to view the list of genes",
                  x = "Type",
                  y = "count")
 
@@ -610,170 +553,95 @@ snp_table_server <- function(id) {
 
       })
 
-     # subset of df_plot--------------------------------------------
-     # browser()
-
-
-
+     # display the gene along with the link to jbrowse  --------------------------------------------
      observe({
-       req(input$plot_click, df_plot(), input$click)
+       req(input$plot_click, df_plot())
 
-       # browser()
-       clicked <- reactive(input$plot_click$domain$discrete_limits$x)
-       #browser()
-       x_pos <- reactive(round(input$plot_click$x))
-       y_pos <- reactive(round(input$plot_click$y))
-        print(y_pos())
-       # req(df_plot())
-      # browser()
-      # print(str(clicked()))
-      # print(clicked())
-      #  print(input$plot_click$x)
-      #  print(input$plot_click$y)
+       # Access plot data
+       df <- df_plot()
+       # process the data as used in the graph
+       plot_info <- df %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
+       plot_info$TYPE <- as.character(plot_info$TYPE)
 
-       # process it
-       plot_info_click <- df_plot() %>% group_by(TYPE) %>% summarize(count = n(), GENE = unique(GENE))
-       printed_gene <- reactive(unique(plot_info_click$GENE[plot_info_click$TYPE %in% clicked()]))
-       print(printed_gene())
-     #  gene_selected <- reactive(plot_info_click[plot_info_click$TYPE == clicked()]$GENE %>% unique())
-       click_type_x <- reactive(input$plot_click$domain$discrete_limits$x[x_pos()])
+       # Extract x position from click
+       x_labels <- input$plot_click$domain$discrete_limits$x
+       x_pos <- round(input$plot_click$x)
 
-       type_c <- plot_info_click[plot_info_click$TYPE == click_type_x(), "count", drop = TRUE]
-       print(type_c)
-
-
-       if(all(y_pos() >= 0) & all(y_pos() <= type_c)){
-
-         #   output$info_click <- renderPrint({
-         #     print(printed_gene())
-         # }) unix
-
-      # browser()
-
-
-        output$info_click <- renderUI({
-          print(printed_gene())
-          tags$a(href = "https://www.google.co.in/",
-                 target = "_blank",
-                 paste(printed_gene()),
-
-
-          # # defining custom genomes with data provided by URLs-------------------------
-          # base_url <- "https://gladki.pl/igvr/testFiles"
-          # title <- "ribo remote"
-          # fasta_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.fasta")
-          # fasta_index_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.fasta.fai")
-          # annotation_file <- sprintf("%s/%s", base_url, "ribosomal-RNA-gene.gff3")
-          # locus <- "U13369.1:7,276-8,225"
-          # genomeOptions <- parseAndValidateGenomeSpec(
-          #   genomeName = "hg38",
-          #   initialLocus = "NDUFS2",
-          #   dataMode = "http",
-          #   stockGenome = FALSE,
-          #   fasta = fasta_file,
-          #   fastaIndex = fasta_index_file,
-          #   genomeAnnotation = annotation_file
-          #
-          # )
-          # genomeOptions
-
-
-#
-# # defining custom genomes with data provided on local files------------------
-# data_directory <- system.file(package = "igvShiny", "extdata"),
-# fasta_file <- file.path(data_directory, "ribosomal-RNA-gene.fasta"),
-# fasta_index_file <- file.path(data_directory, "ribosomal-RNA-gene.fasta.fai"),
-# annotation_file <- file.path(data_directory, "ribosomal-RNA-gene.gff3"),
-# genomeOptions2 <- parseAndValidateGenomeSpec(
-#   genomeName = "ribo local",
-#   initialLocus = "U13369.1:7,276-8,225",
-#   dataMode = "localFiles",
-#   stockGenome = FALSE,
-#   fasta = fasta_file,
-#   fastaIndex = fasta_index_file,
-#   genomeAnnotation = annotation_file
-# ),
-
-)
-          })
-
-       } else {
-         output$info_click <- NULL
+       # Check if click is within x axis bounds
+       if (x_pos < 1 || x_pos > length(x_labels)) {
+         output$info_click <- renderUI(NULL)
+         return()
        }
 
+       # Get the clicked TYPE label
+       clicked_type <- x_labels[[x_pos]]
 
+       # Filter df for clicked TYPE
+       clicked_genes_df <- df %>%
+         filter(TYPE == clicked_type) %>%
+         select(GENE, CHROM, START = POS, END =POS) %>%
+         distinct()
 
+       # Get y value of click and max count for that type (to check if click is inside bar)
+       y_val <- input$plot_click$y
+       bar_height <- plot_info[plot_info$TYPE == clicked_type,]$count # mx bar height for the TYPE
+
+       # Check if y click falls within bar (0 to bar_height)
+       if (y_val < 0 || y_val > bar_height) {
+         output$info_click <- renderUI(NULL)
+         return()
+       }
+
+       # Generate UI with one JBrowse link per gene
+       output$info_click <- renderUI({
+         if (nrow(clicked_genes_df) == 0) return(NULL)
+
+         tagList(
+           # h4("Clicked the link to view in JBrowse\n", paste0(clicked_type, ":")),
+           HTML(paste0("<h4>Clicked the link to view in JBrowse<br>", clicked_type, ":</h4>")),
+           lapply(seq_len(nrow(clicked_genes_df)), function(i) {
+             gene <- clicked_genes_df$GENE[i]
+             chr <- clicked_genes_df$CHR[i]
+             start <- clicked_genes_df$START[i]
+             end <- clicked_genes_df$END[i]
+             # start <- ifelse(clicked_genes_df$START[i] - 100 < 1, clicked_genes_df$START[i] - 100, 1) # extend by 100 bp
+             # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
+
+             jbrowse_url <- paste0(
+               "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants&loc=",
+               chr, ":", start, "..", end
+             )
+
+             tags$a(
+               href = jbrowse_url,
+               target = "_blank",
+               style = "display: block; margin-bottom: 4px;",
+               ifelse(clicked_type == "intergenic_region", paste0("Nearby ", gene, " (", chr, ":", start, "-", end, ")"),
+                      paste0(gene, " (", chr, ":", start, "-", end, ")"))
+             )
+           })
+         )
+       })
      })
 
-       observe({
-         req(input$plot_hover, df_plot(), input$click,
-             is.numeric(input$plot_hover$x), is.numeric(input$plot_hover$y))
 
-         # data for display
-         plot_info_hover <- df_plot() %>% group_by(TYPE) %>% summarise(count = n(), unique_count = n_distinct(GENE))
-         # print(plot_info_hover)
-         count_type <- reactive(df_plot() %>% group_by(TYPE) %>% summarise(count = n()))
+    #display the graph----------------------
+    observe({
+     req(!is.null(final_plot()))
+    #browser()
+        # show download button and type here
+        output$UiDownloadBar <- renderUI(
+          downloadButton(outputId = ns("download_bar"), label = "Image",
+                         icon = shiny::icon("download"), class = "btn, btn-info", style="color:white",
+                         title = "Download Image")
+        )
+        output$uiImageType <- renderUI(
+          radioButtons(inputId = ns("imgtype"), inline = TRUE, label = NULL, choices = c("PNG", "PDF", "JPG"))
+        )
 
+       output$plot <- renderPlot(final_plot())
 
-        #  browser()
-        # print(input$plot_hover)
-          # get the x-axis position
-        # print(input$plot_hover$y)
-        # print(input$plot_hover$x)
-
-         x_pos <- reactive(round(as.numeric(input$plot_hover$x)))
-         y_pos <- reactive(round(as.numeric(input$plot_hover$y)))
-         # rf <- class(x_pos)
-         # print (rf)
-
-         print(str(x_pos()))
-         print(str(y_pos()))
-
-          # extract the type for the x-position
-          # req(x_pos() %in% c(1:10))
-         hover_type_x <- reactive(input$plot_hover$domain$discrete_limits$x[x_pos()])
-         # count of gene for the type
-         hover_df <- plot_info_hover %>% filter(TYPE == hover_type_x()) # && (plot_info_hover %>% filter(count == y_pos()))
-         hover_df_y <- plot_info_hover %>% filter(count == y_pos())
-         gene_count <- reactive(sum(hover_df$unique_count))
-         type_c <- plot_info_hover[plot_info_hover$TYPE == hover_type_x(), "count", drop = TRUE]
-         print(type_c)
-          # req(y_pos() <= type_c)
-
-
-         if(y_pos() >= 0 && y_pos() <= type_c){
-
-           output$info_hover <- renderPrint({
-             print(paste(hover_type_x(), ": unique gene count = ", gene_count()))
-
-
-           })
-
-         }
-          else {
-            output$info_hover <- NULL
-          }
-
-
-  })
-
-        #display the graph
-        observe({
-         req(!is.null(final_plot()))
-        #browser()
-            # show download button and type here
-            output$UiDownloadBar <- renderUI(
-              downloadButton(outputId = ns("download_bar"), label = "Image",
-                             icon = shiny::icon("download"), class = "btn, btn-info", style="color:white",
-                             title = "Download Image")
-            )
-            output$uiImageType <- renderUI(
-              radioButtons(inputId = ns("imgtype"), inline = TRUE, label = NULL, choices = c("png", "pdf", "jpeg"))
-            )
-
-           output$plot <- renderPlot(final_plot())
-
-          })
+      })
 
 
 
@@ -825,30 +693,30 @@ snp_table_server <- function(id) {
             filename = function() {
 
               switch(input$imgtype,
-                           "png" = paste0("snps_",format(Sys.time(), "%d_%X"),'.png'),
-                           "pdf" = paste0("snps_",format(Sys.time(), "%d_%X"),'.pdf'),
-                           "jpeg" = paste0("snps_",format(Sys.time(), "%d_%X"),'.jpeg'),
+                           "PNG" = paste0("snps_",format(Sys.time(), "%d_%X"),'.png'),
+                           "PDF" = paste0("snps_",format(Sys.time(), "%d_%X"),'.pdf'),
+                           "JPG" = paste0("snps_",format(Sys.time(), "%d_%X"),'.jpeg'),
 
               )
             },
 
             content = function(file) {
 
-              if(input$imgtype == "png") {
+              if(input$imgtype == "PNG") {
                 png(file,  width = 12, height = 8, units = "in", res = 400)
                 print(final_plot())
                 dev.off()
                 contentType = 'image/png'
 
               }
-              else if(input$imgtype == "pdf") {
+              else if(input$imgtype == "PDF") {
                 pdf(file, width = 12, height = 8, onefile = T)
                 print(final_plot())
                 dev.off()
                 contentType = 'image/pdf'
 
               }
-              else if(input$imgtype == "jpeg") {
+              else if(input$imgtype == "JPG") {
                 jpeg(file,  width = 12, height = 8, units = "in", res = 400)
                 print(final_plot())
                 dev.off()

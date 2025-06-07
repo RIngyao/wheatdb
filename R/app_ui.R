@@ -170,6 +170,11 @@ app_ui <- function(request) {
                   snp_table_ui("table")
           ),#end markers
 
+          # genetic resources
+          tabItem(tabName = "Genetics",
+                  genetic_resources_ui("resource")
+                  ),
+
           tabItem(tabName = "BLAST",
                   blast_ui("blast")
           ), #end blast
@@ -183,7 +188,7 @@ app_ui <- function(request) {
                     height = "900px",
                     width = "100%",
                   )
-          ) #end genetic_resources
+          ) #end jbwheat
 
         ) #end tabItems
       ),#end dashboardbody
