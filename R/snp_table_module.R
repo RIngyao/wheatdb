@@ -559,7 +559,6 @@ snp_table_server <- function(id) {
       final_plot <- eventReactive(input$click, {
         req(is.data.frame(df_plot()))
        #  browser()
-         print(df_plot())
           if(nrow(df_plot()) > 1){
            # browser()
           #  print(df_plot())
