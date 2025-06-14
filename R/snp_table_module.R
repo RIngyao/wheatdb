@@ -143,6 +143,8 @@ snp_table_server <- function(id) {
     # connect duckdb
     con <- dbConnect(duckdb::duckdb(), dbdir = "data-raw/final.duckdb")
 
+
+
      # get the input  info  for coordinate and  return TRUE for numeric,  else FALSE for  non-numeric
     start_coordTF <- reactive({
       req(input$start_coord)
@@ -183,7 +185,21 @@ snp_table_server <- function(id) {
     #table_download <- reactiveValues(download=NULL) # for displaying table download option
     null_plot <- reactiveValues(imgplot=NULL) #true for NULL and false for displaying the plot
 
-    # checking validity of the coordinates--------------------------
+    col <- dbGetQuery(con, "desc snp_table") #%>% select(CHROM, POS,REF,ALT, GENE, TYPE,IMPACT, everthying())
+    lgt <- length(col$column_name)
+    updated_list <- as.character(col$column_name[-c(1:4,lgt,lgt-1,lgt-2)])
+
+    # update the cultivar list
+    observe({
+       #browser()
+
+      updateSelectInput(inputId = "sample_name", label = "Cultivar name",
+                        choices = c("All", updated_list))
+
+    })
+
+
+     # checking validity of the coordinates--------------------------
     observe({
           # browser()
 
@@ -315,7 +331,6 @@ snp_table_server <- function(id) {
 
         # get the file extension
         ext <- reactive(tools::file_ext(input$upload$name))
-        print(str(ext()))
 
         if(!isTRUE(ext() %in% c("csv", "tsv"))) {
         gene_error(paste0("Please upload a valid file type"))
@@ -382,19 +397,27 @@ snp_table_server <- function(id) {
         }
     })
 
+
+
+
    # processing the final table--------------------------
 
      final_table <- eventReactive(input$click,{
       req(sample_name())
-       # browser()
-       col <- dbGetQuery(con, "desc snp_table")
-       if(sample_name() == "All") {
-         lgt <- length(col$column_name)
-          col_list <- as.character(col$column_name[-c(1:4,lgt,lgt-1,lgt-2)])
+
+         if(sample_name() == "All") {
+
+           df_sample <- reactive(as.character(col$column_name)) #[-c(lgt,lgt-1,lgt-2)]))
+           # <- reactive(col)
+       }
+       else{
+         df_sample <- reactive(c("CHROM", "POS", "REF", "ALT", "GENE", "TYPE", "IMPACT", sample_name()))
+         # df_sample <- reactive(col[,col_list])
        }
 
-
+     #  print(col_list)
       # check for error and extract the data
+    #  if(sample_name() %in% updated_list)
 
        if(query() == "geneID") {
 
@@ -403,9 +426,12 @@ snp_table_server <- function(id) {
          gene <- unlist(strsplit(gene_sample(), "[, ]+")) %>% unique() #splitting the gene on the basis of comma or space
 
          #extract data from duckdb------------------------------------------
-         df_table <- dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene) ) %>% as.data.frame()
-
-       }
+         df_table <- dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene) ) %>% as.data.frame() %>%
+           # select only the cultivars choosen by the user
+           select(df_sample()) %>%
+           # display proper table
+           select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
+    }
        else{
 
          # query with coordinates
@@ -414,21 +440,36 @@ snp_table_server <- function(id) {
            if(query() == "coordinates") {
 
              req(start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord()))
+             df_table <- dbGetQuery(con, "SELECT *  FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord())) %>%
+               # select only the cultivars choosen by the user
+               select(df_sample()) %>%
+               # display proper table
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
 
              }
            else if(query() == "type") {
              req(type_sample(), start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample()))
+             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample())) %>%
+               # select only the cultivars choosen by the user
+               select(df_sample()) %>%
+               # display proper table
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
+
 
            }
            else if(query() == "impact") {
              req(chr_sample(), impact_sample(), start_coord$coord(), end_coord$coord(), track_error_df$status)
-             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample()))
+             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample())) %>%
+               # select only the cultivars choosen by the user
+               select(df_sample()) %>%
+               # display proper table
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
+
 
           }
 
-         }else {
+        # }
+         else {
            # Default will be null for table
            df_table <- as.data.frame(NULL)
          } # end of inner if clause
@@ -436,8 +477,8 @@ snp_table_server <- function(id) {
        }# end of if clause
 
        return(df_table)
-      })
-
+      }
+})
 
 
 
@@ -554,9 +595,14 @@ snp_table_server <- function(id) {
       })
 
      # display the gene along with the link to jbrowse  --------------------------------------------
-     observe({
-       req(input$plot_click, df_plot())
+     observeEvent(input$plot_click, {
+       req(nrow(df_plot()) > 1, !is.null(final_plot()), input$query_menu != "None",
+           # isTRUE(gene_error),
+           isTRUE(track_error_df$status))
 
+       # browser()
+
+       # if(query_menu() != "none")
        # Access plot data
        df <- df_plot()
        # process the data as used in the graph

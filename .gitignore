@@ -3,5 +3,5 @@ data-raw/blast_db
 data-raw/query.fa
 data-raw/blast.log
 data-raw/final.duckdb
-inst/app/www/images/*
+inst/app/www/images
 .Rproj.user

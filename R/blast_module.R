@@ -235,7 +235,9 @@ blast_ui <- function(id) {
                                                    "sstart", "send", "evalue", "bitscore"))
 
           # Update status to done
-          output$blast_msg <- renderText("BLAST completed successfully!")
+       #   output$b
+
+          last_msg <- renderText("BLAST completed successfully!")
 
           # Render the results table
           output$blast_table <- renderDT({

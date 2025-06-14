@@ -61,10 +61,12 @@ genetic_resources_server <- function(id){
       req(choice() == "Compare", select1())
 
       second_var <- reactive(cultivar_list[!cultivar_list %in% select1()])
+      # don't change the alread selected value in variet2 if it is not equal to the selection in var1
+      old <- ifelse(select1() != input$variety2, input$variety2,second_var()[1])
       # print(second_var())
       updateSelectInput(session,"variety2",
                         choices = second_var(),
-                        selected = second_var()[1]
+                        selected = old #second_var()[1]
       )
     })
 
@@ -108,7 +110,7 @@ genetic_resources_server <- function(id){
                   src = paste0("www/images/seeds_", select_id1(),".jpg"), height="200px"
                 ),
                 tags$img(
-                  src = paste0("www/images/spikes_", select_id2(),".JPG"), height = "200px"
+                  src = paste0("www/images/spikes_", select_id1(),".JPG"), height = "200px"
                 )
               ),
 
