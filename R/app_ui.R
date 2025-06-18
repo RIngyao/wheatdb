@@ -184,7 +184,7 @@ app_ui <- function(request) {
                     # below link is configured for  reverse proxy
                     # it will say page not found in shiny-server
                     # to work in shiny-server prefix with: https://223.31.159.7/
-                    src = "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants",
+                    src = "/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants",
                     height = "900px",
                     width = "100%",
                   )

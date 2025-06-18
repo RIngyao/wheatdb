@@ -144,7 +144,6 @@ snp_table_server <- function(id) {
     con <- dbConnect(duckdb::duckdb(), dbdir = "data-raw/final.duckdb")
 
 
-
      # get the input  info  for coordinate and  return TRUE for numeric,  else FALSE for  non-numeric
     start_coordTF <- reactive({
       req(input$start_coord)
@@ -185,64 +184,116 @@ snp_table_server <- function(id) {
     #table_download <- reactiveValues(download=NULL) # for displaying table download option
     null_plot <- reactiveValues(imgplot=NULL) #true for NULL and false for displaying the plot
 
-    col <- dbGetQuery(con, "desc snp_table") #%>% select(CHROM, POS,REF,ALT, GENE, TYPE,IMPACT, everthying())
+    col <- dbGetQuery(con, "desc snp_table") #get columns #%>% select(CHROM, POS,REF,ALT, GENE, TYPE,IMPACT, everthying())
     lgt <- length(col$column_name)
     updated_list <- as.character(col$column_name[-c(1:4,lgt,lgt-1,lgt-2)])
 
     # update the cultivar list
     observe({
-       #browser()
-
       updateSelectInput(inputId = "sample_name", label = "Cultivar name",
                         choices = c("All", updated_list))
-
     })
 
 
-     # checking validity of the coordinates--------------------------
+    # extracting geneId for uploaded data and manually entered data-------------------------
+    gene_list <- eventReactive(input$click,{
+      # browser()
+      req(gene_choice())
+      if(gene_choice() == "Upload"){
+
+        path <- reactive(input$upload$datapath)
+        # read the genes: must be one gene per line
+        gene <- reactive(readr::read_lines(path(), skip_empty_rows = TRUE))
+
+      }else if(gene_choice() == "Enter"){
+        # manually entered gene ID
+        # split based on comma or space
+        gene <- reactive(unlist(strsplit(gene_sample(), "[, ]+")))
+      }
+
+      return(unique(gene()))
+    })
+
+
+    #checking for validity of geneId-------------
     observe({
-          # browser()
+      req(gene_list())
 
-        if (!isTruthy(start_coordTF()) || !isTruthy(end_coordTF())){
-           # checking for numeric
-           track_error_df$status <- reactive(FALSE)
-           error_msg$msg <- "Provide numeric value for coordinates"
-           output$table_output <- renderDT((NULL))
-           output$plot <- renderPlot(NULL)
-         }
-         else {
-           # browser()
-           # only numeric values were provided
-           start_coord$coord <- reactive(as.numeric(input$start_coord))
-           end_coord$coord <- reactive(as.numeric(input$end_coord))
+      # check for presence of Traes
+      ge_checks <- reactive(unlist(lapply(gene_list(), check_gene, "name")))
+      # check for size of gene ID
+      ge_size <- reactive(unlist(lapply(gene_list(), check_gene, "size")))
+      ge_end <- reactive(unlist(lapply(gene_list(), check_gene, "end")))
 
-           if (!isTruthy(start_coord$coord() < end_coord$coord())) {
-             track_error_df$status <- reactive(FALSE)
-             error_msg$msg <- "End coordinate should be greater than start coordinate"
-             output$table_output <- renderDT((NULL))
-             output$plot <- renderPlot((NULL))
-           }  else {
-             output$alert <-
+      # if any error in the gene list: generate error message
+      if(!all(ge_checks())){
+        idx <- which(ge_checks() == FALSE)
+        errorId <- reactive(gene_list()[idx])
+        gene_error(paste0("Invalid gene ID: ", errorId(),". \nRetry again.")) #. Eg. TraesCS1A03G0011000")
+        output$table_output <- renderDT((NULL))
+        output$plot <- renderPlot(NULL)
 
-               (NULL)
-             track_error_df$status <- TRUE
+      }else if(!all(ge_size())){
 
-             }
-          if (is.null(start_coord$coord()) & is.null(end_coord$coord())) {
-            null_table$show <- TRUE
-            null_plot$imgplot <- TRUE
-            output$table_output <- renderDT((NULL))
-            output$plot <- renderPlot((NULL))
+        idx <- which(ge_size() == FALSE)
+        errorId <- reactive(gene_list()[idx])
+        gene_error(paste0("Invalid gene ID: ", errorId(),". \nIt must have 19 characters.")) #. Eg. TraesCS1A03G0011000")
+        output$table_output <- renderDT((NULL))
+        output$plot <- renderPlot(NULL)
 
-          } else {
-           null_table$show <- FALSE
-           null_plot$imgplot <- FALSE
-         }
-         }
+      } else if(!all(ge_end())){
+        idx <- which(ge_end() == FALSE)
+        errorId <- reactive(gene_list()[idx])
+        gene_error(paste0("Invalid gene ID: ", errorId()))
+        output$table_output <- renderDT((NULL))
+        output$plot <- renderPlot(NULL)
+      }
+      else {
+        gene_error(TRUE)
+      }
+    })
 
-      })
+    # checking validity of the coordinates--------------------------
+    observe({
+      # browser()
+      if (!isTruthy(start_coordTF()) || !isTruthy(end_coordTF())){
+        # checking for numeric
+        track_error_df$status <- reactive(FALSE)
+        error_msg$msg <- "Provide numeric value for coordinates"
+        output$table_output <- renderDT((NULL))
+        output$plot <- renderPlot(NULL)
+      }
+      else {
+        # browser()
+        # only numeric values were provided
+        start_coord$coord <- reactive(as.numeric(input$start_coord))
+        end_coord$coord <- reactive(as.numeric(input$end_coord))
 
+        if (!isTruthy(start_coord$coord() < end_coord$coord())) {
+          track_error_df$status <- reactive(FALSE)
+          error_msg$msg <- "End coordinate should be greater than start coordinate"
+          output$table_output <- renderDT((NULL))
+          output$plot <- renderPlot((NULL))
+        }  else {
+          output$alert <-
 
+            (NULL)
+          track_error_df$status <- TRUE
+
+        }
+        if (is.null(start_coord$coord()) & is.null(end_coord$coord())) {
+          null_table$show <- TRUE
+          null_plot$imgplot <- TRUE
+          output$table_output <- renderDT((NULL))
+          output$plot <- renderPlot((NULL))
+
+        } else {
+          null_table$show <- FALSE
+          null_plot$imgplot <- FALSE
+        }
+      }
+
+    })
 
 
     # feedback ----------------------------------------------------------------
@@ -254,14 +305,16 @@ snp_table_server <- function(id) {
       if(!isTRUE(track_error_df$status)){
         showFeedbackWarning(inputId="start_coord", text = error_msg$msg, color = "#ff0000",
                             icon = shiny::icon("warning-sign", lib = "glyphicon"))
-         output$uiDownload <- renderUI(NULL)
-         output$uiDownloadBar <- renderUI(NULL)
+
          track_error_df$status <- FALSE
         # error_msg$msg <- TRUE
       } else{
+        # track_error_df$status <- NULL
         hideFeedback(inputId = "start_coord")
-
       }
+      # refresh existing
+      output$uiDownload <- renderUI(NULL)
+      output$uiDownloadBar <- renderUI(NULL)
       output$table_output <- renderDT((NULL))
       output$UiDownload <- renderUI((NULL))
       output$uiDownloadBar <- renderUI((NULL))
@@ -272,44 +325,23 @@ snp_table_server <- function(id) {
       null_plot$imgplot <- TRUE
     })
 
-
+    # feedback for gene id error
     observe({
 
       req(gene_error())
-       #browser()
-      gene <- reactive(unlist(strsplit(gene_sample(), "[, ]+")))  #splitting the gene on the basis of comma or space
+      # gene <- reactive(unlist(strsplit(gene_sample(), "[, ]+")))  #splitting the gene on the basis of comma or space
      # print(gene)
 
       if(!isTRUE(gene_error())){
-        showFeedbackWarning(inputId = "enter_gene", text = gene_error(), color = "#ff0000",
+        showFeedbackWarning(inputId = ifelse(gene_choice() == "Enter", "enter_gene", "upload"), text = gene_error(), color = "#ff0000",
                             icon = shiny::icon("warning-sign", lib = "glyphicon"))
-
-        output$uiDownload <- renderUI(NULL)
-        output$uiDownloadBar <- renderUI(NULL)
       } else{
-        hideFeedback(inputId = "enter_gene")
+        hideFeedback(inputId = ifelse(gene_choice() == "Enter", "enter_gene", "upload"))
       }
-      output$table_output <- renderDT((NULL))
-      output$UiDownload <- renderUI((NULL))
-      output$UiDownloadBar <- renderUI((NULL))
-      output$uiFiletype <- renderUI((NULL))
-      output$uiImageType <- renderUI((NULL))
-      null_table$show <- TRUE
-      output$plot <- renderPlot(NULL)
-      null_plot$imgplot <- TRUE
-    #}
-    })
 
-    observe({
-      req(gene_error())
-      if(!isTRUE(gene_error())){
-        showFeedback(inputId = "upload", text = gene_error())
-
-        output$uiDownload <- renderUI(NULL)
-        output$uiDownloadBar <- renderUI(NULL)
-      } else{
-        hideFeedback(inputId = "upload")
-      }
+      # refresh
+      output$uiDownload <- renderUI(NULL)
+      output$uiDownloadBar <- renderUI(NULL)
       output$table_output <- renderDT((NULL))
       output$UiDownload <- renderUI((NULL))
       output$UiDownloadBar <- renderUI((NULL))
@@ -320,90 +352,10 @@ snp_table_server <- function(id) {
       null_plot$imgplot <- TRUE
     })
 
+    # processing the final table--------------------------
 
-
-    # processing geneId for uploaded data and manually entered data-------------------------
-    gene_list <- eventReactive(input$click,{
-     # browser()
-      req(gene_choice())
-      if(gene_choice() == "Upload"){
-        path <- reactive(input$upload$datapath)
-
-        # get the file extension
-        ext <- reactive(tools::file_ext(input$upload$name))
-
-        if(!isTRUE(ext() %in% c("csv", "tsv"))) {
-        gene_error(paste0("Please upload a valid file type"))
-        }
-         else {
-        gene_error(TRUE)
-        }
-
-        # load the data
-        gene <- reactive(
-          switch(ext(),
-                 "csv" = read_csv(path()),
-                 "tsv" = read_tsv(path())
-          )
-        )
-
-       }
-
-      req(gene_choice(), gene_sample())
-        if(gene_choice() == "Enter"){
-        # manually entered gene ID
-
-        # split based on comma or space
-        gene <- reactive(unlist(strsplit(gene_sample(), "[, ]+")))
-
-      }
-
-      return(gene())
-    })
-
-
-    #checking for validity of geneId-------------
-    observe({
-      req(gene_list())
-     # browser()
-      # check for presence of TraesCS
-
-    # if(length(gene_error()) ==1 && isTRUE(gene_error())){
-        ge_checks <- reactive(unlist(lapply(gene_list(), check_gene, "name")))
-        ge_size <- reactive(unlist(lapply(gene_list(), check_gene, "size")))
-
-
-      if(!all(ge_checks())){
-        idx <- which(ge_checks() == FALSE)
-         #print(idx)
-        errorId <- reactive(gene_list()[idx])
-        # print(errorId())
-        gene_error(paste0("Invalid gene ID: ", errorId(),". \nRetry again.")) #. Eg. TraesCS1A03G0011000")
-       # print(gene_error())
-        output$table_output <- renderDT((NULL))
-        output$plot <- renderPlot(NULL)
-
-      }else if(!all(ge_size())){
-
-          idx <- which(ge_size() == FALSE)
-          errorId <- reactive(gene_list()[idx])
-          gene_error(paste0("Invalid gene ID: ", errorId(),". \nIt must have 19 characters.")) #. Eg. TraesCS1A03G0011000")
-          output$table_output <- renderDT((NULL))
-          output$plot <- renderPlot(NULL)
-
-      }
-        else {
-          gene_error(TRUE)
-        }
-    })
-
-
-
-
-   # processing the final table--------------------------
-
-     final_table <- eventReactive(input$click,{
-      req(sample_name())
+    final_table <- eventReactive(input$click,{
+      req(sample_name(), gene_error())
 
          if(sample_name() == "All") {
 
@@ -422,11 +374,11 @@ snp_table_server <- function(id) {
        if(query() == "geneID") {
 
          # query with only gene ID
-         req(gene_sample())
-         gene <- unlist(strsplit(gene_sample(), "[, ]+")) %>% unique() #splitting the gene on the basis of comma or space
+         req(gene_list(), gene_choice())
+         # gene <- unlist(strsplit(gene_list(), "[, ]+")) %>% unique() #splitting the gene on the basis of comma or space
 
          #extract data from duckdb------------------------------------------
-         df_table <- dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene) ) %>% as.data.frame() %>%
+         df_table <- dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene_list()) ) %>% as.data.frame() %>%
            # select only the cultivars choosen by the user
            select(df_sample()) %>%
            # display proper table
@@ -624,7 +576,7 @@ snp_table_server <- function(id) {
        # Filter df for clicked TYPE
        clicked_genes_df <- df %>%
          filter(TYPE == clicked_type) %>%
-         select(GENE, CHROM, START = POS, END =POS) %>%
+         select(GENE, CHROM, START = POS, END = POS) %>%
          distinct()
 
        # Get y value of click and max count for that type (to check if click is inside bar)
@@ -639,6 +591,8 @@ snp_table_server <- function(id) {
 
        # Generate UI with one JBrowse link per gene
        output$info_click <- renderUI({
+
+         req(df_plot(), gene_data())
          if (nrow(clicked_genes_df) == 0) return(NULL)
 
          tagList(

@@ -2,7 +2,7 @@
 #'
 #' @description A utils function
 #' @param gene string: gene ID
-#' @param check string: what to check - size or name
+#' @param check string: what to check - size or  name or end
 #' @return The return value, if any, from executing the utility.
 #'
 #' @noRd
@@ -16,11 +16,12 @@ check_gene <- function(gene, check){
     gene <- strsplit(gene, "[, ]+")
 
     out <- (nchar(gene) == 19)
+  }else if(check == "end"){
+    # must end with numeric
+    out <- stringr::str_detect(gene,"[0-9]$")
   }
   # }
 
   return(out)
 }
 
-
-?is_empty
