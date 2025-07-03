@@ -49,7 +49,8 @@ snp_table_ui <- function(id) {
           ),
           conditionalPanel(
             condition = sprintf("input['%s'] == 'Upload'", ns("gene_choice")),
-            column(8, fileInput(ns("upload"), "Upload GENE ID"))
+            column(8, fileInput(ns("upload"), "Upload GENE ID")) # helpText("File must contain one gene_id per row. No header required.", style = "color:red;"))
+            #column(8, helpText("File must contain one gene_id per row. No header required."))
           )
         )
       ),
@@ -202,6 +203,7 @@ snp_table_server <- function(id) {
       if(gene_choice() == "Upload"){
 
         path <- reactive(input$upload$datapath)
+        # mention in the ui: one  gene per line# no header
         # read the genes: must be one gene per line
         gene <- reactive(readr::read_lines(path(), skip_empty_rows = TRUE))
 
@@ -215,7 +217,7 @@ snp_table_server <- function(id) {
     })
 
 
-    #checking for validity of geneId-------------
+    #checking for validity of geneId-------------------------------------------
     observe({
       req(gene_list())
 
@@ -224,6 +226,7 @@ snp_table_server <- function(id) {
       # check for size of gene ID
       ge_size <- reactive(unlist(lapply(gene_list(), check_gene, "size")))
       ge_end <- reactive(unlist(lapply(gene_list(), check_gene, "end")))
+      # traesCS0282u82
 
       # if any error in the gene list: generate error message
       if(!all(ge_checks())){
@@ -275,9 +278,7 @@ snp_table_server <- function(id) {
           output$table_output <- renderDT((NULL))
           output$plot <- renderPlot((NULL))
         }  else {
-          output$alert <-
-
-            (NULL)
+          output$alert <- NULL
           track_error_df$status <- TRUE
 
         }
@@ -367,17 +368,17 @@ snp_table_server <- function(id) {
          # df_sample <- reactive(col[,col_list])
        }
 
-     #  print(col_list)
-      # check for error and extract the data
-    #  if(sample_name() %in% updated_list)
+
 
        if(query() == "geneID") {
 
          # query with only gene ID
          req(gene_list(), gene_choice())
-         # gene <- unlist(strsplit(gene_list(), "[, ]+")) %>% unique() #splitting the gene on the basis of comma or space
 
          #extract data from duckdb------------------------------------------
+
+
+        # browser()
          df_table <- dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene_list()) ) %>% as.data.frame() %>%
            # select only the cultivars choosen by the user
            select(df_sample()) %>%
@@ -436,7 +437,7 @@ snp_table_server <- function(id) {
 
     # display table--------------------------------
     observe({
-      req(is.data.frame(final_table()))
+      req(is.data.frame(final_table()), isTRUE(gene_error()))
 
       #if(isTRUE(gene_error()) || isTRUE(track_error_df$status)) {
 
@@ -470,13 +471,16 @@ snp_table_server <- function(id) {
 
      df_plot <- reactive({
        # req(gene_sample(), gene_error())
-       req(gene_error(), input$click)
-       # browser()
+       req(isTRUE(gene_error()),input$click)
+
        if(query() == "geneID") {
          req(gene_sample())
 
          if(isTRUE(gene_error()) && (nrow(final_table()) > 1)) {
+           # browser()
+           #if there is no error and there are tables
           df <- final_table() #dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene))
+          # print(df)
          }
        }
        else {
@@ -510,7 +514,7 @@ snp_table_server <- function(id) {
       # process the graph--------------------------------------------
       final_plot <- eventReactive(input$click, {
         req(is.data.frame(df_plot()))
-       #  browser()
+        # browser()
           if(nrow(df_plot()) > 1){
            # browser()
           #  print(df_plot())
@@ -546,87 +550,234 @@ snp_table_server <- function(id) {
       })
 
      # display the gene along with the link to jbrowse  --------------------------------------------
-     observeEvent(input$plot_click, {
-       req(nrow(df_plot()) > 1, !is.null(final_plot()), input$query_menu != "None",
-           # isTRUE(gene_error),
-           isTRUE(track_error_df$status))
+     observe({
+       req(input$plot_click, nrow(df_plot()) > 1, !is.null(final_plot()), input$query_menu != "None")
 
-       # browser()
+       if(isTRUE(gene_error())) {
+         # browser()
+         # if(query_menu() != "none")
+         # Access plot data
+         df <- df_plot()
+         # process the data as used in the graph
+         plot_info <- df %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
+         plot_info$TYPE <- as.character(plot_info$TYPE)
 
-       # if(query_menu() != "none")
-       # Access plot data
-       df <- df_plot()
-       # process the data as used in the graph
-       plot_info <- df %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
-       plot_info$TYPE <- as.character(plot_info$TYPE)
+         # Extract x position from click
+         x_labels <- input$plot_click$domain$discrete_limits$x
+         x_pos <- round(input$plot_click$x)
 
-       # Extract x position from click
-       x_labels <- input$plot_click$domain$discrete_limits$x
-       x_pos <- round(input$plot_click$x)
+         # Check if click is within x axis bounds
+         if (x_pos < 1 || x_pos > length(x_labels)) {
+           output$info_click <- renderUI(NULL)
+           return()
+         }
 
-       # Check if click is within x axis bounds
-       if (x_pos < 1 || x_pos > length(x_labels)) {
-         output$info_click <- renderUI(NULL)
-         return()
+         # Get the clicked TYPE label
+         clicked_type <- x_labels[[x_pos]]
+
+         # Filter df for clicked TYPE
+         clicked_genes_df <- df %>%
+           filter(TYPE == clicked_type) %>%
+           select(GENE, CHROM, START = POS, END = POS) %>%
+           distinct()
+
+         # Get y value of click and max count for that type (to check if click is inside bar)
+         y_val <- input$plot_click$y
+         bar_height <- plot_info[plot_info$TYPE == clicked_type,]$count # mx bar height for the TYPE
+
+         # Check if y click falls within bar (0 to bar_height)
+         if (y_val < 0 || y_val > bar_height) {
+           output$info_click <- renderUI(NULL)
+           return()
+         }
+
+         # Generate UI with one JBrowse link per gene
+         output$info_click <- renderUI({
+
+           req(df_plot(), gene_data())
+           if (nrow(clicked_genes_df) == 0) return(NULL)
+
+           tagList(
+             # h4("Clicked the link to view in JBrowse\n", paste0(clicked_type, ":")),
+             HTML(paste0("<h4>Clicked the link to view in JBrowse<br>", clicked_type, ":</h4>")),
+             lapply(seq_len(nrow(clicked_genes_df)), function(i) {
+               gene <- clicked_genes_df$GENE[i]
+               chr <- clicked_genes_df$CHR[i]
+               start <- clicked_genes_df$START[i]
+               end <- clicked_genes_df$END[i]
+               # start <- ifelse(clicked_genes_df$START[i] - 100 < 1, clicked_genes_df$START[i] - 100, 1) # extend by 100 bp
+               # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
+
+               jbrowse_url <- paste0(
+                 "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants&loc=",
+                 chr, ":", start, "..", end
+               )
+
+               tags$a(
+                 href = jbrowse_url,
+                 target = "_blank",
+                 style = "display: block; margin-bottom: 4px;",
+                 ifelse(clicked_type == "intergenic_region", paste0("Nearby ", gene, " (", chr, ":", start, "-", end, ")"),
+                        paste0(gene, " (", chr, ":", start, "-", end, ")"))
+               )
+             })
+           )
+         })
        }
 
-       # Get the clicked TYPE label
-       clicked_type <- x_labels[[x_pos]]
+       if(isTRUE(track_error_df$status)) {
+         # browser()
+         # if(query_menu() != "none")
+         # Access plot data
+         df <- df_plot()
+         # process the data as used in the graph
+         plot_info <- df %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
+         plot_info$TYPE <- as.character(plot_info$TYPE)
 
-       # Filter df for clicked TYPE
-       clicked_genes_df <- df %>%
-         filter(TYPE == clicked_type) %>%
-         select(GENE, CHROM, START = POS, END = POS) %>%
-         distinct()
+         # Extract x position from click
+         x_labels <- input$plot_click$domain$discrete_limits$x
+         x_pos <- round(input$plot_click$x)
 
-       # Get y value of click and max count for that type (to check if click is inside bar)
-       y_val <- input$plot_click$y
-       bar_height <- plot_info[plot_info$TYPE == clicked_type,]$count # mx bar height for the TYPE
+         # Check if click is within x axis bounds
+         if (x_pos < 1 || x_pos > length(x_labels)) {
+           output$info_click <- renderUI(NULL)
+           return()
+         }
 
-       # Check if y click falls within bar (0 to bar_height)
-       if (y_val < 0 || y_val > bar_height) {
-         output$info_click <- renderUI(NULL)
-         return()
+         # Get the clicked TYPE label
+         clicked_type <- x_labels[[x_pos]]
+
+         # Filter df for clicked TYPE
+         clicked_genes_df <- df %>%
+           filter(TYPE == clicked_type) %>%
+           select(GENE, CHROM, START = POS, END = POS) %>%
+           distinct()
+
+         # Get y value of click and max count for that type (to check if click is inside bar)
+         y_val <- input$plot_click$y
+         bar_height <- plot_info[plot_info$TYPE == clicked_type,]$count # mx bar height for the TYPE
+
+         # Check if y click falls within bar (0 to bar_height)
+         if (y_val < 0 || y_val > bar_height) {
+           output$info_click <- renderUI(NULL)
+           return()
+         }
+
+         # Generate UI with one JBrowse link per gene
+         output$info_click <- renderUI({
+
+           req(df_plot(), gene_data())
+           if (nrow(clicked_genes_df) == 0) return(NULL)
+
+           tagList(
+             # h4("Clicked the link to view in JBrowse\n", paste0(clicked_type, ":")),
+             HTML(paste0("<h4>Clicked the link to view in JBrowse<br>", clicked_type, ":</h4>")),
+             lapply(seq_len(nrow(clicked_genes_df)), function(i) {
+               gene <- clicked_genes_df$GENE[i]
+               chr <- clicked_genes_df$CHR[i]
+               start <- clicked_genes_df$START[i]
+               end <- clicked_genes_df$END[i]
+               # start <- ifelse(clicked_genes_df$START[i] - 100 < 1, clicked_genes_df$START[i] - 100, 1) # extend by 100 bp
+               # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
+
+               jbrowse_url <- paste0(
+                 "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants&loc=",
+                 chr, ":", start, "..", end
+               )
+
+               tags$a(
+                 href = jbrowse_url,
+                 target = "_blank",
+                 style = "display: block; margin-bottom: 4px;",
+                 ifelse(clicked_type == "intergenic_region", paste0("Nearby ", gene, " (", chr, ":", start, "-", end, ")"),
+                        paste0(gene, " (", chr, ":", start, "-", end, ")"))
+               )
+             })
+           )
+         })
        }
-
-       # Generate UI with one JBrowse link per gene
-       output$info_click <- renderUI({
-
-         req(df_plot(), gene_data())
-         if (nrow(clicked_genes_df) == 0) return(NULL)
-
-         tagList(
-           # h4("Clicked the link to view in JBrowse\n", paste0(clicked_type, ":")),
-           HTML(paste0("<h4>Clicked the link to view in JBrowse<br>", clicked_type, ":</h4>")),
-           lapply(seq_len(nrow(clicked_genes_df)), function(i) {
-             gene <- clicked_genes_df$GENE[i]
-             chr <- clicked_genes_df$CHR[i]
-             start <- clicked_genes_df$START[i]
-             end <- clicked_genes_df$END[i]
-             # start <- ifelse(clicked_genes_df$START[i] - 100 < 1, clicked_genes_df$START[i] - 100, 1) # extend by 100 bp
-             # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
-
-             jbrowse_url <- paste0(
-               "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants&loc=",
-               chr, ":", start, "..", end
-             )
-
-             tags$a(
-               href = jbrowse_url,
-               target = "_blank",
-               style = "display: block; margin-bottom: 4px;",
-               ifelse(clicked_type == "intergenic_region", paste0("Nearby ", gene, " (", chr, ":", start, "-", end, ")"),
-                      paste0(gene, " (", chr, ":", start, "-", end, ")"))
-             )
-           })
-         )
-       })
      })
+
+     # observeEvent(input$plot_click, {
+     #   req(nrow(df_plot()) > 1, !is.null(final_plot()), input$query_menu != "None")
+     #       # isTRUE(gene_error),
+     #       # isTRUE(track_error_df$status))
+     #
+     #   # browser()
+     #   # if(query_menu() != "none")
+     #   # Access plot data
+     #   df <- df_plot()
+     #   # process the data as used in the graph
+     #   plot_info <- df %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
+     #   plot_info$TYPE <- as.character(plot_info$TYPE)
+     #
+     #   # Extract x position from click
+     #   x_labels <- input$plot_click$domain$discrete_limits$x
+     #   x_pos <- round(input$plot_click$x)
+     #
+     #   # Check if click is within x axis bounds
+     #   if (x_pos < 1 || x_pos > length(x_labels)) {
+     #     output$info_click <- renderUI(NULL)
+     #     return()
+     #   }
+     #
+     #   # Get the clicked TYPE label
+     #   clicked_type <- x_labels[[x_pos]]
+     #
+     #   # Filter df for clicked TYPE
+     #   clicked_genes_df <- df %>%
+     #     filter(TYPE == clicked_type) %>%
+     #     select(GENE, CHROM, START = POS, END = POS) %>%
+     #     distinct()
+     #
+     #   # Get y value of click and max count for that type (to check if click is inside bar)
+     #   y_val <- input$plot_click$y
+     #   bar_height <- plot_info[plot_info$TYPE == clicked_type,]$count # mx bar height for the TYPE
+     #
+     #   # Check if y click falls within bar (0 to bar_height)
+     #   if (y_val < 0 || y_val > bar_height) {
+     #     output$info_click <- renderUI(NULL)
+     #     return()
+     #   }
+     #
+     #   # Generate UI with one JBrowse link per gene
+     #   output$info_click <- renderUI({
+     #
+     #     req(df_plot(), gene_data())
+     #     if (nrow(clicked_genes_df) == 0) return(NULL)
+     #
+     #     tagList(
+     #       # h4("Clicked the link to view in JBrowse\n", paste0(clicked_type, ":")),
+     #       HTML(paste0("<h4>Clicked the link to view in JBrowse<br>", clicked_type, ":</h4>")),
+     #       lapply(seq_len(nrow(clicked_genes_df)), function(i) {
+     #         gene <- clicked_genes_df$GENE[i]
+     #         chr <- clicked_genes_df$CHR[i]
+     #         start <- clicked_genes_df$START[i]
+     #         end <- clicked_genes_df$END[i]
+     #         # start <- ifelse(clicked_genes_df$START[i] - 100 < 1, clicked_genes_df$START[i] - 100, 1) # extend by 100 bp
+     #         # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
+     #
+     #         jbrowse_url <- paste0(
+     #           "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants&loc=",
+     #           chr, ":", start, "..", end
+     #         )
+     #
+     #         tags$a(
+     #           href = jbrowse_url,
+     #           target = "_blank",
+     #           style = "display: block; margin-bottom: 4px;",
+     #           ifelse(clicked_type == "intergenic_region", paste0("Nearby ", gene, " (", chr, ":", start, "-", end, ")"),
+     #                  paste0(gene, " (", chr, ":", start, "-", end, ")"))
+     #         )
+     #       })
+     #     )
+     #   })
+     # })
 
 
     #display the graph----------------------
     observe({
-     req(!is.null(final_plot()))
+     req(!is.null(final_plot()), isTRUE(gene_error()))
     #browser()
         # show download button and type here
         output$UiDownloadBar <- renderUI(
@@ -673,7 +824,7 @@ snp_table_server <- function(id) {
                     write.table(final_table(), file, sep = "\t")
                   }
                   else if(input$filetype == "xlsx" || input$filetype == "xls") {
-                    write.xlsx(final_table(), file)
+                    write.xlsx(final_table(), file,)
                   }
                 }
               )
@@ -761,7 +912,7 @@ snp_table_server <- function(id) {
 # TraesCS1A03G0003200
 
 
-
+#
 ## To be copied in the UI
 # mod_name_of_module1_ui("name_of_module1_1")
 

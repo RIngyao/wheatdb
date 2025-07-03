@@ -76,62 +76,115 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     shinydashboard::dashboardPage(
-      skin = "purple",
+
       dashboardHeader(
         tags$li(class = "dropdown",
                 tags$style(".main-header {max-height: 30px}"),
-                tags$style(".main-header .logo {height: 60px;}")
+                tags$style(".main-header .logo {height: 60px; background-color: #208381 !important;}"), # 373e02
+                tags$style(".main-header .navbar {background-color: #208381 !important;}") #189c8c
                 ),
 
-
-        # title = tags$div(
-        #   style = "display: flex; align-items: center;",
-        #   tags$img(src = "www/new_download.png", height = "40px"),
-        # #   tags$span("Indian Wheat Germplasm Characterization and Trait Discovery - DBT Sponsored Project",
-        # #             style = "margin-left: 10px; font-weight: bold; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;")
-        # )
-        #------------------------------------
-         # title = tags$img(src="www/new_download.png", width = '30%')
-        title = tags$div(
+          title = tags$div(
           style = "display: flex; align-items: center;",
           tags$img(src = "www/new_download.png", height = "60px"),
           tags$span("  WheatDB", style = "margin-left: 10px; font-weight: bold; font-size: 20px;"),
-          # tags$li(
-          #   class = "dropdown",
-          #   tags$div("Indian Wheat Germplasm Characterization and Trait Discovery - DBT Sponsored Project")
-          #   # style = "padding: 15px 20px;  font-size: 16px;")
-          # )
-        )
-        # end of old title-------------------------
-        ), # end of dashboardHeader
-                        # taags$li(class = "text_title",
-                        #          tags$p("Wheat Genome Portal")
-                        #          )),
 
+)
+),
 
-      dashboardSidebar(
-        width = 200,
-        br(),
-        shinydashboard::sidebarMenu(
-          menuItem("Home", tabName="home", icon=icon("home")),
-          menuItem("Variants", tabName="markers", icon = icon("table")),
-          menuItem(HTML("Seed & Spikelet Archive"), tabName="Genetics", icon = icon("list")),
-          # if href is used, don't use tabName and newTab
-          menuItem(text = tags$span(
-            HTML("Genome Tracks"),
-            title = "JBrowse2"
-          ), tabName="jbwheatdb", icon = icon("dna")),
+dashboardSidebar(
+  width = 200,
+  br(),
 
-          # menuItem(text = tags$span(
-          #   HTML("Genome Tracks"),
-          #   title = "It will redirect to new tab"
-          # ), icon = icon("dna"),
-          #          href = "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants"
-          # ),
-          menuItem("BLAST", tabName="BLAST", icon = icon("list"))
-        )
+  tags$head(
+    tags$style(
+      HTML("
 
-      ),
+                   .main-sidebar {
+                      display: flex;
+                      flex-direction: column;
+                      height: 100vh;
+                      /*background-color: white !important;*/
+                      overflow: hidden;
+                    }
+
+                    /* Sidebar menu stays on top */
+                    .main-sidebar .sidebar-menu {
+                      flex-shrink: 0;
+                      z-index: 2;
+                    }
+
+                    /* Image fills the remaining space */
+                    .sidebar-bottom-image {
+                      position: absolute;
+                      top: auto;
+                      bottom: 0;
+                      left: 0;
+                      /*right: 0;*/
+                      top: calc(100% - 150vh + 0px); /* Adjust 200px based on menu height */
+                      height: calc(150vh - 0px);
+                      z-index: -10;
+                      overflow: hidden;
+                    }
+
+                    .sidebar-bottom-image img {
+                      width: 100%;
+                      height: 100%;
+                      object-fit: cover;
+                      mask-image: linear-gradient(to top, rgba(255, 255, 255, 0.75) 0%, transparent 100%);
+                      -webkit-mask-image: linear-gradient(to top, rgba(255, 255, 255, 0.75) 0%, transparent 100%);
+
+                      /*mask-image: linear-gradient(to top, white 0%, transparent 100%);
+                      -webkit-mask-image: linear-gradient(to top, white 0%, transparent 100%);*/
+                    }
+                   ")
+    ) # end of tags style
+  ), # end of tags head
+
+  # background image for side bar
+  tags$div(
+    class = "sidebar-bottom-image",
+    tags$img(src = "www/images/wheat_8.jpg")
+  ),
+
+  shinydashboard::sidebarMenu(
+
+    tags$li(class = "dropdown",
+            tags$style(".main-sidebar {background-color: #d28d04 !important;}"), #E49B0F
+            tags$style("
+                             /* Change label color for sidebar menu */
+                              .main-sidebar .sidebar-menu li a {
+                                color: #1a1a1a !important;
+                                font-weight: 600;
+                              }
+
+                              /* Active (selected) menu item */
+                              .main-sidebar .sidebar-menu li.active a {
+                                color: #ffffff !important;
+                                background-color: #d28d04 !important;
+                              }
+
+                              /* Hover effect */
+                              .main-sidebar .sidebar-menu li a:hover {
+                                color: #ffffff !important;
+                                background-color: #d28d04 !important;
+                              }
+                             ")
+
+    ),
+    menuItem("Home", tabName="home", icon=icon("home")),
+    menuItem("Variants", tabName="markers", icon = icon("table")),
+    menuItem(HTML("Seed & Spikelet Archive"), tabName="Genetics", icon = icon("list")),
+    # if href is used, don't use tabName and newTab
+    menuItem(text = tags$span(
+      HTML("Genome Tracks"),
+      title = "JBrowse2"
+    ), tabName="jbwheatdb", icon = icon("dna")),
+
+    menuItem("BLAST", tabName="BLAST", icon = icon("list"))
+  )
+
+),
 
 
       dashboardBody(
@@ -139,8 +192,6 @@ app_ui <- function(request) {
 
         tags$head(
           tags$link(rel="stylesheet", type="text/css", href="custom.css")
-          # remove the sidebar toggle button
-          # tags$style(HTML(".main-header .sidebar-toggle {display: none;}"))
         ),
 
         tabItems(
@@ -159,7 +210,7 @@ app_ui <- function(request) {
                           tags$img(src = "www/images/slide_2.jpg", style = "width: 1500px; height:400px;")
 
                         )
-                     # )
+
                       ),
                         column(12, frontPage),
 
@@ -181,10 +232,7 @@ app_ui <- function(request) {
 
           tabItem(tabName = "jbwheatdb",
                   tags$iframe(
-                    # below link is configured for  reverse proxy
-                    # it will say page not found in shiny-server
-                    # to work in shiny-server prefix with: https://223.31.159.7/
-                    src = "/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants",
+                    src = "https://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants",
                     height = "900px",
                     width = "100%",
                   )
@@ -212,12 +260,6 @@ app_ui <- function(request) {
           </div>
               ')
       )
-
-
-
-
-
-
 
   ) #end taglist
 
@@ -251,13 +293,3 @@ golem_add_external_resources <- function() {
 }
 
 
-         # Wheat is one of the world\'s three leading cereal crops that include rice and corn, providing about 20% of the calories we consume every day, and is also a leading source of protein.  Wheat is a staple crop and a primary source of food for
-         # for billions, playing a crutial role in global food security. Advancing genetic and genomic resources for wheat is of utmost importance for improving yield, stress tolerance and disease resistance. Wheat is mainly grown in temperate region. It thrives well in diverse climates with rain-fed plains to irrigated regions making it
-         # staple food across Asia, North America , Russia and Europe.
-         # However, the global wheat supply and demand has become critical in recent years due to global environmental changes
-         # and population growth, and an increase in wheat production by more than 60% over the next 40 years
-         # has been deemed indispensable. In addition, in response to the emergence of new threats such as
-         # the outbreak of wheat blast disease, it is urgent to develop wheat varieties that are resistant to
-         # environmental changes for sustainable production. In Japan, it is also necessary to increase domestic
-         # wheat production and develop varieties with high yield, excellent milling quality, as well as varieties
-         # with sufficient resistance to pre-harvest sprouting, Fusarium head blight etc. often caused by Japan\'s wet climate

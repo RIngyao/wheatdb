@@ -103,12 +103,6 @@ blast_ui <- function(id) {
     error_msg <- reactiveVal()
     # Check the validity and get the input sequence provided by the user---------------------
 
-    #         paste_seq <- ">test1
-    # ACGCCTCCTGCTTACTGAGCAACGATTCGAGACGCGCCGATCCAGGGGCAACGACGCCCTCTCGGCAAACGCCGCCACCAAGGGTGGT
-    # >test2
-    # ACGCCTCCTGCTTACTGAGCAACGATTCGAGACGCGCCGATCCAGGGGCAACGACGCCCTCTCGGCAAACGCCGCCACCAAGGGTGGTATG"
-            # paste_seq <- "ACGCCTdCCTGCTTACTGAGCAACGATTCGAGACGCGCCGATCCAGGGGCAACGACGCCCTCTCGGCAAACGCCGCCACCAAGGGTGGTATG"
-
     query_seq <- eventReactive(input$click,{
 
       if(choice() == "Enter"){ # paste sequence
@@ -190,9 +184,11 @@ blast_ui <- function(id) {
 
       req(query_seq())
 
+      #browser()
       # Save query sequence as FASTA file
       query_path <- "data-raw/query.fa"
       write_lines(query_seq(), query_path)
+
 
       # Collect validated parameters
       params <- list(
@@ -207,10 +203,10 @@ blast_ui <- function(id) {
 
       # Show status message that BLAST started
       output$blast_msg <- renderText("BLAST is running...")
-
       future::plan(multisession, workers = 1)
 
       # Run BLAST asynchronously
+      #browser()
       future({
 
         blastcmd <- sprintf(
@@ -223,21 +219,21 @@ blast_ui <- function(id) {
         )
 
         system(blastcmd, wait = TRUE)
-
-
       }) %...>% {
 
-        # Read BLAST output
+         # Read BLAST output # blast successfully completed
         blast_output <- vroom::vroom("data-raw/blast_result",
                                      delim = "\t",
                                      col_names = c("qseqid", "sseqid", "pident", "length",
                                                    "mismatch", "gapopen", "qstart", "qend",
                                                    "sstart", "send", "evalue", "bitscore"))
+       # last_msg <- renderText("BLAST completed successfully!")
+        output$blast_msg <- renderText("BLAST completed successfully!")
 
           # Update status to done
        #   output$b
+        #  browser()
 
-          last_msg <- renderText("BLAST completed successfully!")
 
           # Render the results table
           output$blast_table <- renderDT({
@@ -264,16 +260,17 @@ blast_ui <- function(id) {
             sep = "\n"
           ))
 
+
           # refresh the error msg
           error_msg(NULL)
           error_sign(FALSE)
 
           # refresh the data save in the server: don't call directly
-          later::later(function() {
-            lapply(c("data-raw/query.fa", "data-raw/blast_result"), function(f) file.create(f))
-          }, delay = 5)
+          # later::later(function() {
+          #   lapply(c("data-raw/query.fa", "data-raw/blast_result"), function(f) file.create(f))
+          # }, delay = 5)
 
-      } %...!% {
+      }%...!% {
         # On error, show message and clear previous outputs
         output$blast_msg <- renderText("BLAST failed. Please try again.")
         output$blast_table <- renderDT(NULL)
@@ -298,7 +295,9 @@ blast_ui <- function(id) {
   })
  }
 
- # TTCACGGTTCAGAATTTATATTGCGGGACGTTCGACCTCCAATTACATGTTTTAA
+
+ # >seq1
+ # CTAATAATAATGCAAACTATTTTAATTAGGTGTCAAACTTATTGGGGTAGTAGAATAGATTATAACATTAATTTAGGAGTTGTATTTATATTTTCTAAAACAACAATTAAGAGAATAAAGTAGAAAAGAAAAATAAAGAAAAGAAAGAAATAATAAGACAAAACAGTAAACAAAAAAAAAGATTGAAAGAGCCCCCCCCCCCGGGCCAAACGGCCCAGCTGGCCTCCGCCGCCCGAACGGGCCGGCCCAACCGGCCACCCCCCACTCCCCATAACCCCCCACTCCACCTGTCAAACCCTAGCCCACTCCCCACTTCCTCCTTCACGGTTCAGAATTTATATTGCGGGACGTTCGACCTCCAATTACATGTTTTAA
 
 ## To be copied in the UI
 # mod_name_of_module1_ui("name_of_module1_1")

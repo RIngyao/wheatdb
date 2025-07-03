@@ -19,6 +19,7 @@ run_app <- function(
       ui = app_ui,
       server = app_server,
       onStart = onStart,
+      # onSt
       options = options,
       enableBookmarking = enableBookmarking,
       uiPattern = uiPattern

@@ -20,6 +20,10 @@ check_gene <- function(gene, check){
     # must end with numeric
     out <- stringr::str_detect(gene,"[0-9]$")
   }
+  # else if(check == "num"){
+  #   # must have numeric value after TraeCS1A
+  #
+  # }
   # }
 
   return(out)
