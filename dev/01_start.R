@@ -49,13 +49,12 @@ usethis::use_package("seqinr", type = "depends")
 usethis::use_package("shinyWidgets", type = "depends")
 usethis::use_package("DT", type = "depends")
 usethis::use_package("tidyverse", type = "depends")
-# remove unused package
-# usethis::use_package("bs4Dash", remove = TRUE)
-# usethis::use_package("magick", type = "import")
-attachment::att_amend_desc() # update the DESCRIPTION file with the new packages; it will remove unused packages
-# remove package from description, then remove package from namespace
-# add a documentation
-
+usethis::use_package("shinyBS")
+# usethis::use_package("tippy")
+# update the DESCRIPTION file with the new packages; it will remove unused packages
+attachment::att_amend_desc()
+# update the R/wheatdb-package.R and
+# update the NAMESPACE
 devtools::document()
 
 renv::snapshot() # take a snapshot of the packages

@@ -8,7 +8,7 @@
 app_server <- function(input, output, session) {
   # data---------------------------------
   # Your application server logic
-  snp_table_server("table")
+  # snp_table_server("table")
 
   # blast module
   blast_server("blast") #, blast_df=blast_df)

@@ -1325,44 +1325,6 @@
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
       "Repository": "CRAN"
     },
-    "desc": {
-      "Package": "desc",
-      "Version": "1.4.3",
-      "Source": "Repository",
-      "Title": "Manipulate DESCRIPTION Files",
-      "Authors@R": "c( person(\"Gábor\", \"Csárdi\", , \"csardi.gabor@gmail.com\", role = c(\"aut\", \"cre\")), person(\"Kirill\", \"Müller\", role = \"aut\"), person(\"Jim\", \"Hester\", , \"james.f.hester@gmail.com\", role = \"aut\"), person(\"Maëlle\", \"Salmon\", role = \"ctb\", comment = c(ORCID = \"0000-0002-2815-0399\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")) )",
-      "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
-      "Description": "Tools to read, write, create, and manipulate DESCRIPTION files.  It is intended for packages that create or manipulate other packages.",
-      "License": "MIT + file LICENSE",
-      "URL": "https://desc.r-lib.org/, https://github.com/r-lib/desc",
-      "BugReports": "https://github.com/r-lib/desc/issues",
-      "Depends": [
-        "R (>= 3.4)"
-      ],
-      "Imports": [
-        "cli",
-        "R6",
-        "utils"
-      ],
-      "Suggests": [
-        "callr",
-        "covr",
-        "gh",
-        "spelling",
-        "testthat",
-        "whoami",
-        "withr"
-      ],
-      "Config/Needs/website": "tidyverse/tidytemplate",
-      "Config/testthat/edition": "3",
-      "Encoding": "UTF-8",
-      "Language": "en-US",
-      "RoxygenNote": "7.2.3",
-      "Collate": "'assertions.R' 'authors-at-r.R' 'built.R' 'classes.R' 'collate.R' 'constants.R' 'deps.R' 'desc-package.R' 'description.R' 'encoding.R' 'find-package-root.R' 'latex.R' 'non-oo-api.R' 'package-archives.R' 'read.R' 'remotes.R' 'str.R' 'syntax_checks.R' 'urls.R' 'utils.R' 'validate.R' 'version.R'",
-      "NeedsCompilation": "no",
-      "Author": "Gábor Csárdi [aut, cre], Kirill Müller [aut], Jim Hester [aut], Maëlle Salmon [ctb] (<https://orcid.org/0000-0002-2815-0399>), Posit Software, PBC [cph, fnd]",
-      "Repository": "CRAN"
-    },
     "digest": {
       "Package": "digest",
       "Version": "0.6.37",
@@ -1495,6 +1457,51 @@
       "NeedsCompilation": "no",
       "Author": "Hadley Wickham [cre, aut], Maximilian Girlich [aut], Mark Fairbanks [aut], Ryan Dickerson [aut], Posit Software, PBC [cph, fnd]",
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
+      "Repository": "CRAN"
+    },
+    "duckdb": {
+      "Package": "duckdb",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Title": "DBI Package for the DuckDB Database Management System",
+      "Authors@R": "c( person(\"Hannes\", \"Mühleisen\", , \"hannes@cwi.nl\", role = \"aut\", comment = c(ORCID = \"0000-0001-8552-0029\")), person(\"Mark\", \"Raasveldt\", , \"mark.raasveldt@cwi.nl\", role = \"aut\", comment = c(ORCID = \"0000-0001-5005-6844\")), person(\"Kirill\", \"Müller\", , \"kirill@cynkra.com\", role = \"cre\", comment = c(ORCID = \"0000-0002-1416-3412\")), person(\"Stichting DuckDB Foundation\", role = \"cph\"), person(\"Apache Software Foundation\", role = \"cph\"), person(\"PostgreSQL Global Development Group\", role = \"cph\"), person(\"The Regents of the University of California\", role = \"cph\"), person(\"Cameron Desrochers\", role = \"cph\"), person(\"Victor Zverovich\", role = \"cph\"), person(\"RAD Game Tools\", role = \"cph\"), person(\"Valve Software\", role = \"cph\"), person(\"Rich Geldreich\", role = \"cph\"), person(\"Tenacious Software LLC\", role = \"cph\"), person(\"The RE2 Authors\", role = \"cph\"), person(\"Google Inc.\", role = \"cph\"), person(\"Facebook Inc.\", role = \"cph\"), person(\"Steven G. Johnson\", role = \"cph\"), person(\"Jiahao Chen\", role = \"cph\"), person(\"Tony Kelman\", role = \"cph\"), person(\"Jonas Fonseca\", role = \"cph\"), person(\"Lukas Fittl\", role = \"cph\"), person(\"Salvatore Sanfilippo\", role = \"cph\"), person(\"Art.sy, Inc.\", role = \"cph\"), person(\"Oran Agra\", role = \"cph\"), person(\"Redis Labs, Inc.\", role = \"cph\"), person(\"Melissa O'Neill\", role = \"cph\"), person(\"PCG Project contributors\", role = \"cph\") )",
+      "Description": "The DuckDB project is an embedded analytical data management system with support for the Structured Query Language (SQL). This package includes all of DuckDB and an R Database Interface (DBI) connector.",
+      "License": "MIT + file LICENSE",
+      "URL": "https://r.duckdb.org/, https://github.com/duckdb/duckdb-r",
+      "BugReports": "https://github.com/duckdb/duckdb-r/issues",
+      "Depends": [
+        "DBI",
+        "R (>= 4.1.0)"
+      ],
+      "Imports": [
+        "methods",
+        "utils"
+      ],
+      "Suggests": [
+        "adbcdrivermanager",
+        "arrow (>= 13.0.0)",
+        "bit64",
+        "callr",
+        "clock",
+        "DBItest",
+        "dbplyr",
+        "dplyr",
+        "rlang",
+        "testthat",
+        "tibble",
+        "vctrs",
+        "withr"
+      ],
+      "Config/build/compilation-database": "false",
+      "Config/build/never-clean": "true",
+      "Config/comment/compilation-database": "Generate manually with pkgload:::generate_db() for faster pkgload::load_all()",
+      "Config/gha/extra-packages": "arrow=?ignore-before-r=4.2.0",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.2.9000",
+      "SystemRequirements": "xz (for building from source)",
+      "NeedsCompilation": "yes",
+      "Author": "Hannes Mühleisen [aut] (ORCID: <https://orcid.org/0000-0001-8552-0029>), Mark Raasveldt [aut] (ORCID: <https://orcid.org/0000-0001-5005-6844>), Kirill Müller [cre] (ORCID: <https://orcid.org/0000-0002-1416-3412>), Stichting DuckDB Foundation [cph], Apache Software Foundation [cph], PostgreSQL Global Development Group [cph], The Regents of the University of California [cph], Cameron Desrochers [cph], Victor Zverovich [cph], RAD Game Tools [cph], Valve Software [cph], Rich Geldreich [cph], Tenacious Software LLC [cph], The RE2 Authors [cph], Google Inc. [cph], Facebook Inc. [cph], Steven G. Johnson [cph], Jiahao Chen [cph], Tony Kelman [cph], Jonas Fonseca [cph], Lukas Fittl [cph], Salvatore Sanfilippo [cph], Art.sy, Inc. [cph], Oran Agra [cph], Redis Labs, Inc. [cph], Melissa O'Neill [cph], PCG Project contributors [cph]",
+      "Maintainer": "Kirill Müller <kirill@cynkra.com>",
       "Repository": "CRAN"
     },
     "evaluate": {
@@ -3314,44 +3321,6 @@
       "Maintainer": "Kirill Müller <kirill@cynkra.com>",
       "Repository": "CRAN"
     },
-    "pkgbuild": {
-      "Package": "pkgbuild",
-      "Version": "1.4.5",
-      "Source": "Repository",
-      "Title": "Find Tools Needed to Build R Packages",
-      "Authors@R": "c( person(\"Hadley\", \"Wickham\", role = \"aut\"), person(\"Jim\", \"Hester\", role = \"aut\"), person(\"Gábor\", \"Csárdi\", , \"csardi.gabor@gmail.com\", role = c(\"aut\", \"cre\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")) )",
-      "Description": "Provides functions used to build R packages. Locates compilers needed to build R packages on various platforms and ensures the PATH is configured appropriately so R can use them.",
-      "License": "MIT + file LICENSE",
-      "URL": "https://github.com/r-lib/pkgbuild, https://pkgbuild.r-lib.org",
-      "BugReports": "https://github.com/r-lib/pkgbuild/issues",
-      "Depends": [
-        "R (>= 3.5)"
-      ],
-      "Imports": [
-        "callr (>= 3.2.0)",
-        "cli (>= 3.4.0)",
-        "desc",
-        "processx",
-        "R6"
-      ],
-      "Suggests": [
-        "covr",
-        "cpp11",
-        "knitr",
-        "Rcpp",
-        "rmarkdown",
-        "testthat (>= 3.2.0)",
-        "withr (>= 2.3.0)"
-      ],
-      "Config/Needs/website": "tidyverse/tidytemplate",
-      "Config/testthat/edition": "3",
-      "Encoding": "UTF-8",
-      "RoxygenNote": "7.2.3",
-      "NeedsCompilation": "no",
-      "Author": "Hadley Wickham [aut], Jim Hester [aut], Gábor Csárdi [aut, cre], Posit Software, PBC [cph, fnd]",
-      "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
-      "Repository": "CRAN"
-    },
     "pkgconfig": {
       "Package": "pkgconfig",
       "Version": "2.0.3",
@@ -3374,55 +3343,6 @@
       "BugReports": "https://github.com/r-lib/pkgconfig/issues",
       "Encoding": "UTF-8",
       "NeedsCompilation": "no",
-      "Repository": "CRAN"
-    },
-    "pkgload": {
-      "Package": "pkgload",
-      "Version": "1.4.0",
-      "Source": "Repository",
-      "Title": "Simulate Package Installation and Attach",
-      "Authors@R": "c( person(\"Hadley\", \"Wickham\", role = \"aut\"), person(\"Winston\", \"Chang\", role = \"aut\"), person(\"Jim\", \"Hester\", role = \"aut\"), person(\"Lionel\", \"Henry\", , \"lionel@posit.co\", role = c(\"aut\", \"cre\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")), person(\"R Core team\", role = \"ctb\", comment = \"Some namespace and vignette code extracted from base R\") )",
-      "Description": "Simulates the process of installing a package and then attaching it. This is a key part of the 'devtools' package as it allows you to rapidly iterate while developing a package.",
-      "License": "GPL-3",
-      "URL": "https://github.com/r-lib/pkgload, https://pkgload.r-lib.org",
-      "BugReports": "https://github.com/r-lib/pkgload/issues",
-      "Depends": [
-        "R (>= 3.4.0)"
-      ],
-      "Imports": [
-        "cli (>= 3.3.0)",
-        "desc",
-        "fs",
-        "glue",
-        "lifecycle",
-        "methods",
-        "pkgbuild",
-        "processx",
-        "rlang (>= 1.1.1)",
-        "rprojroot",
-        "utils",
-        "withr (>= 2.4.3)"
-      ],
-      "Suggests": [
-        "bitops",
-        "jsonlite",
-        "mathjaxr",
-        "pak",
-        "Rcpp",
-        "remotes",
-        "rstudioapi",
-        "testthat (>= 3.2.1.1)",
-        "usethis"
-      ],
-      "Config/Needs/website": "tidyverse/tidytemplate, ggplot2",
-      "Config/testthat/edition": "3",
-      "Config/testthat/parallel": "TRUE",
-      "Config/testthat/start-first": "dll",
-      "Encoding": "UTF-8",
-      "RoxygenNote": "7.3.1",
-      "NeedsCompilation": "no",
-      "Author": "Hadley Wickham [aut], Winston Chang [aut], Jim Hester [aut], Lionel Henry [aut, cre], Posit Software, PBC [cph, fnd], R Core team [ctb] (Some namespace and vignette code extracted from base R)",
-      "Maintainer": "Lionel Henry <lionel@posit.co>",
       "Repository": "CRAN"
     },
     "plogr": {
@@ -4447,6 +4367,26 @@
       "NeedsCompilation": "no",
       "Author": "Winston Chang [aut, cre] (<https://orcid.org/0000-0002-1576-2126>), Joe Cheng [aut], JJ Allaire [aut], Carson Sievert [aut] (<https://orcid.org/0000-0002-4958-2844>), Barret Schloerke [aut] (<https://orcid.org/0000-0001-9986-114X>), Yihui Xie [aut], Jeff Allen [aut], Jonathan McPherson [aut], Alan Dipert [aut], Barbara Borges [aut], Posit Software, PBC [cph, fnd], jQuery Foundation [cph] (jQuery library and jQuery UI library), jQuery contributors [ctb, cph] (jQuery library; authors listed in inst/www/shared/jquery-AUTHORS.txt), jQuery UI contributors [ctb, cph] (jQuery UI library; authors listed in inst/www/shared/jqueryui/AUTHORS.txt), Mark Otto [ctb] (Bootstrap library), Jacob Thornton [ctb] (Bootstrap library), Bootstrap contributors [ctb] (Bootstrap library), Twitter, Inc [cph] (Bootstrap library), Prem Nawaz Khan [ctb] (Bootstrap accessibility plugin), Victor Tsaran [ctb] (Bootstrap accessibility plugin), Dennis Lembree [ctb] (Bootstrap accessibility plugin), Srinivasu Chakravarthula [ctb] (Bootstrap accessibility plugin), Cathy O'Connor [ctb] (Bootstrap accessibility plugin), PayPal, Inc [cph] (Bootstrap accessibility plugin), Stefan Petre [ctb, cph] (Bootstrap-datepicker library), Andrew Rowls [ctb, cph] (Bootstrap-datepicker library), Brian Reavis [ctb, cph] (selectize.js library), Salmen Bejaoui [ctb, cph] (selectize-plugin-a11y library), Denis Ineshin [ctb, cph] (ion.rangeSlider library), Sami Samhuri [ctb, cph] (Javascript strftime library), SpryMedia Limited [ctb, cph] (DataTables library), John Fraser [ctb, cph] (showdown.js library), John Gruber [ctb, cph] (showdown.js library), Ivan Sagalaev [ctb, cph] (highlight.js library), R Core Team [ctb, cph] (tar implementation from R)",
       "Maintainer": "Winston Chang <winston@posit.co>",
+      "Repository": "CRAN"
+    },
+    "shinyBS": {
+      "Package": "shinyBS",
+      "Version": "0.61.1",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Twitter Bootstrap Components for Shiny",
+      "Date": "2015-03-30",
+      "Author": "Eric Bailey",
+      "Maintainer": "Eric Bailey <ebailey@idem.in.gov>",
+      "Description": "Adds additional Twitter Bootstrap components to Shiny.",
+      "Imports": [
+        "shiny (>= 0.11)",
+        "htmltools"
+      ],
+      "URL": "https://ebailey78.github.io/shinyBS",
+      "BugReports": "https://github.com/ebailey78/shinyBS/issues",
+      "License": "GPL-3",
+      "NeedsCompilation": "no",
       "Repository": "CRAN"
     },
     "shinyFeedback": {

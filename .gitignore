@@ -1,7 +1,14 @@
+rscript_create_duckdb.R
 data-raw/blast_result
 data-raw/blast_db
 data-raw/query.fa
 data-raw/blast.log
 data-raw/final.duckdb
+data-raw/ilr.txt
+data-raw/ipr.txt
+data-raw/ipor.txt
+data-raw/durum.txt
+data-raw/wild.txt
+data-raw/shpaero.txt
 inst/app/www/images
 .Rproj.user

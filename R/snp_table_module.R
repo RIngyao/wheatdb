@@ -9,7 +9,6 @@
 #' @importFrom shiny NS tagList
 snp_table_ui <- function(id) {
   ns <- NS(id)
-
   type <- c(
     "intergenic_region", "upstream_gene_variant", "intron_variant", "conservative_inframe_deletion",
     "3_prime_UTR_variant", "5_prime_UTR_variant", "downstream_gene_variant", "splice_region_variant&intron_variant",
@@ -35,8 +34,25 @@ snp_table_ui <- function(id) {
       h3("SNP Query Parameters", style = "color:#025b05; text-align:center; margin-bottom: 20px;"),
 
       fluidRow(
-        column(6, selectInput(ns("query_menu"), "Query type", choices = c("None", "geneID", "type", "impact", "coordinates"))),
-        column(6, selectInput(ns("sample_name"), "Cultivar name", choices = "All", selected = "All"))
+        column(3, selectInput(ns("query_menu"), "Query type", choices = c("None", "geneID", "type", "impact", "coordinates"))),
+        column(3, selectInput(ns("variant_menu"), "Variant type", choices = c("All", "SNPs", "InDels"))),
+        column(3,
+               selectInput(ns("group_menu"), "Group", choices = c("All", "ILR", "IPR", "GR", "IPoR", "Durum","Sphaerococcum", "Wild"), selected = "All"),
+               shinyBS::bsTooltip(id = ns("group_menu"),
+                                   title = paste(
+                                     "ILR - Indian Landrace",
+                                     "IPR - Pre-green-revolution",
+                                     "IPoR - Post-green-revolution",
+                                     "GR - Four founder genotypes of green-revolution",
+                                     "Sphaerococcum - Indian dwarf wheat",
+                                     sep = "<br/>"
+                                   ),
+                                   placement = "right", options = list(container = "body"))
+                 # helpText("ILR - Indian Landrace; IPR - Pre-green-revolution; IPoR - Post-green-revolution;
+                 #                  GR - Four founder genotypes of green-revolution"))
+               ),
+
+        column(3, selectInput(ns("sample_name"), "Cultivar name", choices = "All", multiple = TRUE, selected = "All"))
       ),
 
       conditionalPanel(
@@ -140,9 +156,33 @@ snp_table_server <- function(id) {
   moduleServer(id, function(input, output, session){
 
     ns <- session$ns
+    # check options: All must not be together with other options--------------
+    # feedback error msg for the first line of query options
+    opts1_error <- reactiveVal(FALSE) # FALSE mean no error; TRUE indicate there is error
+    # group_menu
+    observeEvent(input$group_menu, {
+      if(length(input$group_menu) > 1 && any(input$group_menu == "All")){
+        showFeedbackDanger(inputId="group_menu", text = "Choose only All or exclude it from other selections",
+                           color = "#ff0000", icon = shiny::icon("warning-sign", lib = "glyphicon"))
+        opts1_error(TRUE)
+      }else{
+        hideFeedback("group_menu")
+        opts1_error(FALSE)
+      }
+    })
 
-    # connect duckdb
-    con <- dbConnect(duckdb::duckdb(), dbdir = "data-raw/final.duckdb")
+    observeEvent(input$sample_name, {
+      if(length(input$sample_name) > 1 && any(input$sample_name == "All")){
+        showFeedbackDanger(inputId="sample_name", text = "Choose only All or exclude it from other selections",
+                           color = "#ff0000") #, icon = shiny::icon("warning-sign", lib = "glyphicon"))
+        opts1_error(TRUE)
+      }else{
+        hideFeedback("sample_name")
+        opts1_error(FALSE)
+      }
+    })
+
+
 
 
      # get the input  info  for coordinate and  return TRUE for numeric,  else FALSE for  non-numeric
@@ -185,14 +225,22 @@ snp_table_server <- function(id) {
     #table_download <- reactiveValues(download=NULL) # for displaying table download option
     null_plot <- reactiveValues(imgplot=NULL) #true for NULL and false for displaying the plot
 
-    col <- dbGetQuery(con, "desc snp_table") #get columns #%>% select(CHROM, POS,REF,ALT, GENE, TYPE,IMPACT, everthying())
-    lgt <- length(col$column_name)
-    updated_list <- as.character(col$column_name[-c(1:4,lgt,lgt-1,lgt-2)])
+
+    # Create a dplyr data from DuckDB connection---------------------
+    dplyr_data <- reactive({
+      req(!opts1_error(), input$variant_menu, input$group_menu)
+      func_extract_duckdb(var = input$variant_menu, group = input$group_menu, db = duckdb::duckdb())
+    })
+
+
+    column_list <- reactive(colnames(dplyr_data())) #get columns #%>% select(CHROM, POS,REF,ALT, GENE, TYPE,IMPACT, everthying()
 
     # update the cultivar list
     observe({
+      lgt <- length(column_list())
+      updated_list <- as.character(column_list()[-c(1:4,lgt,lgt-1,lgt-2)])
       updateSelectInput(inputId = "sample_name", label = "Cultivar name",
-                        choices = c("All", updated_list))
+                        choices = c("All", updated_list), selected = "All")
     })
 
 
@@ -360,7 +408,7 @@ snp_table_server <- function(id) {
 
          if(sample_name() == "All") {
 
-           df_sample <- reactive(as.character(col$column_name)) #[-c(lgt,lgt-1,lgt-2)]))
+           df_sample <- reactive(as.character(column_list()$column_name)) #[-c(lgt,lgt-1,lgt-2)]))
            # <- reactive(col)
        }
        else{
@@ -376,16 +424,13 @@ snp_table_server <- function(id) {
          req(gene_list(), gene_choice())
 
          #extract data from duckdb------------------------------------------
-
-
-        # browser()
-         df_table <- dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene_list()) ) %>% as.data.frame() %>%
+         df_table <- dplyr_data() %>%  #dbGetQuery(duckdb_con(), "select * from snp_table where GENE = ?", params = list(gene_list()) ) %>% as.data.frame() %>%
+           filter(GENE %in% gene_list()) %>%
            # select only the cultivars choosen by the user
            select(df_sample()) %>%
            # display proper table
            select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
-    }
-       else{
+    } else {
 
          # query with coordinates
          if(isTRUE(track_error_df$status) && isTruthy(start_coord$coord()) && isTruthy(end_coord$coord())){
@@ -393,26 +438,37 @@ snp_table_server <- function(id) {
            if(query() == "coordinates") {
 
              req(start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table <- dbGetQuery(con, "SELECT *  FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord())) %>%
+             df_table <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT *  FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord())) %>%
+               filter(CHROM %in% chr_sample() &
+                        (POS >= start_coord$coord() & POS <= end_coord$coord())
+                      ) %>%
                # select only the cultivars choosen by the user
                select(df_sample()) %>%
                # display proper table
                select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
 
-             }
-           else if(query() == "type") {
+             } else if (query() == "type") {
              req(type_sample(), start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample())) %>%
+
+             df_table <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample())) %>%
+               filter(CHROM %in% chr_sample() &
+                        (POS >= start_coord$coord() & POS <= end_coord$coord()) &
+                        TYPE == type_sample()
+                      ) %>%
                # select only the cultivars choosen by the user
                select(df_sample()) %>%
                # display proper table
                select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
 
 
-           }
-           else if(query() == "impact") {
+           } else if (query() == "impact") {
              req(chr_sample(), impact_sample(), start_coord$coord(), end_coord$coord(), track_error_df$status)
-             df_table <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample())) %>%
+
+             df_table <- dplyr_data() %>% # dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample())) %>%
+               filter(CHROM %in% chr_sample() &
+                        (POS >= start_coord$coord() & POS <= end_coord$coord()) &
+                        IMPACT == impact_sample()
+                      ) %>%
                # select only the cultivars choosen by the user
                select(df_sample()) %>%
                # display proper table
@@ -429,7 +485,7 @@ snp_table_server <- function(id) {
 
        }# end of if clause
 
-       return(df_table)
+       return(collect(df_table))
       }
 })
 
@@ -471,15 +527,16 @@ snp_table_server <- function(id) {
 
      df_plot <- reactive({
        # req(gene_sample(), gene_error())
-       req(isTRUE(gene_error()),input$click)
+       # req(isTRUE(gene_error()),input$click)
+       req(gene_error(),input$click)
 
        if(query() == "geneID") {
          req(gene_sample())
 
-         if(isTRUE(gene_error()) && (nrow(final_table()) > 1)) {
+         if(gene_error() && (nrow(final_table()) > 1)) {
            # browser()
            #if there is no error and there are tables
-          df <- final_table() #dbGetQuery(con, "select * from snp_table where GENE = ?", params = list(gene))
+          df <- final_table() #dbGetQuery(duckdb_con(), "select * from snp_table where GENE = ?", params = list(gene))
           # print(df)
          }
        }
@@ -489,17 +546,20 @@ snp_table_server <- function(id) {
            if(nrow(final_table()) > 1) {
              if(query() == "type") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), type_sample())
-               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample()))
+               df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample()))
+                 filter(CHROM == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()) & TYPE == type_sample())
 
              }
              else if(query() == "impact") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), impact_sample())
-               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample()))
+               df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample()))
+                 filter(CHROM == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()) & IMPACT == impact_sample())
 
              }
              else if(query() == "coordinates") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample())
-               df <- dbGetQuery(con, "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord()))
+               df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord()))
+                 filter(CHROM == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()))
 
              }
            }
@@ -507,7 +567,7 @@ snp_table_server <- function(id) {
          }
          else {df <- NULL}
        }
-       return(df)
+       return(collect(df))
 
      })
 

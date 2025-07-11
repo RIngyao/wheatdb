@@ -25,10 +25,10 @@ golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the modu
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
-golem::add_fct("", with_test = TRUE) # for big function
-golem::add_utils("check_gene", with_test = TRUE) # for small function
-golem::add_utils("index_gene", with_test = TRUE) # for small function
-
+golem::add_fct("", with_test = TRUE) # for big function and used in multiple
+golem::add_utils("check_gene", with_test = TRUE) # for small function or used once
+golem::add_utils("index_gene", with_test = TRUE) # for small function or used once
+golem::add_utils("func_extract_duckdb", with_test = TRUE)
 
 ## External resources
 ## Creates .js and .css files at inst/app/www

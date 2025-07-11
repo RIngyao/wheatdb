@@ -1,6 +1,115 @@
 /* General Body display*/
+/* new design----*/
+/* Make the entire page a vertical flex container */
+html, body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+/* ========== Adjust the conent and footer =============== */
+/* Main content wrapper that grows but ensures footer stays at the bottom */
+#app-main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
 
-  .logo {
+/* Footer fixed at bottom only when content is short */
+.footer-wrapper {
+  flex-shrink: 0;
+  background-color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+/* ========== End of Adjust the whole conent and footer =============== */
+/* Don't leave gap on the left and right sides, except if the screen width is too large */
+.container, .container-fluid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: auto !important;   /* Center horizontally */
+  margin-right: auto !important;  /* Center horizontally */
+  max-width: 1500px !important;   /* adjust the max-width of screen */
+  width: 100% !important;
+}
+
+/* navigation bar */
+/*
+.navbar {
+  position: relative;
+  width: 100%;
+  background-color: transparent !important;
+  border: none;
+  box-shadow: 0 2px rgba(0, 0, 0, 0.1);
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 50px;
+}
+*/
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1030;
+  background-color: #ffffff; /* navbar background color */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
+/* this is require for fixed position to displayed the below content */
+#app-main {
+  margin-top: 82px;  /* same as navbar height */
+}
+
+.navbar-nav {
+  justify-content: center;
+  padding-right: 5px:
+  padding-left: 5px;
+}
+
+.navbar-toggle {
+  color: black !important;
+  background-color: black !important;
+}
+
+/* adjust the tab-panel */
+.page-wrapper {
+  width: 100%;
+  max-width: 1500px;  /* or 1140px 960px or whatever looks good */
+  margin: 0 auto;     /* centers the div */
+  padding: 20px;
+  min-height: 80vh;  /* Enough to push footer down for short pages */
+  padding-bottom: 40px;
+}
+
+/* Make the tab labels black */
+.navbar .navbar-nav > li > a {
+  color: #000 !important;
+  font-weight: 900;
+}
+
+/* change color on hover */
+.navbar-nav > li > a:hover {
+  color: #208381 !important;
+}
+
+.slide {
+  padding-top: 0 ;
+  margin-top: 0;
+}
+
+
+/* End of New design---- */
+
+
+.logo {
     width: 100px;
     height: 100px;
     margin-left: 0px;
@@ -8,7 +117,7 @@
 
   }
 body, .content-wrapper {
-  background-color: white;
+  background-color: #ffffff !important;
   background-size: 100;
 }
 /*Display for headers*/
@@ -166,10 +275,10 @@ h2{
 }
 */
 
-.container {
-  max-width: 900px;
+.descriptions {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 15px;
+  padding: 40px;
   font-family: "Georgia", serif;
   color: #333;
   line-height: 1.6;
@@ -191,7 +300,7 @@ h2{
   padding-bottom: 8px;
 }
 
-.link-container {
+.link-descriptions {
   display: flex;
   flex-wrap: wrap;
   gap: 25px;
@@ -227,13 +336,12 @@ h2{
 
 
  .link {
-
-   width: 250px;
-     height: 300px;
- padding: 10px 10px;
+  width: 250px;
+  height: 300px;
+  padding: 10px 10px;
   border: 1px solid black;
   float: right;
-   margin-right: 10px;
+  margin-right: 10px;
   text-align: left;
 }
 
@@ -406,7 +514,6 @@ width: 250px;
 
 .footermsg {
   border-top: 2px solid #d9d9e0;
-  /*background: linear-gradient(to bottom, #222d32 0%, #ffffff 30%);*/
   background-color: #fff;
   text-align: center;
   padding: 10px 10px;
@@ -415,7 +522,13 @@ width: 250px;
   margin: 0 auto;
   font-family: "Times New Roman", Times, serif;
   color: #222;
+
+  /* 👇 Add these lines to remove any shadow */
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
 }
+
 
 .footermsg h3 {
   font-size: 20px;

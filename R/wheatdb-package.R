@@ -21,6 +21,7 @@
 #'@import RMariaDB
 #'@import DBI
 #'@import shinyWidgets
+#'@import shinyBS
 ## usethis names
 
 NULL
