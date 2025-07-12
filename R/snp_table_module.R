@@ -31,7 +31,7 @@ snp_table_ui <- function(id) {
     div(
       class = "query-section",
       style = "margin-top:10px; padding: 20px; background: #f7fafd; border: 1px solid #cce5ff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);",
-      h3("SNP Query Parameters", style = "color:#025b05; text-align:center; margin-bottom: 20px;"),
+      h3("Query Parameters", style = "color:#025b05; text-align:center; margin-bottom: 20px;"),
 
       fluidRow(
         column(3, selectInput(ns("query_menu"), "Query type", choices = c("None", "geneID", "type", "impact", "coordinates"))),
@@ -110,6 +110,7 @@ snp_table_ui <- function(id) {
     br(),
 
     # Table Output and Download UI
+    # old--------------
     fluidRow(
       box(title = "SNP Table", height = "600px", width = 12, solidHeader = TRUE, status = "primary",
           div(style = "display: flex; justify-content: flex-end; gap: 10px; padding: 5px;",
@@ -145,6 +146,7 @@ snp_table_ui <- function(id) {
           )
       )
     )
+    # old----------
   )
 }
 
@@ -161,6 +163,7 @@ snp_table_server <- function(id) {
     opts1_error <- reactiveVal(FALSE) # FALSE mean no error; TRUE indicate there is error
     # group_menu
     observeEvent(input$group_menu, {
+
       if(length(input$group_menu) > 1 && any(input$group_menu == "All")){
         showFeedbackDanger(inputId="group_menu", text = "Choose only All or exclude it from other selections",
                            color = "#ff0000", icon = shiny::icon("warning-sign", lib = "glyphicon"))
@@ -405,10 +408,10 @@ snp_table_server <- function(id) {
 
     final_table <- eventReactive(input$click,{
       req(sample_name(), gene_error())
+      # browser()
+         if(all(sample_name() == "All")) {
 
-         if(sample_name() == "All") {
-
-           df_sample <- reactive(as.character(column_list()$column_name)) #[-c(lgt,lgt-1,lgt-2)]))
+           df_sample <- reactive(as.character(column_list())) #[-c(lgt,lgt-1,lgt-2)]))
            # <- reactive(col)
        }
        else{
@@ -424,12 +427,13 @@ snp_table_server <- function(id) {
          req(gene_list(), gene_choice())
 
          #extract data from duckdb------------------------------------------
-         df_table <- dplyr_data() %>%  #dbGetQuery(duckdb_con(), "select * from snp_table where GENE = ?", params = list(gene_list()) ) %>% as.data.frame() %>%
-           filter(GENE %in% gene_list()) %>%
-           # select only the cultivars choosen by the user
-           select(df_sample()) %>%
-           # display proper table
-           select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
+         df_table <- dplyr_data() %>%
+           filter(GENE %in% local(gene_list())) %>%
+           # select relevant cultivars + required columns
+           select(CHROM, POS, REF, ALT, GENE, TYPE, IMPACT, all_of(df_sample()))
+
+         #dbGetQuery(duckdb_con(), "select * from snp_table where GENE = ?", params = list(gene_list()) ) %>% as.data.frame() %>%
+
     } else {
 
          # query with coordinates
@@ -439,56 +443,49 @@ snp_table_server <- function(id) {
 
              req(start_coord$coord(), end_coord$coord(), chr_sample())
              df_table <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT *  FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord())) %>%
-               filter(CHROM %in% chr_sample() &
-                        (POS >= start_coord$coord() & POS <= end_coord$coord())
+               filter(CHROM %in% local(chr_sample()) &
+                        (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord()))
                       ) %>%
                # select only the cultivars choosen by the user
-               select(df_sample()) %>%
-               # display proper table
-               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, all_of(df_sample()))
 
              } else if (query() == "type") {
              req(type_sample(), start_coord$coord(), end_coord$coord(), chr_sample())
 
              df_table <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample())) %>%
-               filter(CHROM %in% chr_sample() &
-                        (POS >= start_coord$coord() & POS <= end_coord$coord()) &
-                        TYPE == type_sample()
+               filter(CHROM %in% local(chr_sample()) &
+                        (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord())) &
+                        TYPE == local(type_sample())
                       ) %>%
                # select only the cultivars choosen by the user
-               select(df_sample()) %>%
-               # display proper table
-               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, all_of(df_sample()))
 
 
            } else if (query() == "impact") {
              req(chr_sample(), impact_sample(), start_coord$coord(), end_coord$coord(), track_error_df$status)
 
              df_table <- dplyr_data() %>% # dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample())) %>%
-               filter(CHROM %in% chr_sample() &
-                        (POS >= start_coord$coord() & POS <= end_coord$coord()) &
-                        IMPACT == impact_sample()
+               filter(CHROM %in% local(chr_sample()) &
+                        (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord())) &
+                        IMPACT == local(impact_sample())
                       ) %>%
-               # select only the cultivars choosen by the user
-               select(df_sample()) %>%
-               # display proper table
-               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, everything())
-
+               # select only the cultivars choosen by the user and display proper table
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, all_of(df_sample()))
 
           }
 
         # }
          else {
            # Default will be null for table
-           df_table <- as.data.frame(NULL)
+           df_table <- tibble::as_tibble(NULL)
          } # end of inner if clause
 
        }# end of if clause
 
-       return(collect(df_table))
+      # return and convert lazy evaluation to data.frame
+       return(df_table %>% as.data.frame())
       }
-})
-
+   })
 
 
     # display table--------------------------------
@@ -547,19 +544,27 @@ snp_table_server <- function(id) {
              if(query() == "type") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), type_sample())
                df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample()))
-                 filter(CHROM == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()) & TYPE == type_sample())
+                 filter(CHROM == local(chr_sample()) &
+                          (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord())) &
+                          TYPE == local(type_sample())
+                        )
 
              }
              else if(query() == "impact") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), impact_sample())
                df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample()))
-                 filter(CHROM == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()) & IMPACT == impact_sample())
+                 filter(CHROM == local(chr_sample()) &
+                          (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord())) &
+                          IMPACT == local(impact_sample())
+                        )
 
              }
              else if(query() == "coordinates") {
                req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample())
                df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord()))
-                 filter(CHROM == chr_sample() & (POS >= start_coord$coord() & POS <= end_coord$coord()))
+                 filter(CHROM == local(chr_sample()) &
+                          (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord()))
+                        )
 
              }
            }
@@ -567,7 +572,7 @@ snp_table_server <- function(id) {
          }
          else {df <- NULL}
        }
-       return(collect(df))
+       return(df %>% as.data.frame())
 
      })
 
@@ -593,12 +598,9 @@ snp_table_server <- function(id) {
                 plot.margin = margin(t=10, r=10, b=10, l=10, unit = "mm")
               ) +
               geom_text(aes(label = count), vjust = -0.6, size = 4, color = "black") +
-              labs(title="Number of genes overlap with the SNPs.\nIncluded nearby genes (intergenic regions)",
-                   subtitle = "Click the bar to view the list of genes",
+              labs(title="Click the bar to view the list of genes",
                  x = "Type",
-                 y = "count")
-
-
+                 y = "No. of SNPs")
 
         }else{
           data_plot <- NULL
@@ -758,83 +760,6 @@ snp_table_server <- function(id) {
        }
      })
 
-     # observeEvent(input$plot_click, {
-     #   req(nrow(df_plot()) > 1, !is.null(final_plot()), input$query_menu != "None")
-     #       # isTRUE(gene_error),
-     #       # isTRUE(track_error_df$status))
-     #
-     #   # browser()
-     #   # if(query_menu() != "none")
-     #   # Access plot data
-     #   df <- df_plot()
-     #   # process the data as used in the graph
-     #   plot_info <- df %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
-     #   plot_info$TYPE <- as.character(plot_info$TYPE)
-     #
-     #   # Extract x position from click
-     #   x_labels <- input$plot_click$domain$discrete_limits$x
-     #   x_pos <- round(input$plot_click$x)
-     #
-     #   # Check if click is within x axis bounds
-     #   if (x_pos < 1 || x_pos > length(x_labels)) {
-     #     output$info_click <- renderUI(NULL)
-     #     return()
-     #   }
-     #
-     #   # Get the clicked TYPE label
-     #   clicked_type <- x_labels[[x_pos]]
-     #
-     #   # Filter df for clicked TYPE
-     #   clicked_genes_df <- df %>%
-     #     filter(TYPE == clicked_type) %>%
-     #     select(GENE, CHROM, START = POS, END = POS) %>%
-     #     distinct()
-     #
-     #   # Get y value of click and max count for that type (to check if click is inside bar)
-     #   y_val <- input$plot_click$y
-     #   bar_height <- plot_info[plot_info$TYPE == clicked_type,]$count # mx bar height for the TYPE
-     #
-     #   # Check if y click falls within bar (0 to bar_height)
-     #   if (y_val < 0 || y_val > bar_height) {
-     #     output$info_click <- renderUI(NULL)
-     #     return()
-     #   }
-     #
-     #   # Generate UI with one JBrowse link per gene
-     #   output$info_click <- renderUI({
-     #
-     #     req(df_plot(), gene_data())
-     #     if (nrow(clicked_genes_df) == 0) return(NULL)
-     #
-     #     tagList(
-     #       # h4("Clicked the link to view in JBrowse\n", paste0(clicked_type, ":")),
-     #       HTML(paste0("<h4>Clicked the link to view in JBrowse<br>", clicked_type, ":</h4>")),
-     #       lapply(seq_len(nrow(clicked_genes_df)), function(i) {
-     #         gene <- clicked_genes_df$GENE[i]
-     #         chr <- clicked_genes_df$CHR[i]
-     #         start <- clicked_genes_df$START[i]
-     #         end <- clicked_genes_df$END[i]
-     #         # start <- ifelse(clicked_genes_df$START[i] - 100 < 1, clicked_genes_df$START[i] - 100, 1) # extend by 100 bp
-     #         # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
-     #
-     #         jbrowse_url <- paste0(
-     #           "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants&loc=",
-     #           chr, ":", start, "..", end
-     #         )
-     #
-     #         tags$a(
-     #           href = jbrowse_url,
-     #           target = "_blank",
-     #           style = "display: block; margin-bottom: 4px;",
-     #           ifelse(clicked_type == "intergenic_region", paste0("Nearby ", gene, " (", chr, ":", start, "-", end, ")"),
-     #                  paste0(gene, " (", chr, ":", start, "-", end, ")"))
-     #         )
-     #       })
-     #     )
-     #   })
-     # })
-
-
     #display the graph----------------------
     observe({
      req(!is.null(final_plot()), isTRUE(gene_error()))
@@ -854,92 +779,63 @@ snp_table_server <- function(id) {
       })
 
 
+    # Download action---------------------------------------------------------------------
+    # Action for table
+     output$Download <- downloadHandler(
+       filename = function() {
+         switch(input$filetype,
+                "csv" = "wheatdb_snps.csv",
+                "tsv" = "wheatdb_snps.tsv",
+                "xlsx" = "wheatdb_snps.xlsx",
+                "xls" = "wheatdb_snps.xls")
+       },
+       content = function(file) {
+         data <- final_table()
+         req(is.data.frame(data))  # Ensure data is valid
 
+         if (input$filetype == "csv") {
+           write.csv(data, file, row.names = FALSE)
+         } else if (input$filetype == "tsv") {
+           write.table(data, file, sep = "\t", row.names = FALSE)
+         } else if (input$filetype %in% c("xlsx", "xls")) {
+           # Requires the 'openxlsx' package
+           openxlsx::write.xlsx(data, file)
+         }
+       }
+     )
 
+    # action for graph
+     output$download_bar <- downloadHandler(
 
-        # Download action---------------------------------------------------------------------
-        # Action for table
-        observe({
-          # browser()
-          req(is.data.frame(final_table()))
-               #if(isTRUE(gene_error()) || isTRUE(track_error_df$status)) {
-               output$Download <- downloadHandler(
+       filename = function() {
+         # Avoid ":" in filenames (replace with "-")
+         timestamp <- format(Sys.time(), "%Y-%m-%d_%H-%M-%S")
 
-                filename = function() {
+         switch(input$imgtype,
+                "PNG" = paste0("snps_", timestamp, ".png"),
+                "PDF" = paste0("snps_", timestamp, ".pdf"),
+                "JPG" = paste0("snps_", timestamp, ".jpeg"))
+       },
 
-                  paste(switch(input$filetype,
-                               "csv" = "wheatdb_snps.csv",
-                               "tsv" = "wheatdb_snps.tsv",
-                               "xlsx" = "wheatdb_snps.xlsx",
-                               "xls" = "wheatdb_snps.xls",
-                  ))
-                },
+       content = function(file) {
+         req(final_plot())  # Ensure plot is available
 
-                content = function(file) {
+         if (input$imgtype == "PNG") {
+           png(file, width = 12, height = 8, units = "in", res = 450)
+           print(final_plot())
+           dev.off()
+         } else if (input$imgtype == "PDF") {
+           pdf(file, width = 12, height = 8, onefile = TRUE)
+           print(final_plot())
+           dev.off()
+         } else if (input$imgtype == "JPG") {
+           jpeg(file, width = 12, height = 8, units = "in", res = 450)
+           print(final_plot())
+           dev.off()
+         }
+       }
+     )
 
-                  if(input$filetype == "csv") {
-                    write.csv(final_table(), file, sep = ",")
-                  }
-                  else if(input$filetype == "tsv") {
-                    write.table(final_table(), file, sep = "\t")
-                  }
-                  else if(input$filetype == "xlsx" || input$filetype == "xls") {
-                    write.xlsx(final_table(), file,)
-                  }
-                }
-              )
-
-
-
-        })
-
-        # action for graph
-        observe({
-          req(!is.null(final_plot()))
-          imgtype <- reactive(NULL)
-          # browser()
-          output$download_bar <- downloadHandler(
-
-            filename = function() {
-
-              switch(input$imgtype,
-                           "PNG" = paste0("snps_",format(Sys.time(), "%d_%X"),'.png'),
-                           "PDF" = paste0("snps_",format(Sys.time(), "%d_%X"),'.pdf'),
-                           "JPG" = paste0("snps_",format(Sys.time(), "%d_%X"),'.jpeg'),
-
-              )
-            },
-
-            content = function(file) {
-
-              if(input$imgtype == "PNG") {
-                png(file,  width = 12, height = 8, units = "in", res = 400)
-                print(final_plot())
-                dev.off()
-                contentType = 'image/png'
-
-              }
-              else if(input$imgtype == "PDF") {
-                pdf(file, width = 12, height = 8, onefile = T)
-                print(final_plot())
-                dev.off()
-                contentType = 'image/pdf'
-
-              }
-              else if(input$imgtype == "JPG") {
-                jpeg(file,  width = 12, height = 8, units = "in", res = 400)
-                print(final_plot())
-                dev.off()
-                contentType = 'image/jpeg'
-
-              }
-            }
-
-          )
-
-        })
-#
-#
   } # end of inner module server
 
    )      }# end of module function

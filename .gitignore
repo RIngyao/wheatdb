@@ -1,4 +1,3 @@
-rscript_create_duckdb.R
 data-raw/blast_result
 data-raw/blast_db
 data-raw/query.fa
@@ -10,5 +9,6 @@ data-raw/ipor.txt
 data-raw/durum.txt
 data-raw/wild.txt
 data-raw/shpaero.txt
+data-raw/groups.txt
 inst/app/www/images
 .Rproj.user

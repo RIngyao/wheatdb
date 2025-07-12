@@ -1,5 +1,6 @@
 /* General Body display*/
 /* new design----*/
+
 /* Make the entire page a vertical flex container */
 html, body {
   display: flex;
@@ -58,7 +59,7 @@ html, body {
   right: 0;
   width: 100%;
   z-index: 1030;
-  background-color: #ffffff; /* navbar background color */
+  background-color: #ffffff; /* transparent !important; navbar background color */
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -82,7 +83,7 @@ html, body {
 /* adjust the tab-panel */
 .page-wrapper {
   width: 100%;
-  max-width: 1500px;  /* or 1140px 960px or whatever looks good */
+  max-width: 1200px;  /* or 1140px 960px or whatever looks good */
   margin: 0 auto;     /* centers the div */
   padding: 20px;
   min-height: 80vh;  /* Enough to push footer down for short pages */
@@ -104,6 +105,43 @@ html, body {
   padding-top: 0 ;
   margin-top: 0;
 }
+
+/* For variant */
+/* Restore default box appearance if overridden */
+.box {
+  background-color: #ffffff;
+  border-radius: 3px;
+  border: 1px solid #d2d6de;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
+.box-header {
+  color: #444;
+  display: block;
+  padding: 10px;
+  position: relative;
+  background: #3c8dbc;  /* primary = #3c8dbc or #367fa9 */
+  color: #fff;
+}
+
+.box-header > .box-title {
+  font-size: 20px !important;
+}
+
+.box.box-primary > .box-header {
+  background-color: #3c8dbc;
+}
+
+.box.box-info > .box-header {
+  background-color: #00c0ef;
+}
+
+.box-body {
+  padding: 10px;
+}
+
+/* end variant */
 
 
 /* End of New design---- */
@@ -523,7 +561,7 @@ width: 250px;
   font-family: "Times New Roman", Times, serif;
   color: #222;
 
-  /* 👇 Add these lines to remove any shadow */
+  /* remove any shadow */
   box-shadow: none !important;
   -webkit-box-shadow: none !important;
   -moz-box-shadow: none !important;

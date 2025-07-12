@@ -53,9 +53,33 @@ app_ui <- function(request) {
             "Home",
             # div(class = "page-wrapper",
 
-              fluidRow(
-                # carousel-------------------------
-                HTML('
+            fluidRow(
+              # carousel-------------------------
+              # HTML('
+              #         <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+              #           <div class="carousel-indicators">
+              #             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
+              #             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
+              #           </div>
+              #           <div class="carousel-inner">
+              #             <div class="carousel-item active">
+              #             <img src="www/images/slide_1.jpg" class="d-block w-100" style="height: 400px;">
+              #             </div>
+              #             <div class="carousel-item">
+              #               <img src="www/images/slide_2.jpg" class="d-block w-100" style="height: 400px;">
+              #             </div>
+              #           </div>
+              #           <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+              #             <span class="carousel-control-prev-icon"></span>
+              #             <span class="visually-hidden">Previous</span>
+              #           </button>
+              #           <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+              #             <span class="carousel-control-next-icon"></span>
+              #             <span class="visually-hidden">Next</span>
+              #           </button>
+              #       </div>
+              #     '),
+              HTML('
                       <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-indicators">
                           <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
@@ -66,7 +90,7 @@ app_ui <- function(request) {
                           <img src="www/images/slide_1.jpg" class="d-block w-100" style="height: 400px;">
                           </div>
                           <div class="carousel-item">
-                            <img src="www/images/slide_2.jpg" class="d-block w-100" style="height: 400px;">
+                            <img src="www/images/slide_1.jpg" class="d-block w-100" style="height: 400px;">
                           </div>
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -79,63 +103,49 @@ app_ui <- function(request) {
                         </button>
                     </div>
                   '),
-                # Descriptions---------------------
-                column(12,
-                       # div(
-                       #   class = "descriptions",
-                         HTML('
+              # Descriptions---------------------
+              column(12,
+                     # div(
+                     #   class = "descriptions",
+                     HTML('
                             <div class="descriptions">
-                              <p class="about-text">
+                              <p class="about-text" style = "font-family: Arial, Helvetica, sans-serif;">
                                 Wheat, a climate sensitive crop, is grown on 30.5 million hectares in India and the majority of wheat growing area faces several biotic and abiotic stresses resulting in poor quality grains and reduced yield. Exploration of untapped genetic diversity leading to resistant and better performing cultivars is needed to ensure food security. Breeding wheat varieties with high yield under stress environments has been challenging due to high genotype x environment interaction, lack of truly resistant germplasm, and absence of reliable markers linked with key QTLs. Despite emphasis on exploiting diversity, only few successes exist deploying alleles from traditional landraces in elite breeding programs. There is consensus among gene banks, geneticists, and breeders on the urgent need for systematic evaluation to realize the genomic and resistance potential of large seed collections. Characterization and documentation of valuable germplasm are prerequisites for breeding and genomic studies. The goal of this project is to accelerate germplasm and genomic information usage in wheat breeding programs to minimize yield losses across India. This network project <span style="font-style: italic; font-weight: bold;";> “Germplasm Characterization and Trait Discovery in Wheat using Genomic Approaches and its Integration for Improving Climate Resilience, Productivity and Nutritional Quality” </span> is funded by the  <span style="font-weight: bold;";>Department of Biotechnology, Ministry of Science and Technology, Government of India </span>.
                               </p>
 
-                              <h2 class="section-title">Lab\'s Related Websites</h2>
+                               <h2 class="section-title">Related Websites</h2>
 
-                              <div class="link-descriptions">
+                              <div class="link-container">
 
                                 <div class="website">
-                                  <a href="http://223.31.159.7/chickpea" target="_blank">
-                                    <h4>Chickpea Genome Database</h4>
+                                  <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank">
+                                    <h4>NCBI BLAST</h4>
                                   </a>
-                                  <p>A comprehensive resource for genes, markers, and primers of chickpea.</p>
+                                  <p>NCBI Basic Local Alignment Search Tool</p>
                                 </div>
 
                                 <div class="website">
-                                  <a href="http://223.31.159.7/cicer" target="_blank">
-                                    <h4>Chickpea Methylation Database</h4>
+                                  <a href="https://www.wheatgenome.org/" target="_blank">
+                                    <h4>International Wheat Genome Sequencing Consortium</h4>
                                   </a>
-                                  <p>Database focused on DNA methylation variation in wild and cultivated chickpea accessions.</p>
+                                  <p>IWGSC is an international, collaborative consortium, established in 2005 by a group of wheat growers</p>
                                 </div>
 
                                 <div class="website">
-                                  <a href="http://223.31.159.7/ctdb" target="_blank">
-                                    <h4>Chickpea Transcriptome Database</h4>
+                                  <a href="https://plants.ensembl.org/index.html" target="_blank">
+                                    <h4>Ensembl Plants</h4>
                                   </a>
-                                  <p>Database on whole-genome assembly and annotation of chickpea genomes from NIPGR.</p>
+                                  <p>Genome-centric portal for plant species of scientific interest</p>
                                 </div>
 
-                                <div class="website">
-                                  <a href="http://ricebeanportal.com" target="_blank">
-                                    <h4>Ricebean Portal</h4>
-                                  </a>
-                                  <p>Multi-institutional project exploring molecular signatures and gene regulation for rice bean improvement.</p>
-                                </div>
-
-                                <div class="website">
-                                  <a href="http://223.31.159.7/rsb" target="_blank">
-                                    <h4>Rice Sheath Blight Database</h4>
-                                  </a>
-                                  <p>Database on rice sheath blight disease and ongoing research in rice.</p>
-                                </div>
+                              </div>
 
                             </div>
-
-                          </div>
                                  <br>
                                  <br>
                         ') # end of front page descriptions and link
-                ) # end of column
-              ) # end of fluidRow
+              ) # end of column
+            ) # end of fluidRow
             # ) # div for centering
             # ) # end page wrapper div
           ),
@@ -150,34 +160,34 @@ app_ui <- function(request) {
           tabPanel("Variants",
                    div(class = "page-wrapper",
                        snp_table_ui("table")
-                       )
-                   ),
+                   )
+          ),
           # --------- Morphology ---------
           tabPanel("Morphology",
                    div(class = "page-wrapper",
                        genetic_resources_ui("resource")
-                       )
-                   ),
+                   )
+          ),
           # --------- Genome tracks ---------
           tabPanel("Genome-Tracks",
                    div(class = "page-wrapper",
-                     tags$iframe(
-                       src = "https://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants",
-                       height = "900px",
-                       width = "100%",
-                       style = "border: none;"
-                     )
+                       tags$iframe(
+                         src = "https://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants",
+                         height = "900px",
+                         width = "100%",
+                         style = "border: none;"
+                       )
                    )
           ),
           # --------- Blast ---------
           tabPanel("BLAST", div(class = "page-wrapper",
                                 blast_ui("blast")
-                                )
+          )
           ),
           # --------- Publication ---------
           tabPanel("Publications", div(class = "page-wrapper",
                                        value = "publication page"
-                                       )
+          )
           )
         ) # end of nav bar
     ),
