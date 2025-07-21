@@ -20,65 +20,76 @@ golem_add_external_resources <- function() {
     )
   )
 }
-
 app_ui <- function(request) {
-  fluidPage(
-    theme = bslib::bs_theme(
-      version = 5,
-      bootswatch = "flatly",  # Use any other like "lux", "minty", "yeti", etc.
-      primary = "#208381",
-      base_font = bslib::font_google("Open Sans")
-    ),
+    fluidPage(
+      theme = bslib::bs_theme(
+        version = 5,
+        bootswatch = "flatly",
+        primary = "#208381",
+        base_font = bslib::font_google("Open Sans")
+      ),
 
-    golem_add_external_resources(),
+      golem_add_external_resources(),
+      useShinyjs(),
+      tags$head(
+        tags$link(rel = "stylesheet", type = "text/css", href = "www/custom.css"),
+        tags$script(HTML("
+                    document.addEventListener('DOMContentLoaded', function () {
+                      document.querySelectorAll('.navbar-center a').forEach(function (link) {
+                        link.addEventListener('click', function (e) {
+                          e.preventDefault();
+                          const pageId = this.textContent.toLowerCase().replace(/\\s+/g, '-');
 
-    tags$head(
-      tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
-    ),
+                          // Set input$page for Shiny
+                          Shiny.setInputValue('page', pageId, { priority: 'event' });
 
-    div(id = "app-main",  # Flex container
-        navbarPage(
-          title = div(
-            tags$img(src = "www/new_download.png", height = "50px", style = "margin-right: 0px; margin-bottom: 0;"),
-            span("WheatDB", style = "font-weight: bold; font-size: 30px; color: orange; margin: 0; padding-right: 0; padding-bottom: 0;")
+                          // Remove 'active' class from all links
+                          document.querySelectorAll('.navbar-center a').forEach(function (l) {
+                            l.classList.remove('active');
+                          });
+
+                          // Add 'active' class to the clicked link
+                          this.classList.add('active');
+                        });
+                      });
+                    });
+                    "))
+
+      ),
+      # ----------- Custom Navbar -----------
+      div(class = "custom-navbar",
+          div(class = "navbar-base"), # add this so that the content page is block behind custom-navbar
+          # Background image div (with fade)
+          div(class = "navbar-bg"),
+
+          div(class = "navbar-left",
+              tags$img(src = "www/new_download.png", height = "50px"),
+              span("WheatDB", class = "app-title")
           ),
-          windowTitle = "WheatDB",
-          id = "main_nav",
-          collapsible = TRUE,
-          # inverse = TRUE,  # Dark navbar
-          fluid = TRUE,
+          div(class = "navbar-center",
+              div(class = "navbar-links",
+              tags$a(href = "#", onclick = "Shiny.setInputValue('page', 'home')", "Home"),
+              tags$a(href = "#", onclick = "Shiny.setInputValue('page', 'accessions')", "Accessions"),
+              tags$a(href = "#", onclick = "Shiny.setInputValue('page', 'variants')", "Variants"),
+              tags$a(href = "#", onclick = "Shiny.setInputValue('page', 'morphology')", "Morphology"),
+              tags$a(href = "#", onclick = "Shiny.setInputValue('page', 'genome-tracks')", "Genome-Tracks"),
+              tags$a(href = "#", onclick = "Shiny.setInputValue('page', 'blast')", "BLAST"),
+              tags$a(href = "#", onclick = "Shiny.setInputValue('page', 'publications')", "Publications")
+              )
+          ),
+          div(class = "navbar-right",
+              # empty just in case we need to add logo
+              # tags$img(src = "www/images/wheat_8.jpg", class = "fade-wheat")
+          )
+      ),
 
-          # --------- Home Page ---------
-          tabPanel(
-            "Home",
-            # div(class = "page-wrapper",
-
+      # Content Area
+      div(class = "page-content",
+          # Define All Pages, But Hide by Default
+          div(
+            id = "home", class = "page-home", style = "display: block;",
+            # home------------------
             fluidRow(
-              # carousel-------------------------
-              # HTML('
-              #         <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
-              #           <div class="carousel-indicators">
-              #             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
-              #             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
-              #           </div>
-              #           <div class="carousel-inner">
-              #             <div class="carousel-item active">
-              #             <img src="www/images/slide_1.jpg" class="d-block w-100" style="height: 400px;">
-              #             </div>
-              #             <div class="carousel-item">
-              #               <img src="www/images/slide_2.jpg" class="d-block w-100" style="height: 400px;">
-              #             </div>
-              #           </div>
-              #           <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-              #             <span class="carousel-control-prev-icon"></span>
-              #             <span class="visually-hidden">Previous</span>
-              #           </button>
-              #           <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-              #             <span class="carousel-control-next-icon"></span>
-              #             <span class="visually-hidden">Next</span>
-              #           </button>
-              #       </div>
-              #     '),
               HTML('
                       <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-indicators">
@@ -90,7 +101,7 @@ app_ui <- function(request) {
                           <img src="www/images/slide_1.jpg" class="d-block w-100" style="height: 400px;">
                           </div>
                           <div class="carousel-item">
-                            <img src="www/images/slide_1.jpg" class="d-block w-100" style="height: 400px;">
+                            <img src="www/images/front_seed_spike.jpg" class="d-block w-100" style="height: 400px;">
                           </div>
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -103,100 +114,177 @@ app_ui <- function(request) {
                         </button>
                     </div>
                   '),
-              # Descriptions---------------------
+              # Descriptions
               column(12,
                      # div(
                      #   class = "descriptions",
                      HTML('
-                            <div class="descriptions">
-                              <p class="about-text" style = "font-family: Arial, Helvetica, sans-serif;">
-                                Wheat, a climate sensitive crop, is grown on 30.5 million hectares in India and the majority of wheat growing area faces several biotic and abiotic stresses resulting in poor quality grains and reduced yield. Exploration of untapped genetic diversity leading to resistant and better performing cultivars is needed to ensure food security. Breeding wheat varieties with high yield under stress environments has been challenging due to high genotype x environment interaction, lack of truly resistant germplasm, and absence of reliable markers linked with key QTLs. Despite emphasis on exploiting diversity, only few successes exist deploying alleles from traditional landraces in elite breeding programs. There is consensus among gene banks, geneticists, and breeders on the urgent need for systematic evaluation to realize the genomic and resistance potential of large seed collections. Characterization and documentation of valuable germplasm are prerequisites for breeding and genomic studies. The goal of this project is to accelerate germplasm and genomic information usage in wheat breeding programs to minimize yield losses across India. This network project <span style="font-style: italic; font-weight: bold;";> “Germplasm Characterization and Trait Discovery in Wheat using Genomic Approaches and its Integration for Improving Climate Resilience, Productivity and Nutritional Quality” </span> is funded by the  <span style="font-weight: bold;";>Department of Biotechnology, Ministry of Science and Technology, Government of India </span>.
+                        <div class="descriptions">
+                          <div class = "front-two">
+                            <div class="about-text">
+                              <h1>About</h1>
+                              <p>Wheat is a staple crop grown on over 30.5 million hectares across India. However, the majority of wheat-growing regions face multiple biotic (pests and diseases) and abiotic (climate and soil) stresses that severely impact grain quality and crop yields. Addressing these challenges is critical to ensuring national food security.</p>
+
+                              <p>While India holds vast genetic diversity in wheat, especially within traditional landraces, this diversity remains largely underutilized in modern breeding programs. There is strong consensus among breeders, gene banks, and geneticists on the urgent need for systematic evaluation and integration of this diversity into breeding pipelines. Characterization and documentation of valuable germplasm are prerequisites for breeding and genomic studies.</p>
+
+                              <p>This database provides a variant map of Indian wheat germplasm, developed as part of the national network project -
+                                <span class="highlight">"Germplasm Characterization and Trait Discovery in Wheat using Genomic Approaches and its Integration for Improving Climate Resilience, Productivity and Nutritional Quality"</span>,
+                                supported by the
+                                <span class="funding">Department of Biotechnology, Ministry of Science and Technology, Government of India</span>.
                               </p>
 
-                               <h2 class="section-title">Related Websites</h2>
+                              <p>The goal of this project is to accelerate the use of valuable germplasm and genomic data in wheat breeding programs to minimize yield losses across India.</p>
+                            </div> <!-- about-test -->
 
-                              <div class="link-container">
+                            <div class="about-study">
+                            <h2 class="study-title">Study</h2>
+                              <h2 class="study-title">Data Overview</h2>
 
-                                <div class="website">
-                                  <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank">
-                                    <h4>NCBI BLAST</h4>
-                                  </a>
-                                  <p>NCBI Basic Local Alignment Search Tool</p>
+                              <div class="first-group">
+                                <div class="acc-no">
+                                  <h2>126</h2>
                                 </div>
-
-                                <div class="website">
-                                  <a href="https://www.wheatgenome.org/" target="_blank">
-                                    <h4>International Wheat Genome Sequencing Consortium</h4>
-                                  </a>
-                                  <p>IWGSC is an international, collaborative consortium, established in 2005 by a group of wheat growers</p>
+                                <div class="group-name">
+                                  <a href="#" onclick="Shiny.setInputValue(\'page\', \'accessions\')"
+                                  style="color: white; text-decoration: underline; cursor: pointer;">Indian wheat landrace (ILR)</a>
                                 </div>
-
-                                <div class="website">
-                                  <a href="https://plants.ensembl.org/index.html" target="_blank">
-                                    <h4>Ensembl Plants</h4>
-                                  </a>
-                                  <p>Genome-centric portal for plant species of scientific interest</p>
-                                </div>
-
                               </div>
 
-                            </div>
-                                 <br>
-                                 <br>
-                        ') # end of front page descriptions and link
-              ) # end of column
-            ) # end of fluidRow
-            # ) # div for centering
-            # ) # end page wrapper div
-          ),
-          # other panel-----------------------
-          # div(class = "centered-content", # div for centering
-          # --------- Accesion info ---------
-          tabPanel("Accessions",
-                   div(class = "page-wrapper",
-                       value = "Accessions detail")
-          ),
-          # --------- variants ---------
-          tabPanel("Variants",
-                   div(class = "page-wrapper",
-                       snp_table_ui("table")
-                   )
-          ),
-          # --------- Morphology ---------
-          tabPanel("Morphology",
-                   div(class = "page-wrapper",
-                       genetic_resources_ui("resource")
-                   )
-          ),
-          # --------- Genome tracks ---------
-          tabPanel("Genome-Tracks",
-                   div(class = "page-wrapper",
-                       tags$iframe(
-                         src = "https://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants",
-                         height = "900px",
-                         width = "100%",
-                         style = "border: none;"
-                       )
-                   )
-          ),
-          # --------- Blast ---------
-          tabPanel("BLAST", div(class = "page-wrapper",
-                                blast_ui("blast")
-          )
-          ),
-          # --------- Publication ---------
-          tabPanel("Publications", div(class = "page-wrapper",
-                                       value = "publication page"
-          )
-          )
-        ) # end of nav bar
-    ),
+                              <div class="first-group">
+                                <div class="acc-no">
+                                  <h2>27</h2>
+                                </div>
+                                <div class="group-name">
+                                  <a href="#" onclick="Shiny.setInputValue(\'page\', \'accessions\')"
+                                  style="color: white; text-decoration: underline; cursor: pointer;">Pre-Green-Revolution variety (IPR)</a>
+                                </div>
+                              </div>
 
-    # --------- Footer ---------
-    div(class = "footer-wrapper",
-        HTML('
+                              <div class="first-group">
+                                <div class="acc-no">
+                                  <h2>42</h2>
+                                </div>
+                                <div class="group-name">
+                                  <a href="#" onclick="Shiny.setInputValue(\'page\', \'accessions\')"
+                                  style="color: white; text-decoration: underline; cursor: pointer;">Post-Green-Revolution variety (IPoR)</a>
+                                </div>
+                              </div>
+
+                              <div class="first-group">
+                                <div class="acc-no">
+                                  <h2>26</h2>
+                                </div>
+                                <div class="group-name">
+                                  <a href="#" onclick="Shiny.setInputValue(\'page\', \'accessions\')"
+                                  style="color: white; text-decoration: underline; cursor: pointer;">Indian dwarf wheat (<i>T. sphaerococcum</i>)</a>
+                                </div>
+                              </div>
+
+                              <div class="first-group">
+                                <div class="acc-no">
+                                  <h2>3</h2>
+                                </div>
+                                <div class="group-name">
+                                  <a href="#" onclick="Shiny.setInputValue(\'page\', \'accessions\')"
+                                  style="color: white; text-decoration: underline; cursor: pointer;">Indian <i>T. durum</i></a>
+                                </div>
+                              </div>
+
+                              <div class="first-group">
+                                <div class="acc-no">
+                                  <h2>3</h2>
+                                </div>
+                                <div class="group-name">
+                                  <a href="#" onclick="Shiny.setInputValue(\'page\', \'accessions\')"
+                                  style="color: white; text-decoration: underline; cursor: pointer;">Wild variety</a>
+                                </div>
+                              </div>
+                            </div>
+
+
+                          </div> <!-- front-two -->
+
+                          <div class="front-genetic">
+                          <h2>Genectic landscape of the study</h2>
+                          <div class="front-image-wrapper">
+                            <img src="www/images/map2.png" alt="Genetic landscape map" class="front-map">
+                          </div>
+                          <div class="front-image-wrapper">
+                            <img src="www/images/genetic_landscape.jpg" alt="Genetic landscape" class="front-image">
+                          </div>
+                          </div>
+                          <h2 class="section-title">Useful Links</h2>
+
+                          <div class="link-container">
+
+                            <div class="website">
+                              <a href="https://blast.ncbi.nlm.nih.gov/Blast.cgi" target="_blank">
+                                <h4>NCBI BLAST</h4>
+                              </a>
+                              <p>NCBI\'s Basic Local Alignment Search Tool for comparing nucleotide or protein sequences.</p>
+                            </div>
+
+                            <div class="website">
+                            <a href="https://www.wheatgenome.org/" target="_blank">
+                            <h4>International Wheat Genome Sequencing Consortium (IWGSC)</h4>
+                            </a>
+                            <p>An international collaborative effort established in 2005 to advance wheat genome research.</p>
+                            </div>
+
+                            <div class="website">
+                            <a href="https://plants.ensembl.org/index.html" target="_blank">
+                            <h4>Ensembl Plants</h4>
+                            </a>
+                            <p>A genome-centric portal providing access to plant species of scientific interest.</p>
+                            </div>
+
+                            </div>
+
+                            </div>
+                            <br><br>
+                            '),
+ # end of front page descriptions and link
+              ) # end of column
+            )
+            # end home------------------
+          ),
+          div(
+            id = "accessions", class = "page-wrapper", style = "display: none;",
+            mod_accessions_ui("accessions")
+          ),
+          div(
+            id = "variants", class = "page-wrapper", style = "display: none;",
+            snp_table_ui("table")
+          ),
+          div(
+            id = "morphology", class = "page-wrapper", style = "display: none;",
+            genetic_resources_ui("resource")
+          ),
+
+          div(
+            id = "genome-tracks", class = "page-wrapper", style = "display: none;",
+            tags$iframe(
+              src = "https://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&loc=Chr1A:39670..41695&tracks=wheat-ReferenceSequenceTrack,gene-annotations,All",
+              height = "800px",
+              width = "100%",
+              style = "border: none;"
+            )
+          ),
+
+
+          div(
+            id = "blast", class = "page-wrapper", style = "display: none;",
+            blast_ui("blast")
+          ),
+          div(
+            id = "publications", class = "page-wrapper", style = "display: none;",
+            h3("Publications content coming soon...")
+          ),
+          # --------- Footer ---------
+          div(class = "footer-wrapper",
+              HTML('
           <div class="footermsg">
-            <h3>Copyright All Rights Reserved 2025</h3>
+            <h3>Copyright All Rights Reserved 2025, NIPGR</h3>
             <div class="logo-pair">
               <div class="logo-box1">
                 <img src="www/images/f-l1.jpg" alt="logo1">
@@ -216,6 +304,8 @@ app_ui <- function(request) {
             </div>
           </div>
         ')
+          ) # end of footer
+      )
     )
-  )
+
 }

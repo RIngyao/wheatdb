@@ -22,6 +22,7 @@
 #'@import DBI
 #'@import shinyWidgets
 #'@import shinyBS
+#'@import shinyvalidate
 ## usethis names
 
 NULL

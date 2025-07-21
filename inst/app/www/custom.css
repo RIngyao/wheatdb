@@ -11,12 +11,151 @@ html, body {
   height: 100%;
   overflow-x: hidden;
 }
+
+/* navigation bar */
+.custom-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 120px;
+  padding: 0 30px;
+  z-index: 99;
+  overflow: hidden; /* Ensures the background doesn't leak outside */
+  box-shadow: 0 2px rgba(0, 0, 0, 0.1);
+}
+
+/* apply this to make the page content is below the custom-navbar */
+div.container-fluid {
+  padding-top: 120px;
+}
+
+/*base require to not show the content behing navigation bar */
+.navbar-base {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white; /* or use rgba(255,255,255,0.95) for slight transparency */
+  z-index: 0;
+}
+
+/* Background image of navigation bar with fade */
+.navbar-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  /* for image_4.jpg
+  background-image: url('images/wheat_8.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover; /* allow cropping */
+
+  /* for image_8.jpg */
+  background-image: url('images/wheat_1.jpg'); /* relative to www/ 4 and wheat_8.jpg : not bad 3*/
+  background-position: bottom;
+  background-repeat: repeat;
+  background-size: contain;
+  z-index: 1;
+
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 70%, black 90%, transparent 100%),
+    linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
+  -webkit-mask-composite: destination-in;
+
+  mask-image:
+    linear-gradient(to right, transparent 0%, black 70%, black 90%, transparent 100%),
+    linear-gradient(to bottom, black 0%, black 80%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Foreground content of navigation bar stays solid */
+.navbar-left,
+.navbar-center,
+.navbar-right {
+  position: relative;
+  z-index: 2; /* Above background */
+  display: flex;
+  align-items: center;
+  background-color: white;
+}
+
+/* adjust height of logo and label */
+.navbar-left {
+  height: 120px;
+  background-image: radial-gradient(ellipse at 10% 100%,white,white,white,#bdecfe); /* yellow fae7c7*/
+  /* add Horizontal fade */
+  linear-gradient(to right, transparent 0%, black 0%, black 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+
+  mask-image: linear-gradient(to right, transparent 0%, black 0%, black 90%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Centered nav menu */
+.navbar-center {
+  flex-grow: 1;
+  justify-content: center;
+  align-self: flex-end; /* To align it toward the bottom */
+  padding: 10px;
+  height: 40px;
+  /*margin-bottom: 10px;*/
+   /* Horizontal fade mask */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 85%, transparent 100%);
+  -webkit-mask-composite: source-in;
+
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 85%, transparent 100%);
+  mask-composite: intersect;
+}
+
+.navbar-links a {
+  margin: 0 10px;
+  font-weight: bold;
+  text-decoration: none;
+  color: black;
+}
+
+.navbar-links a:hover {
+  color: #208381 !important;
+}
+
+.navbar-center a.active {
+  border-bottom: 2px solid #208381; /* Underline when active */
+  font-weight: bold;
+  color: #208381; /* colored text for active */
+}
+
+/* web title */
+.app-title {
+  margin-left: 10px;
+  font-weight: bold;
+  font-size: 30px;
+  color: orange;
+  margin: 0;
+  padding-right: 20px;
+  padding-bottom: 0;
+}
+
 /* ========== Adjust the conent and footer =============== */
-/* Main content wrapper that grows but ensures footer stays at the bottom */
+/* Main content wrapper that grows but ensures footer stays at the bottom
 #app-main {
   flex: 1 0 auto;
   display: flex;
   flex-direction: column;
+}
+*/
+
+.page-wrapper {
+  width: 100%;
+  max-width: 1140px;  /* or 1140px 960px or whatever looks good */
+  margin: 0 auto;     /* centers the div */
+  padding: 20px;
+  min-height: 80vh !important;  /* Enough to push footer down for short pages */
+  padding-bottom: 40px;
 }
 
 /* Footer fixed at bottom only when content is short */
@@ -36,69 +175,6 @@ html, body {
   margin-right: auto !important;  /* Center horizontally */
   max-width: 1500px !important;   /* adjust the max-width of screen */
   width: 100% !important;
-}
-
-/* navigation bar */
-/*
-.navbar {
-  position: relative;
-  width: 100%;
-  background-color: transparent !important;
-  border: none;
-  box-shadow: 0 2px rgba(0, 0, 0, 0.1);
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
-  padding-top: 50px;
-}
-*/
-
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  z-index: 1030;
-  background-color: #ffffff; /* transparent !important; navbar background color */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-
-/* this is require for fixed position to displayed the below content */
-#app-main {
-  margin-top: 82px;  /* same as navbar height */
-}
-
-.navbar-nav {
-  justify-content: center;
-  padding-right: 5px:
-  padding-left: 5px;
-}
-
-.navbar-toggle {
-  color: black !important;
-  background-color: black !important;
-}
-
-/* adjust the tab-panel */
-.page-wrapper {
-  width: 100%;
-  max-width: 1200px;  /* or 1140px 960px or whatever looks good */
-  margin: 0 auto;     /* centers the div */
-  padding: 20px;
-  min-height: 80vh;  /* Enough to push footer down for short pages */
-  padding-bottom: 40px;
-}
-
-/* Make the tab labels black */
-.navbar .navbar-nav > li > a {
-  color: #000 !important;
-  font-weight: 900;
-}
-
-/* change color on hover */
-.navbar-nav > li > a:hover {
-  color: #208381 !important;
 }
 
 .slide {
@@ -144,8 +220,153 @@ html, body {
 /* end variant */
 
 
-/* End of New design---- */
+/* front page design */
+.about-text h1 {
+  font-size: 2.2em;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
 
+.about-text p {
+  font-size: 17px !important;
+  font-family: Arial, sans-serif !important;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.highlight {
+  font-style: italic;
+  font-weight: bold;
+  color: #1e7e34;
+}
+
+.funding {
+  font-weight: bold;
+  color: #0056b3;
+}
+
+.section-title {
+  font-size: 1.8em;
+  margin-top: 40px;
+  color: #2c3e50;
+}
+
+/* dividing the about into two column */
+.front-two {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.about-text {
+  flex: 3;
+  min-width: 300px;
+  max-width: 48%;
+  box-sizing: border-box;
+  font-size: 18px;
+  margin-bottom: 40px;
+  text-align: justify;
+}
+
+.about-text p {
+  padding: 5px;
+}
+.about-study{
+  display: flex;
+  flex: 2;
+  min-width: 300px;
+  max-width: 48%;
+  background-color: #086a8f;
+  color:white;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  box-shadow: 10px -10px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+.group-name {
+  border-left: 2px black;
+  text-decoration: underline;
+  text-decoration-color: white;
+}
+.group-name a:hover {
+  color: #d9dad4 !important;
+}
+
+/* genetic_landscape */
+.front-genetic {
+  max-width: 1200px;
+  margin: 120px auto;
+  padding: 40px 10px;
+  background-color: #f9fdfc;
+  text-align: center;
+  font-family: 'Segoe UI', Arial, Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid #048f7e;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.front-genetic h2 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  text-align: left;
+  color: #036d62;
+  font-weight: 700;
+  border-left: 4px solid #048f7e;
+  padding-left: 15px;
+}
+
+/* Scrollable image wrapper */
+/*.front-image-wrapper {
+  width: 100%;
+  max-height: 600px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  position: relative;
+}*/
+
+
+.front-image-wrapper {
+  margin-bottom: 30px;
+}
+
+.front-image-wrapper img {
+  width: 100%;             /* Makes image scale with container */
+  height: auto;            /* Preserves aspect ratio */
+  display: block;
+  border-radius: 8px;      /*  rounded corners */
+  /* box-shadow: 0 4px 8px rgba(0,0,0,0.1); /*  slight shadow */
+}
+
+.front-map {
+  max-height: 700px;   /* adjust map height */
+  height: auto;
+  width: auto;
+  display: block;
+  margin: 0 auto;       /* Center the image */
+  object-fit: contain;  /* Ensure aspect ratio is respected */
+}
+
+/* Image zooms on hover */
+/*.front-image {
+  width: 100%;
+  transition: transform 0.4s ease;
+}*/
+/* When hovering over wrapper, zoom the image
+.front-image-wrapper:hover .front-image {
+  transform: scale(1.2);
+  transform-origin: top bottom;
+}
+*/
+
+/* end of frotn page design */
+
+/* End of New design---- */
 
 .logo {
     width: 100px;
@@ -160,23 +381,23 @@ body, .content-wrapper {
 }
 /*Display for headers*/
 
-  .dropdown{
-    background-color: #ebf2f1;
-    text-align: right;
-    padding: 5px;
-   }
-
-   .main-header {
-     max-height: 30px;
-   }
-   .main-header logo {
-     a
-   }
- .header-font {
-   text-align: right;
-   font-family: Times New Roman;
-   font-size: 20px;
+.dropdown{
+  background-color: #ebf2f1;
+  text-align: right;
+  padding: 5px;
  }
+
+ .main-header {
+   max-height: 30px;
+ }
+ .main-header logo {
+   a
+ }
+.header-font {
+ text-align: right;
+ font-family: Times New Roman;
+ font-size: 20px;
+}
 
 header h1{
   font-size: 3em;
@@ -317,16 +538,11 @@ h2{
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px;
-  font-family: "Georgia", serif;
+  font-family: Arial, sans-serif;
   color: #333;
   line-height: 1.6;
 }
 
-.about-text {
-  font-size: 18px;
-  margin-bottom: 40px;
-  text-align: justify;
-}
 
 .section-title {
   font-family: "Arial", sans-serif;

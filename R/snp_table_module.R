@@ -72,39 +72,27 @@ snp_table_ui <- function(id) {
       ),
 
       conditionalPanel(
-        condition = sprintf("input['%s'] == 'type'", ns("query_menu")),
+        # this approach is required to used the same ID (duplicate ID as earlier verion lead to unexpected behaviour of server logic)
+        condition = sprintf("['coordinates', 'impact', 'type'].includes(input['%s'])", ns("query_menu")),
         fluidRow(
-          column(4, selectInput(ns("type_name"), "TYPE", choices = type)),
+          conditionalPanel(
+            condition = sprintf("input['%s'] == 'type'", ns("query_menu")),
+            column(4, selectInput(ns("type_name"), "TYPE", choices = type))
+          ),
+          conditionalPanel(
+            condition = sprintf("input['%s'] == 'impact'", ns("query_menu")),
+            column(4, selectInput(ns("impact_name"), "IMPACT", choices = c("MODIFIER", "MODERATE", "LOW", "HIGH")))
+          ),
           column(4, selectInput(ns("chr"), "Chromosome", choices = chrom, selected = "Chr1A")),
-          column(2, textInput(ns("start_coord"), "Start", placeholder = "Start value")),
-          column(2, textInput(ns("end_coord"), "End", placeholder = "End value"))
+
+          # update the ui from server
+          uiOutput(ns("ui_start")),
+          uiOutput(ns("ui_end"))
         )
       ),
 
-      conditionalPanel(
-        condition = sprintf("input['%s'] == 'impact'", ns("query_menu")),
-        fluidRow(
-          column(4, selectInput(ns("impact_name"), "IMPACT", choices = c("MODIFIER", "MODERATE", "LOW", "HIGH"))),
-          column(4, selectInput(ns("chr"), "Chromosome", choices = chrom, selected = "Chr1A")),
-          column(2, textInput(ns("start_coord"), "Start", placeholder = "Start value")),
-          column(2, textInput(ns("end_coord"), "End", placeholder = "End value"))
-        )
-      ),
-
-      conditionalPanel(
-        condition = sprintf("input['%s'] == 'coordinates'", ns("query_menu")),
-        fluidRow(
-          column(4, selectInput(ns("chr"), "Chromosome", choices = chrom, selected = "Chr1A")),
-          column(4, textInput(ns("start_coord"), "Start", placeholder = "Start value")),
-          column(4, textInput(ns("end_coord"), "End", placeholder = "End value"))
-        )
-      ),
-
-      conditionalPanel(
-        condition = sprintf("input['%s'] != 'None'", ns("query_menu")),
-        div(style = "text-align:center; margin-top: 20px;",
-            actionButton(ns("click"), "Submit", class = "btn btn-success", style = "font-weight:bold;"))
-      )
+      # button to submit the query: update from server
+      uiOutput(ns("ui_click"))
     ),
 
     br(),
@@ -134,12 +122,17 @@ snp_table_ui <- function(id) {
           ),
           fluidRow(
             column(8,
+                   # conditional panel to show which group to display the graph
+                   uiOutput(ns("ui_plot_group")), # update
+                   # conditionalPanel(condition = sprintf("input['%s'] == 'All'", ns("group_menu")),
+                   #                  selectInput(inputId = ns("plot_group"), label = "Group", choices = c("All", "ILR", "IPR", "GR", "IPoR", "Durum","Sphaerococcum", "Wild"), selected = "All")
+                   #                  ),
                    plotOutput(ns("plot"), height = "600px", click = ns("plot_click"), hover = ns("plot_hover"))
             ),
             column(4,
                    div(
                      style = "height: 600px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px; background: #fefefe;",
-                     # h4("Clicked the gene to view in JBrowse"),
+                     # h4("Click the gene to view in JBrowse"),
                      uiOutput(ns("info_click"))
                    )
             )
@@ -158,6 +151,30 @@ snp_table_server <- function(id) {
   moduleServer(id, function(input, output, session){
 
     ns <- session$ns
+
+    # update the start and end coorindate UI --------------------------------
+    output$ui_start <- renderUI({
+      req(input$query_menu)
+      if(!input$query_menu %in% c("None", "geneID")){
+        width <- switch(input$query_menu,
+                        "type" = 2,
+                        "impact" = 2,
+                        "coordinates" = 4)
+        column(width, textInput(ns("start_coord"), "Start", placeholder = "Start value"))
+      }
+    })
+
+    output$ui_end <- renderUI({
+    req(input$query_menu)
+    if(!input$query_menu %in% c("None", "geneID")){
+      width <- switch(input$query_menu,
+                      "type" = 2,
+                      "impact" = 2,
+                      "coordinates" = 4)
+      column(width, textInput(ns("end_coord"), "End", placeholder = "End value"))
+    }
+  })
+
     # check options: All must not be together with other options--------------
     # feedback error msg for the first line of query options
     opts1_error <- reactiveVal(FALSE) # FALSE mean no error; TRUE indicate there is error
@@ -185,8 +202,82 @@ snp_table_server <- function(id) {
       }
     })
 
+    # submit button --------------------------
+    # show the button only afte validation: first line of defence
+    output$ui_click <- renderUI({
+      req(input$query_menu)
+
+      # initialize shinyvalidate
+      iv <- InputValidator$new()
+
+      # show submit button only when the condition for query is fulfilled
+
+      # Preliminary checks for gene input
+      # refer below sections for detail validation of geneID
+      if(input$query_menu  == "geneID" && input$gene_choice == "Enter"){
+        if(input$gene_choice == "Enter"){
+          req(nzchar(input$enter_gene)) # gene entry must not be empty
+        }else if(input$gene_choice == "Upload"){
+          req(!is.null(input$upload) && nzchar(input$upload$datapath)) # gene entry must not be empty
+        }
+      }
+
+      # check for start and end input
+      if(input$query_menu %in% c("type", "impact", "coordinates")){
+
+        # start must not be empty
+        req(nzchar(input$start_coord))
+        # must be numeric
+        iv$add_rule("start_coord", function(v){
+          if(str_detect(input$start_coord, "^[0-9]+$")){
+            return(NULL)
+          }else{
+            return("Provide numeric value!")
+          }
+        })
+
+        # end must not be empty
+        req(nzchar(input$end_coord))
+        # must be numeric
+        iv$add_rule("end_coord", function(v){
+          if(str_detect(input$end_coord, "^[0-9]+$")){
+            return(NULL)
+          }else{
+            return("Provide numeric value!")
+          }
+        })
+
+        # start < end
+        iv$add_rule("start_coord", function(value) {
+          start <- suppressWarnings(as.numeric(value))
+          end <- suppressWarnings(as.numeric(input$end_coord))
+
+          if(str_detect(value, "^[0-9]+$") && str_detect(input$end_coord, "^[0-9]+$")){
+            if(start >= end){
+              return("Start must be less than end coordinates!")
+            }
+          }
+          return(NULL)
+        })
 
 
+        # enable the iv
+        iv$enable()
+
+        # validate(
+        #   need(as.numeric(input$start_coord) <= as.numeric(input$end_coord), "Start must be smaller than end coordinates!")
+        # )
+      }
+
+      # validate the rules
+      req(iv$is_valid())
+
+      # if all satisfied
+      req(input$query_menu != "None")
+      div(style = "text-align:center; margin-top: 20px;",
+            actionButton(inputId = ns("click"), "Submit", class = "btn btn-success", style = "font-weight:bold;")
+          )
+    })
 
      # get the input  info  for coordinate and  return TRUE for numeric,  else FALSE for  non-numeric
     start_coordTF <- reactive({
@@ -213,14 +304,14 @@ snp_table_server <- function(id) {
     gene_data <- reactive(req(input$plot_click))
 
     # initialize start and end coordinate values
-    start_coord <- reactiveValues(coord=NULL)
-    end_coord <- reactiveValues(coord=NULL)
+    start_coord <- reactive(as.numeric(req(input$start_coord)))
+    end_coord <- reactive(as.numeric(req(input$end_coord)))
     # track the error: False for error msg and TRUE for no error
     track_error_df <- reactiveValues(status=NULL) # to get the error message in red and bold
     # display the error for geneId : False for error and true for no error
     # display_error <- reactiveValues(gene=NULL)
     # error msg for coordinates
-    error_msg <- reactiveValues(msg=NULL)
+    # error_msg <- reactiveValues(msg=NULL)
     # error msg for geneID
     gene_error <- reactiveVal(TRUE) # NUll value doesn't react, so given TRUE - string value if error
     #not to show the table when coordinates are empty
@@ -246,7 +337,6 @@ snp_table_server <- function(id) {
                         choices = c("All", updated_list), selected = "All")
     })
 
-
     # extracting geneId for uploaded data and manually entered data-------------------------
     gene_list <- eventReactive(input$click,{
       # browser()
@@ -266,7 +356,6 @@ snp_table_server <- function(id) {
 
       return(unique(gene()))
     })
-
 
     #checking for validity of geneId-------------------------------------------
     observe({
@@ -308,74 +397,74 @@ snp_table_server <- function(id) {
     })
 
     # checking validity of the coordinates--------------------------
-    observe({
-      # browser()
-      if (!isTruthy(start_coordTF()) || !isTruthy(end_coordTF())){
-        # checking for numeric
-        track_error_df$status <- reactive(FALSE)
-        error_msg$msg <- "Provide numeric value for coordinates"
-        output$table_output <- renderDT((NULL))
-        output$plot <- renderPlot(NULL)
-      }
-      else {
-        # browser()
-        # only numeric values were provided
-        start_coord$coord <- reactive(as.numeric(input$start_coord))
-        end_coord$coord <- reactive(as.numeric(input$end_coord))
-
-        if (!isTruthy(start_coord$coord() < end_coord$coord())) {
-          track_error_df$status <- reactive(FALSE)
-          error_msg$msg <- "End coordinate should be greater than start coordinate"
-          output$table_output <- renderDT((NULL))
-          output$plot <- renderPlot((NULL))
-        }  else {
-          output$alert <- NULL
-          track_error_df$status <- TRUE
-
-        }
-        if (is.null(start_coord$coord()) & is.null(end_coord$coord())) {
-          null_table$show <- TRUE
-          null_plot$imgplot <- TRUE
-          output$table_output <- renderDT((NULL))
-          output$plot <- renderPlot((NULL))
-
-        } else {
-          null_table$show <- FALSE
-          null_plot$imgplot <- FALSE
-        }
-      }
-
-    })
+    # observe({
+    #   # if both the coord are non-numeric
+    #   if (!isTruthy(start_coordTF()) || !isTruthy(end_coordTF())){
+    #     # checking for numeric
+    #     track_error_df$status <- reactive(FALSE)
+    #     error_msg$msg <- "Provide numeric value for coordinates"
+    #     output$table_output <- renderDT((NULL))
+    #     output$plot <- renderPlot(NULL)
+    #   }
+    #   else {
+    #     # browser()
+    #     # only numeric values were provided
+    #     start_coord <- reactive(as.numeric(input$start_coord))
+    #     end_coord <- reactive(as.numeric(input$end_coord))
+    #
+    #     if (!isTruthy(start_coord() < end_coord())) {
+    #       track_error_df$status <- reactive(FALSE)
+    #       error_msg$msg <- "End coordinate should be greater than start coordinate"
+    #       output$table_output <- renderDT((NULL))
+    #       output$plot <- renderPlot((NULL))
+    #     }  else {
+    #       output$alert <- NULL
+    #       track_error_df$status <- TRUE
+    #
+    #     }
+    #     if (is.null(start_coord()) & is.null(end_coord())) {
+    #       null_table$show <- TRUE
+    #       null_plot$imgplot <- TRUE
+    #       output$table_output <- renderDT((NULL))
+    #       output$plot <- renderPlot((NULL))
+    #
+    #     } else {
+    #       null_table$show <- FALSE
+    #       null_plot$imgplot <- FALSE
+    #     }
+    #   }
+    #
+    # })
 
 
     # feedback ----------------------------------------------------------------
 
-    #for coordinates feedback
-    observe({
-     # browser()
-      req(track_error_df$status, error_msg$msg)
-      if(!isTRUE(track_error_df$status)){
-        showFeedbackWarning(inputId="start_coord", text = error_msg$msg, color = "#ff0000",
-                            icon = shiny::icon("warning-sign", lib = "glyphicon"))
-
-         track_error_df$status <- FALSE
-        # error_msg$msg <- TRUE
-      } else{
-        # track_error_df$status <- NULL
-        hideFeedback(inputId = "start_coord")
-      }
-      # refresh existing
-      output$uiDownload <- renderUI(NULL)
-      output$uiDownloadBar <- renderUI(NULL)
-      output$table_output <- renderDT((NULL))
-      output$UiDownload <- renderUI((NULL))
-      output$uiDownloadBar <- renderUI((NULL))
-      output$uiFiletype <- renderUI((NULL))
-      output$uiImageType <- renderUI((NULL))
-      null_table$show <- TRUE
-      output$plot <- renderPlot(NULL)
-      null_plot$imgplot <- TRUE
-    })
+    # #for coordinates feedback
+    # observe({
+    #  # browser()
+    #   req(track_error_df$status, error_msg$msg)
+    #   if(!isTRUE(track_error_df$status)){
+    #     showFeedbackWarning(inputId="start_coord", text = error_msg$msg, color = "#ff0000",
+    #                         icon = shiny::icon("warning-sign", lib = "glyphicon"))
+    #
+    #      track_error_df$status <- FALSE
+    #     # error_msg$msg <- TRUE
+    #   } else{
+    #     # track_error_df$status <- NULL
+    #     hideFeedback(inputId = "start_coord")
+    #   }
+    #   # refresh existing
+    #   output$uiDownload <- renderUI(NULL)
+    #   output$uiDownloadBar <- renderUI(NULL)
+    #   output$table_output <- renderDT((NULL))
+    #   output$UiDownload <- renderUI((NULL))
+    #   output$uiDownloadBar <- renderUI((NULL))
+    #   output$uiFiletype <- renderUI((NULL))
+    #   output$uiImageType <- renderUI((NULL))
+    #   null_table$show <- TRUE
+    #   output$plot <- renderPlot(NULL)
+    #   null_plot$imgplot <- TRUE
+    # })
 
     # feedback for gene id error
     observe({
@@ -430,61 +519,61 @@ snp_table_server <- function(id) {
          df_table <- dplyr_data() %>%
            filter(GENE %in% local(gene_list())) %>%
            # select relevant cultivars + required columns
-           select(CHROM, POS, REF, ALT, GENE, TYPE, IMPACT, all_of(df_sample()))
+           select(CHROM, POS, REF, ALT, GENE, TYPE, IMPACT, variant, all_of(df_sample()))
 
          #dbGetQuery(duckdb_con(), "select * from snp_table where GENE = ?", params = list(gene_list()) ) %>% as.data.frame() %>%
 
     } else {
 
          # query with coordinates
-         if(isTRUE(track_error_df$status) && isTruthy(start_coord$coord()) && isTruthy(end_coord$coord())){
+         # if(isTRUE(track_error_df$status) && isTruthy(start_coord()) && isTruthy(end_coord())){
 
            if(query() == "coordinates") {
 
-             req(start_coord$coord(), end_coord$coord(), chr_sample())
-             df_table <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT *  FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord())) %>%
-               filter(CHROM %in% local(chr_sample()) &
-                        (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord()))
+             req(start_coord(), end_coord(), chr_sample())
+             df_table <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT *  FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord(), end_coord())) %>%
+               filter(CHROM == local(chr_sample()) &
+                        (POS >= local(start_coord()) & POS <= local(end_coord()))
                       ) %>%
                # select only the cultivars choosen by the user
-               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, all_of(df_sample()))
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, variant, all_of(df_sample()))
 
              } else if (query() == "type") {
-             req(type_sample(), start_coord$coord(), end_coord$coord(), chr_sample())
+             req(type_sample(), start_coord(), end_coord(), chr_sample())
 
-             df_table <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample())) %>%
-               filter(CHROM %in% local(chr_sample()) &
-                        (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord())) &
+             df_table <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord(), end_coord(), type_sample())) %>%
+               filter(CHROM == local(chr_sample()) &
+                        (POS >= local(start_coord()) & POS <= local(end_coord())) &
                         TYPE == local(type_sample())
                       ) %>%
                # select only the cultivars choosen by the user
-               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, all_of(df_sample()))
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, variant, all_of(df_sample()))
 
 
            } else if (query() == "impact") {
-             req(chr_sample(), impact_sample(), start_coord$coord(), end_coord$coord(), track_error_df$status)
+             # req(chr_sample(), impact_sample(), start_coord(), end_coord(), track_error_df$status)
+             req(chr_sample(), impact_sample(), start_coord(), end_coord())
 
-             df_table <- dplyr_data() %>% # dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample())) %>%
-               filter(CHROM %in% local(chr_sample()) &
-                        (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord())) &
+             df_table <- dplyr_data() %>% # dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord(), end_coord(), impact_sample())) %>%
+               filter(CHROM == local(chr_sample()) &
+                        (POS >= local(start_coord()) & POS <= local(end_coord())) &
                         IMPACT == local(impact_sample())
                       ) %>%
                # select only the cultivars choosen by the user and display proper table
-               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, all_of(df_sample()))
+               select(CHROM,POS,REF,ALT,GENE,TYPE,IMPACT, variant, all_of(df_sample()))
 
           }
 
         # }
          else {
-           # Default will be null for table
-           df_table <- tibble::as_tibble(NULL)
+           # Default
+           df_table <- dplyr_data()
          } # end of inner if clause
 
-       }# end of if clause
-
+       # }# end of if clause
+    }
       # return and convert lazy evaluation to data.frame
-       return(df_table %>% as.data.frame())
-      }
+      return(as.data.frame(collect(df_table)))
    })
 
 
@@ -494,7 +583,7 @@ snp_table_server <- function(id) {
 
       #if(isTRUE(gene_error()) || isTRUE(track_error_df$status)) {
 
-        if(nrow(final_table()) > 1){
+        # if(nrow(final_table()) > 1){ # don put this condition - require to show empty table
           # show download button for table
           output$uiDownload <- renderUI(
             downloadButton(outputId = ns("Download"), label = "Table",
@@ -506,101 +595,162 @@ snp_table_server <- function(id) {
             radioButtons(inputId = ns("filetype"), inline = TRUE, label = NULL, choices = c("csv", "tsv", "xlsx"))
           )
           output$table_output <- renderDT({
+            # add track link
+            df <- final_table() %>% select(-variant) %>%
+              mutate(Link = paste0(
+                '<a href="http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,All&loc=',
+                CHROM, ':', POS-10, '..', POS+10,
+                '" target="_blank" style = "color:blue;">View</a>'
+              )) %>% select(CHROM, POS, Link, everything())
+
             datatable(
-              cbind(final_table()),
+              df,
+              escape = FALSE, # require to render the HTML link
               options = list(
                 scrollX = TRUE,
                 scrollY = "250px"
               ))
           })
-        }
-})
+        # }
+      })
 
+    # data for graph------------
+    # df_plot <- reactive({
+    # df_plot <- eventReactive(input$click, {
+    #   # req(gene_sample(), gene_error())
+    #   req(isTRUE(gene_error()),input$click)
+    #
+    #   if(query() == "geneID") {
+    #     req(gene_sample())
+    #     if(isTRUE(gene_error()) && nrow(final_table()) > 1) {
+    #       # browser()
+    #       #if there is no error and there are tables
+    #      df <- final_table() #dbGetQuery(duckdb_con(), "select * from snp_table where GENE = ?", params = list(gene))
+    #      # print(df)
+    #     }
+    #   }
+    #   else {
+    #     # check for error and then proceed
+    #     # if(isTRUE(track_error_df$status) && isTruthy(start_coord()) && isTruthy(end_coord())) {
+    #     # if(isTruthy(start_coord()) && isTruthy(end_coord())) {
+    #       if(nrow(final_table()) > 1) {
+    #         if(query() == "type") {
+    #           # req(track_error_df$status, start_coord(), end_coord(), chr_sample(), type_sample())
+    #           req(start_coord(), end_coord(), chr_sample(), type_sample())
+    #           df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord(), end_coord(), type_sample()))
+    #             filter(CHROM == local(chr_sample()) &
+    #                      (POS >= local(start_coord()) & POS <= local(end_coord())) &
+    #                      TYPE == local(type_sample())
+    #                    )
+    #
+    #         }
+    #         else if(query() == "impact") {
+    #           # req(track_error_df$status, start_coord(), end_coord(), chr_sample(), impact_sample())
+    #           req(start_coord(), end_coord(), chr_sample(), impact_sample())
+    #           df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord(), end_coord(), impact_sample()))
+    #             filter(CHROM == local(chr_sample()) &
+    #                      (POS >= local(start_coord()) & POS <= local(end_coord())) &
+    #                      IMPACT == local(impact_sample())
+    #                    )
+    #
+    #         }
+    #         else if(query() == "coordinates") {
+    #           # req(track_error_df$status, start_coord(), end_coord(), chr_sample())
+    #           req(start_coord(), end_coord(), chr_sample())
+    #           df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord(), end_coord()))
+    #             filter(CHROM == local(chr_sample()) &
+    #                      (POS >= local(start_coord()) & POS <= local(end_coord()))
+    #                    )
+    #
+    #         }
+    #
+    #       } else {df <- final_table()}
+    #
+    #     # }
+    #     # else {df <- NULL}
+    #   }
+    #   return(df %>% as.data.frame())
+    #
+    # })
 
-
-     gene <- reactive(unlist(strsplit(gene_sample(), "[, ]+")) %>% unique()) #splitting the gene on the basis of comma or space
-
-     # data for graph------------
-
-     df_plot <- reactive({
-       # req(gene_sample(), gene_error())
-       # req(isTRUE(gene_error()),input$click)
-       req(gene_error(),input$click)
-
-       if(query() == "geneID") {
-         req(gene_sample())
-
-         if(gene_error() && (nrow(final_table()) > 1)) {
-           # browser()
-           #if there is no error and there are tables
-          df <- final_table() #dbGetQuery(duckdb_con(), "select * from snp_table where GENE = ?", params = list(gene))
-          # print(df)
-         }
-       }
-       else {
-         # check for error and then proceed
-         if(isTRUE(track_error_df$status) && isTruthy(start_coord$coord()) && isTruthy(end_coord$coord())) {
-           if(nrow(final_table()) > 1) {
-             if(query() == "type") {
-               req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), type_sample())
-               df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND TYPE = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), type_sample()))
-                 filter(CHROM == local(chr_sample()) &
-                          (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord())) &
-                          TYPE == local(type_sample())
-                        )
-
-             }
-             else if(query() == "impact") {
-               req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample(), impact_sample())
-               df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ? AND IMPACT = ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord(), impact_sample()))
-                 filter(CHROM == local(chr_sample()) &
-                          (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord())) &
-                          IMPACT == local(impact_sample())
-                        )
-
-             }
-             else if(query() == "coordinates") {
-               req(track_error_df$status, start_coord$coord(), end_coord$coord(), chr_sample())
-               df <- dplyr_data() %>% #dbGetQuery(duckdb_con(), "SELECT * FROM snp_table  WHERE CHROM = ? AND POS>= ? AND POS<= ?", params = list(chr_sample(), start_coord$coord(), end_coord$coord()))
-                 filter(CHROM == local(chr_sample()) &
-                          (POS >= local(start_coord$coord()) & POS <= local(end_coord$coord()))
-                        )
-
-             }
-           }
-
-         }
-         else {df <- NULL}
-       }
-       return(df %>% as.data.frame())
-
+    df_plot <- reactive(final_table())
+     # process the graph --------------------------------------------
+     # update the plot_group select input
+     output$ui_plot_group <- renderUI({
+       req(is.data.frame(df_plot()))
+       selectInput(
+         inputId = session$ns("plot_group"),
+         label = "Group",
+         choices = c("All", "ILR", "IPR", "GR", "IPoR", "Durum", "Sphaerococcum", "Wild"),
+         selected = "All"
+       )
      })
 
-      # process the graph--------------------------------------------
-      final_plot <- eventReactive(input$click, {
-        req(is.data.frame(df_plot()))
-        # browser()
+      # final_plot <- eventReactive(input$click, {
+     final_plot <- reactive({
+        req(is.data.frame(final_table()), input$plot_group)
+
+          df_plot <- reactive(final_table())
           if(nrow(df_plot()) > 1){
-           # browser()
-          #  print(df_plot())
-            plot_info <- df_plot() %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
-            #print(plot_info)
+
+            # process the plot based on plot_group
+            if(input$plot_group == "All"){
+
+              if(length(unique(df_plot()$variant)) == 2){
+                # group by Type and variants (SNPs and Indels)
+                plot_info <- df_plot() %>% group_by(TYPE, variant) %>% summarise(count = n()) %>% na.omit()
+              }else{
+                # group by type only
+                plot_info <- df_plot() %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
+              }
+
+            } else {
+              # browser()
+              # load the group info data
+              group_info <- read_delim("data-raw/groups.txt") %>% filter( group == input$plot_group)
+              # join and extract
+              df1 <- df_plot() %>% select(all_of(group_info$name), everything()) %>%
+                # remove those rows that are homozygous to the ref in all the samples
+                filter(!if_all(all_of(group_info$name), ~ .x == "0/0"))
+
+              # compute
+              if(length(unique(df_plot()$variant)) == 2){
+                plot_info <- df1 %>% group_by(TYPE, variant) %>% summarise(count = n()) %>% na.omit()
+              } else {
+                plot_info <- df1 %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
+              }
+
+            }
+
+            # add facet if variant is all
+            facet_layer <- if (length(unique(df_plot()$variant)) == 2) {
+              facet_wrap(variant ~ ., ncol = 3, scales = "free_y")
+            } else {
+              NULL
+            }
+
+            # ggplot
             data_plot <-  ggplot(data = plot_info, aes(x = TYPE, y = count, fill = TYPE)) +
               geom_bar(stat = "identity", width = 0.35)+
               coord_cartesian(clip = "off") +
               theme_classic() +
+              facet_layer +
               theme(
                 axis.text.x = element_text(size = 10, face = "bold", angle = 45, hjust = 1),
                 axis.text.y = element_text(size = 12, face = "bold"),
                 axis.title = element_text(size=12, face = "bold"),
                 axis.ticks = element_line(linewidth = 2),
                 legend.position = "none",
-                plot.margin = margin(t=10, r=10, b=10, l=10, unit = "mm")
+                plot.margin = margin(t=10, r=10, b=10, l=10, unit = "mm"),
+                # for facet
+                strip.text = element_text(size = 15, face = "bold"),
+                panel.spacing.x = unit(10, "mm"),
+                strip.background = element_blank()
               ) +
               geom_text(aes(label = count), vjust = -0.6, size = 4, color = "black") +
-              labs(title="Click the bar to view the list of genes",
+              labs(title="Click the bar to view the overlapped or nearby genes",
                  x = "Type",
-                 y = "No. of SNPs")
+                 y = "No. of variant")
 
         }else{
           data_plot <- NULL
@@ -612,10 +762,89 @@ snp_table_server <- function(id) {
       })
 
      # display the gene along with the link to jbrowse  --------------------------------------------
-     observe({
-       req(input$plot_click, nrow(df_plot()) > 1, !is.null(final_plot()), input$query_menu != "None")
+     observeEvent(input$plot_click, {
+       req(input$plot_click, nrow(df_plot()) > 1, !is.null(final_plot()),
+           input$query_menu != "None",
+           input$variant_menu, input$sample_name, input$group_menu)
 
-       if(isTRUE(gene_error())) {
+       if(isTRUE(gene_error())) { # no error
+
+         # Access plot data
+         df <- df_plot()
+         # process the data as used in the graph
+         plot_info <- df %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
+         plot_info$TYPE <- as.character(plot_info$TYPE)
+
+         # Extract x position from click
+         x_labels <- input$plot_click$domain$discrete_limits$x
+         x_pos <- round(input$plot_click$x)
+
+         # Check if click is within x axis bounds
+         if (x_pos < 1 || x_pos > length(x_labels)) {
+           output$info_click <- renderUI(NULL)
+           return()
+         }
+
+         # Get the clicked TYPE label
+         clicked_type <- x_labels[[x_pos]]
+
+         # Filter df for clicked TYPE
+         clicked_genes_df <- df %>%
+           filter(TYPE == clicked_type) %>%
+           select(GENE, CHROM, START = POS, END = POS) %>%
+           distinct()
+
+         # Get y value of click (to check if click is inside bar)
+         y_val <- input$plot_click$y
+
+         # Make sure 'clicked_type' is valid
+         if (is.null(clicked_type) || !(clicked_type %in% plot_info$TYPE)) {
+           output$info_click <- renderUI(NULL)
+           return()
+         }
+
+         # Safely extract bar height
+         bar_height <- plot_info$count[plot_info$TYPE == clicked_type]
+
+         # Extra check in case bar_height is still empty
+         if (length(bar_height) == 0 || is.null(y_val) || is.na(y_val) || y_val < 0 || y_val > bar_height) {
+           output$info_click <- renderUI(NULL)
+           return()
+         }
+         # Generate UI with one JBrowse link per gene
+         output$info_click <- renderUI({
+
+           req(df_plot(), gene_data())
+           if (nrow(clicked_genes_df) == 0) return(NULL)
+
+           tagList(
+             HTML(paste0("<h4>Click to view in genome-track<br>", clicked_type, ":</h4>")),
+             lapply(seq_len(nrow(clicked_genes_df)), function(i) {
+               gene <- clicked_genes_df$GENE[i]
+               chr <- clicked_genes_df$CHR[i]
+               start <- clicked_genes_df$START[i]
+               end <- clicked_genes_df$END[i]
+               # start <- ifelse(clicked_genes_df$START[i] - 100 < 1, clicked_genes_df$START[i] - 100, 1) # extend by 100 bp
+               # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
+
+               jbrowse_url <- paste0(
+                 "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,All&loc=",
+                 chr, ":", start, "..", end
+               )
+
+               tags$a(
+                 href = jbrowse_url,
+                 target = "_blank",
+                 style = "display: block; margin-bottom: 4px;",
+                 ifelse(clicked_type == "intergenic_region", paste0("Nearby ", gene, " (", chr, ":", start, "-", end, ")"),
+                        paste0(gene, " (", chr, ":", start, "-", end, ")"))
+               )
+             })
+           )
+         })
+       }
+
+       # if(isTRUE(track_error_df$status)) {
          # browser()
          # if(query_menu() != "none")
          # Access plot data
@@ -660,8 +889,7 @@ snp_table_server <- function(id) {
            if (nrow(clicked_genes_df) == 0) return(NULL)
 
            tagList(
-             # h4("Clicked the link to view in JBrowse\n", paste0(clicked_type, ":")),
-             HTML(paste0("<h4>Clicked the link to view in JBrowse<br>", clicked_type, ":</h4>")),
+             HTML(paste0("<h4>Click to view in genome-track<br>", clicked_type, ":</h4>")),
              lapply(seq_len(nrow(clicked_genes_df)), function(i) {
                gene <- clicked_genes_df$GENE[i]
                chr <- clicked_genes_df$CHR[i]
@@ -671,7 +899,7 @@ snp_table_server <- function(id) {
                # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
 
                jbrowse_url <- paste0(
-                 "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants&loc=",
+                 "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,All&loc=",
                  chr, ":", start, "..", end
                )
 
@@ -685,83 +913,12 @@ snp_table_server <- function(id) {
              })
            )
          })
-       }
-
-       if(isTRUE(track_error_df$status)) {
-         # browser()
-         # if(query_menu() != "none")
-         # Access plot data
-         df <- df_plot()
-         # process the data as used in the graph
-         plot_info <- df %>% group_by(TYPE) %>% summarise(count = n()) %>% na.omit()
-         plot_info$TYPE <- as.character(plot_info$TYPE)
-
-         # Extract x position from click
-         x_labels <- input$plot_click$domain$discrete_limits$x
-         x_pos <- round(input$plot_click$x)
-
-         # Check if click is within x axis bounds
-         if (x_pos < 1 || x_pos > length(x_labels)) {
-           output$info_click <- renderUI(NULL)
-           return()
-         }
-
-         # Get the clicked TYPE label
-         clicked_type <- x_labels[[x_pos]]
-
-         # Filter df for clicked TYPE
-         clicked_genes_df <- df %>%
-           filter(TYPE == clicked_type) %>%
-           select(GENE, CHROM, START = POS, END = POS) %>%
-           distinct()
-
-         # Get y value of click and max count for that type (to check if click is inside bar)
-         y_val <- input$plot_click$y
-         bar_height <- plot_info[plot_info$TYPE == clicked_type,]$count # mx bar height for the TYPE
-
-         # Check if y click falls within bar (0 to bar_height)
-         if (y_val < 0 || y_val > bar_height) {
-           output$info_click <- renderUI(NULL)
-           return()
-         }
-
-         # Generate UI with one JBrowse link per gene
-         output$info_click <- renderUI({
-
-           req(df_plot(), gene_data())
-           if (nrow(clicked_genes_df) == 0) return(NULL)
-
-           tagList(
-             # h4("Clicked the link to view in JBrowse\n", paste0(clicked_type, ":")),
-             HTML(paste0("<h4>Clicked the link to view in JBrowse<br>", clicked_type, ":</h4>")),
-             lapply(seq_len(nrow(clicked_genes_df)), function(i) {
-               gene <- clicked_genes_df$GENE[i]
-               chr <- clicked_genes_df$CHR[i]
-               start <- clicked_genes_df$START[i]
-               end <- clicked_genes_df$END[i]
-               # start <- ifelse(clicked_genes_df$START[i] - 100 < 1, clicked_genes_df$START[i] - 100, 1) # extend by 100 bp
-               # end <- clicked_genes_df$END[i] + 100   # extend by 100bp
-
-               jbrowse_url <- paste0(
-                 "http://223.31.159.7/jb_wheatdb/?config=config.json&assembly=wheat&tracks=wheat-ReferenceSequenceTrack,gene-annotations,variants&loc=",
-                 chr, ":", start, "..", end
-               )
-
-               tags$a(
-                 href = jbrowse_url,
-                 target = "_blank",
-                 style = "display: block; margin-bottom: 4px;",
-                 ifelse(clicked_type == "intergenic_region", paste0("Nearby ", gene, " (", chr, ":", start, "-", end, ")"),
-                        paste0(gene, " (", chr, ":", start, "-", end, ")"))
-               )
-             })
-           )
-         })
-       }
+       # }
      })
 
     #display the graph----------------------
     observe({
+     # observeEvent(input$click, {
      req(!is.null(final_plot()), isTRUE(gene_error()))
     #browser()
         # show download button and type here

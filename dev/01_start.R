@@ -50,6 +50,7 @@ usethis::use_package("shinyWidgets", type = "depends")
 usethis::use_package("DT", type = "depends")
 usethis::use_package("tidyverse", type = "depends")
 usethis::use_package("shinyBS")
+usethis::use_package("shinyvalidate")
 # usethis::use_package("tippy")
 # update the DESCRIPTION file with the new packages; it will remove unused packages
 attachment::att_amend_desc()

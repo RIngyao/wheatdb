@@ -10,7 +10,7 @@
 
 #cultivar_list for selectInput-------------------------------------------
 
-idmap <- read_delim("id_map.txt", delim = "\t", col_names = c("variety", "id")) %>% as.data.frame()
+idmap <- read_delim("data-raw/id_map.txt", delim = "\t", col_names = c("variety", "id")) %>% as.data.frame()
 
 genetic_resources_ui <- function(id) {
   ns <- NS(id)

@@ -33,8 +33,10 @@ Imports:
     shiny,
     shinyBS,
     shinydashboard,
+    shinyvalidate,
     shinyWidgets,
     stringr,
+    tibble,
     tools
 Suggests: 
     knitr,

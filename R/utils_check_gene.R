@@ -3,7 +3,7 @@
 #' @description A utils function
 #' @param gene string: gene ID
 #' @param check string: what to check - size or  name or end
-#' @return The return value, if any, from executing the utility.
+#' @return The return value is logical. TRUE for valid gene ID and FALSE for invalid ID.
 #'
 #' @noRd
 check_gene <- function(gene, check){
