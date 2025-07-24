@@ -60,7 +60,18 @@ app_ui <- function(request) {
       div(class = "custom-navbar",
           div(class = "navbar-base"), # add this so that the content page is block behind custom-navbar
           # Background image div (with fade)
-          div(class = "navbar-bg"),
+          # div(class = "navbar-bg"), # backgroun with image
+          # background with video
+          div(class = "navbar-bg",
+              tags$video(
+                autoplay = NA,
+                muted = NA,
+                loop = NA,
+                playsinline = NA,
+                class = "navbar-video",
+                tags$source(src = "www/images/wheat_vid4.mp4", type = "video/mp4")
+              )
+          ),
 
           div(class = "navbar-left",
               tags$img(src = "www/new_download.png", height = "50px"),
@@ -138,7 +149,7 @@ app_ui <- function(request) {
 
                             <div class="about-study">
                             <h2 class="study-title">Study</h2>
-                              <h2 class="study-title">Data Overview</h2>
+                              <h2 class="study-title2">Data Overview</h2>
 
                               <div class="first-group">
                                 <div class="acc-no">
